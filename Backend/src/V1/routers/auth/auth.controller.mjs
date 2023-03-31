@@ -310,12 +310,11 @@ async function httpUpdateAdmin(req, res) {
 			);
 		}
 
-		const userFiltered = excludeFields(
-			updatedUser,
+		const userFiltered = excludeFields(updatedUser, [
 			'id',
 			'password',
-			'passwordSalt'
-		);
+			'passwordSalt',
+		]);
 
 		return res.status(200).json(userFiltered);
 	} catch (error) {

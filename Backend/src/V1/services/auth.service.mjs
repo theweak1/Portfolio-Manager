@@ -38,7 +38,7 @@ async function authenticateJsonWebToken(req, res, next) {
 function generateAccessToken(id) {
 	const user = { id };
 	return jwt.sign(user, process.env.ACCESS_TOKEN_SECRET || '', {
-		expiresIn: '1200s',
+		expiresIn: '5h',
 	});
 }
 

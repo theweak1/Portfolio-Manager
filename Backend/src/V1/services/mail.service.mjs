@@ -88,4 +88,89 @@ async function sendRequestStartupEmail(startupId, email, startup) {
 	}
 }
 
-export { sendResetPasswordEmail, sendRequestStartupEmail };
+async function sendApprovedStartupAccessEmail(toEmail) {
+	try {
+		const APPROVED_STARTUP_ACCESS_TEMPLATE_ID =
+			process.env.APPROVED_STARTUP_ACCESS_TEMPLATE_ID ?? '';
+		const _email = {
+			from: {
+				email: FROM_ADDRESS,
+				name: 'Portfolio Manager',
+			},
+			template_id: APPROVED_STARTUP_ACCESS_TEMPLATE_ID,
+			personalizations: [
+				{
+					to: [
+						{
+							email: toEmail,
+						},
+					],
+					dynamic_template_data: {},
+				},
+			],
+			reply_to: {
+				email: FROM_ADDRESS,
+				name: 'Reply',
+			},
+		};
+
+		return axios({
+			method: 'post',
+			url: EMAIL_SEND_URL,
+			headers: {
+				Authorization: `Bearer ${SENGRID_API_KEY}`,
+			},
+			data: _email,
+		});
+	} catch (error) {
+		throw error;
+	}
+}
+
+async function sendInvestorInvitationEmail(startupInfo, email) {
+	try {
+		const INVITE_EMAIL_TEMPLATE_ID = process.env.INVITE_EMAIL_TEMPLATE_ID ?? '';
+		const _email = {
+			from: {
+				email: FROM_ADDRESS,
+				name: 'Portfolio Manager',
+			},
+			template_id: INVITE_EMAIL_TEMPLATE_ID,
+			personalizations: [
+				{
+					to: [
+						{
+							email: email,
+						},
+					],
+					dynamic_template_data: {
+						startupId: startupInfo.id,
+						companyName: startupInfo.companyName,
+					},
+				},
+			],
+			reply_to: {
+				email: FROM_ADDRESS,
+				name: 'Reply',
+			},
+		};
+
+		return axios({
+			method: 'post',
+			url: EMAIL_SEND_URL,
+			headers: {
+				Authorization: `Bearer ${SENGRID_API_KEY}`,
+			},
+			data: _email,
+		});
+	} catch (error) {
+		throw error;
+	}
+}
+
+export {
+	sendResetPasswordEmail,
+	sendRequestStartupEmail,
+	sendApprovedStartupAccessEmail,
+	sendInvestorInvitationEmail,
+};

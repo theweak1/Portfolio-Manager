@@ -1,6 +1,8 @@
 import crypto from 'crypto';
 import prisma from '../../database/index.mjs';
+
 import { getUserIdFromToken } from '../services/auth.service.mjs';
+
 import { buildErrorObject, excludeFields } from '../util/helpers.mjs';
 
 async function createUser(email, password, role, isApproved) {
@@ -69,7 +71,10 @@ async function isUserAuthorized(email, password) {
 			);
 		}
 
-		const userWithoutPassord = excludeFields(user, 'password', 'passwordSalt');
+		const userWithoutPassord = excludeFields(user, [
+			'password',
+			'passwordSalt',
+		]);
 		return userWithoutPassord;
 	} catch (error) {
 		throw error;
@@ -102,14 +107,13 @@ async function findEmailById(userId) {
 			return null;
 		}
 
-		return excludeFields(
-			user,
+		return excludeFields(user, [
 			'id',
 			'accessToken',
 			'refreshToken',
 			'password',
-			'passwordSalt'
-		);
+			'passwordSalt',
+		]);
 	} catch (error) {
 		throw error;
 	}
@@ -130,14 +134,13 @@ async function updateUserPassword(user, newPassword) {
 			},
 		});
 
-		const userToReturn = excludeFields(
-			updatedUser,
+		const userToReturn = excludeFields(updatedUser, [
 			'id',
 			'password',
 			'passwordSalt',
 			'accessToken',
-			'refreshToken'
-		);
+			'refreshToken',
+		]);
 		return userToReturn;
 	} catch (error) {
 		throw error;
@@ -187,7 +190,33 @@ async function updateUserTokens(userId, accessToken, refreshToken) {
 			},
 		});
 
-		const userFiltered = excludeFields(user, 'id', 'password', 'passwordSalt');
+		const userFiltered = excludeFields(user, [
+			'id',
+			'password',
+			'passwordSalt',
+		]);
+		return userFiltered;
+	} catch (error) {
+		throw error;
+	}
+}
+
+async function updateUserApproval(userId, approval) {
+	try {
+		const user = await prisma.user.update({
+			where: {
+				id: userId,
+			},
+			data: {
+				isApproved: approval,
+			},
+		});
+
+		const userFiltered = excludeFields(user, [
+			'id',
+			'password',
+			'passwordSalt',
+		]);
 		return userFiltered;
 	} catch (error) {
 		throw error;
@@ -262,6 +291,7 @@ export {
 	updateUserPassword,
 	isUserAuthorized,
 	getUserTokens,
+	updateUserApproval,
 	updateUserTokens,
 	validateProfileUpdate,
 };
