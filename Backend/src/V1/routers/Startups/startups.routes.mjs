@@ -5,6 +5,7 @@ import { authenticateJsonWebToken } from '../../services/auth.service.mjs';
 import {
 	httpApproveStartupAccess,
 	httpGetInvestors,
+	httpGetSpecificStartupProfile,
 	httpGetStartupProfileByUserId,
 	httpGetStartupsByInvestorId,
 	httpGetUnApprovedStartups,
@@ -16,21 +17,28 @@ import {
 const router = express.Router();
 
 router.get('/', authenticateJsonWebToken, httpGetStartupsByInvestorId);
-// router.get('/:startupId', authenticateJsonWebToken, httpUpdateStartupProfile);
+
+// TODO: need to create and admin acount to test this route
+router.get('/unapproved', authenticateJsonWebToken, httpGetUnApprovedStartups);
+
+router.get('/investors', authenticateJsonWebToken, httpGetInvestors);
 
 router.get('/profile', authenticateJsonWebToken, httpGetStartupProfileByUserId);
 
-router.get('/unapproved', authenticateJsonWebToken, httpGetUnApprovedStartups);
+router.get(
+	'/:startupId',
+	authenticateJsonWebToken,
+	httpGetSpecificStartupProfile
+);
 
 router.post('/', authenticateJsonWebToken, httpUpdateStartupProfile);
 
+// TODO: need to create and admin acount to test this route
 router.post(
 	'/approve-startup',
 	authenticateJsonWebToken,
 	httpApproveStartupAccess
 );
-
-router.get('/investors', authenticateJsonWebToken, httpGetInvestors);
 
 router.post('/investors', authenticateJsonWebToken, httpNewInvestors);
 

@@ -25,13 +25,21 @@ async function findInvestorByUserId(userId) {
 			where: {
 				userId: userId,
 			},
+			include: {
+				startups: {
+					select: {
+						companyName: true,
+					},
+				},
+			},
 		});
 
 		if (!investor) {
 			return null;
 		}
 
-		return investor;
+		const filteredInvestor = excludeFields(investor, ['userId', 'startupIDs']);
+		return filteredInvestor;
 	} catch (error) {
 		throw error;
 	}
@@ -92,7 +100,6 @@ async function findInvestorByEmail(newInvestors) {
 				id: response ? response.id : '',
 			});
 		}
-
 		return investors;
 	} catch (error) {
 		throw error;

@@ -35,6 +35,7 @@ async function authenticateJsonWebToken(req, res, next) {
 	});
 }
 
+// TODO: Replace expiration time with 1200s after finish development
 function generateAccessToken(id) {
 	const user = { id };
 	return jwt.sign(user, process.env.ACCESS_TOKEN_SECRET || '', {

@@ -14,6 +14,9 @@ const { default: investorRouter } = await import(
 const { default: startupRouter } = await import(
 	`./${API_VERSION}/routers/Startups/startups.routes.mjs`
 );
+const { default: postRouter } = await import(
+	`./${API_VERSION}/routers/Posts/posts.routes.mjs`
+);
 
 dotenv.config();
 
@@ -29,9 +32,9 @@ const options = {
 app.use(cors(options));
 app.use(express.json());
 
-app.use('/api/v1/auth', authRouter);
-app.use('/api/v1/investor', investorRouter);
-
-app.use('/api/v1/startup', startupRouter);
+app.use(`/api/${API_VERSION}/auth`, authRouter);
+app.use(`/api/${API_VERSION}/investor`, investorRouter);
+app.use(`/api/${API_VERSION}/startup`, startupRouter);
+app.use(`/api/${API_VERSION}/post`, postRouter);
 
 export default app;

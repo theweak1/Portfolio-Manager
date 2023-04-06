@@ -4,10 +4,12 @@ import {
 	findStartupByUserId,
 	findUnApprovedStartups,
 	getInvestors,
+	getStartupByIdAndInvestorId,
 	investedStartupsbyInvestorId,
 	updateInvestorsList,
 	updateStartup,
-	validateStartupExists,
+	validateStartupExistsByStartupId,
+	validateStartupExistsByUserId,
 } from '../../models/startups.model.mjs';
 
 import {
@@ -80,7 +82,7 @@ async function httpUpdateStartupProfile(req, res) {
 			});
 		}
 
-		const validatedStartupResponse = await validateStartupExists(
+		const validatedStartupResponse = await validateStartupExistsByUserId(
 			validatedUserResponse.id
 		);
 		if ('errorCode' in validatedStartupResponse) {
@@ -145,7 +147,7 @@ async function httpGetStartupsByInvestorId(req, res) {
 		const investorResponse = await findInvestorByUserId(userId);
 		if (!investorResponse) {
 			return handleBadRequestResponse(
-				'This startup does not exist in the system.',
+				'This investor does not exist in the system.',
 				res
 			);
 		}
@@ -239,6 +241,50 @@ async function httpGetInvestors(req, res) {
 	}
 }
 
+async function httpGetSpecificStartupProfile(req, res) {
+	try {
+		const userId = req.userId;
+		const investorResponse = await findInvestorByUserId(userId);
+
+		if (!investorResponse) {
+			return handleBadRequestResponse(
+				'This investor does not exist in the system.',
+				res
+			);
+		}
+		const startupId = req.params.startupId;
+
+		const startupResponse = await validateStartupExistsByStartupId(startupId);
+
+		if (!startupResponse) {
+			return handleBadRequestResponse(
+				'This startup does not exist in the system.',
+				res
+			);
+		}
+
+		const startup = await getStartupByIdAndInvestorId(
+			startupId,
+			investorResponse.id
+		);
+
+		if (!startup) {
+			return handleNotFoundResponse(
+				'You are not invited to view this startup portfolio.',
+				res
+			);
+		}
+
+		res.status(200).json(startup);
+	} catch (error) {
+		return handleErrorResponse(
+			'get specific startup by startup id',
+			error,
+			res
+		);
+	}
+}
+
 export {
 	httpGetStartupProfileByUserId,
 	httpGetUnApprovedStartups,
@@ -248,4 +294,5 @@ export {
 	httpNewInvestors,
 	httpUpdateInvestor,
 	httpGetInvestors,
+	httpGetSpecificStartupProfile,
 };

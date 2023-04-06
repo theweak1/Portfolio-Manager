@@ -33,17 +33,31 @@ model Investor {
   lastModified DateTime  @default(now())
   userId       String    @unique @db.ObjectId
   user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  Invested     Startup[]
+  startupIDs   String[]  @db.ObjectId
+  startups     Startup[] @relation(fields: [startupIDs], references: [id])
 }
 
 model Startup {
-  id           String    @id @default(auto()) @map("_id") @db.ObjectId
+  id           String     @id @default(auto()) @map("_id") @db.ObjectId
   companyName  String
-  email        String    @unique
-  createdDate  DateTime  @default(now())
-  lastModified DateTime  @default(now())
-  userId       String    @unique @db.ObjectId
-  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  Investor     Investor? @relation(fields: [investorId], references: [id])
-  investorId   String?   @db.ObjectId
+  email        String     @unique
+  createdDate  DateTime   @default(now())
+  lastModified DateTime   @default(now())
+  userId       String     @unique @db.ObjectId
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  investorIds  String[]   @db.ObjectId
+  investors    Investor[] @relation(fields: [investorIds], references: [id])
+
+  blog Post[]
+}
+
+model Post {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  createdDate  DateTime @default(now())
+  lastModified DateTime @default(now())
+  title        String
+  description  String
+
+  creator   Startup @relation(fields: [creatorId], references: [id])
+  creatorId String  @db.ObjectId
 }

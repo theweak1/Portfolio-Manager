@@ -194,12 +194,8 @@ async function httpSignupStartup(req, res) {
 				error: startupResponse,
 			});
 		}
-
-		await sendRequestStartupEmail(
-			startupResponse.id,
-			userInfo.email,
-			startupInfo
-		);
+		// TODO: Uncomment this line when doing full authentication test with admin area.
+		// await sendRequestStartupEmail(startupResponse.id,userInfo.email,startupInfo);
 
 		return res.status(200).json({
 			...startupResponse,

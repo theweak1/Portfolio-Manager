@@ -1,0 +1,130 @@
+import prisma from '../../database/index.mjs';
+
+import { excludeFields, handleNotFoundResponse } from '../util/helpers.mjs';
+
+async function StartupsWithPosts(investorId) {
+	try {
+		const startups = await prisma.startup.findMany({
+			where: {
+				investors: {
+					some: {
+						id: investorId,
+					},
+				},
+			},
+			include: {
+				blog: {
+					select: {
+						lastModified: true,
+						title: true,
+						description: true,
+					},
+				},
+			},
+		});
+
+		if (!startups.length) {
+			return null;
+		}
+
+		const filteredstartups = startups.map((s) =>
+			excludeFields(s, ['investorIds', 'userId', 'createdDate', 'lastModified'])
+		);
+		return startups;
+	} catch (error) {
+		throw error;
+	}
+}
+
+async function CreatePost(startupId, postInfo) {
+	try {
+		const createdPost = await prisma.post.create({
+			data: {
+				title: postInfo.title,
+				description: postInfo.description,
+				creator: {
+					connect: {
+						id: startupId,
+					},
+				},
+			},
+		});
+
+		return createdPost;
+	} catch (error) {
+		throw error;
+	}
+}
+
+async function DeletePost(startupId, postId) {
+	try {
+		const postToDelete = await validatePostExistence(postId);
+
+		if (!postToDelete) {
+			return handleNotFoundResponse('Could not find a post for this id', res);
+		}
+
+		if (postToDelete.creatorId !== startupId) {
+			return buildErrorObject(
+				401,
+				'You are not authorized to delete this post'
+			);
+		}
+
+		const deletedPost = await prisma.post.delete({
+			where: {
+				id: postId,
+			},
+		});
+
+		return deletedPost;
+	} catch (error) {
+		throw error;
+	}
+}
+
+async function updatePost(startupId, postId, postInfo) {
+	try {
+		const postToUpdate = await validatePostExistence(postId);
+
+		if (!postToUpdate) {
+			return handleNotFoundResponse('Could not find a post for this id', res);
+		}
+
+		if (postToUpdate.creatorId !== startupId) {
+			return buildErrorObject(
+				401,
+				'You are not authorized to delete this post'
+			);
+		}
+
+		const UpdatedPost = await prisma.post.update({
+			where: {
+				id: postId,
+			},
+			data: {
+				title: postInfo.title,
+				description: postInfo.description,
+			},
+		});
+
+		return UpdatedPost;
+	} catch (error) {
+		throw error;
+	}
+}
+
+// --- Utilities Functions ---
+async function validatePostExistence(postId) {
+	const post = await prisma.post.findUnique({
+		where: {
+			id: postId,
+		},
+		select: {
+			creatorId: true,
+		},
+	});
+	return post;
+}
+
+export { StartupsWithPosts, CreatePost, DeletePost, updatePost };
