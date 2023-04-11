@@ -2,6 +2,8 @@ import prisma from '../../database/index.mjs';
 
 import { buildErrorObject, excludeFields } from '../util/helpers.mjs';
 
+import { newUpdateNotification } from '../services/mail.service.mjs';
+
 async function createStartup(userId, email, startupInfo) {
 	try {
 		const createdStartup = await prisma.startup.create({
@@ -100,6 +102,7 @@ async function updateStartup(id, email, startupInfo) {
 					? startupInfo.companyName
 					: undefined,
 				email: !!email ? email : undefined,
+				lastModified: new Date(),
 			},
 		});
 
@@ -251,7 +254,15 @@ async function getInvestors(startupId) {
 	try {
 		const startup = await prisma.startup.findUnique({
 			where: { id: startupId },
-			select: { investors: { select: { email: true, name: true } } },
+			select: {
+				companyName: true,
+				investors: {
+					select: {
+						email: true,
+						name: true,
+					},
+				},
+			},
 		});
 
 		return startup;
@@ -297,6 +308,28 @@ async function getStartupByIdAndInvestorId(startupId, investorId) {
 	}
 }
 
+async function NotifyInvestors(startupId) {
+	try {
+		const investorsList = await getInvestors(startupId);
+
+		if (!investorsList) {
+			return null;
+		}
+
+		const companyName = investorsList.companyName;
+		for (const investor of investorsList.investors) {
+			const name = investor.name;
+			const email = investor.email;
+
+			await newUpdateNotification(companyName, name, email);
+		}
+
+		return investorsList;
+	} catch (error) {
+		throw error;
+	}
+}
+
 export {
 	createStartup,
 	findStartupByUserId,
@@ -310,4 +343,5 @@ export {
 	getInvestors,
 	getStartupByIdAndInvestorId,
 	validateStartupExistsByStartupId,
+	NotifyInvestors,
 };

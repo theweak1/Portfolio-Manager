@@ -74,6 +74,7 @@ async function updateInvestor(id, email, investorInfo) {
 			data: {
 				name: !!investorInfo.name ? investorInfo.name : undefined,
 				email: !!email ? email : undefined,
+				lastModified: new Date(),
 			},
 		});
 

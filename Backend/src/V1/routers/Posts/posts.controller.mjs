@@ -7,7 +7,10 @@ import {
 
 import { findInvestorByUserId } from '../../models/investors.model.mjs';
 
-import { findStartupByUserId } from '../../models/startups.model.mjs';
+import {
+	findStartupByUserId,
+	NotifyInvestors,
+} from '../../models/startups.model.mjs';
 import {
 	handleBadRequestResponse,
 	handleErrorResponse,
@@ -60,7 +63,16 @@ async function httpCreatePost(req, res) {
 
 		const postResponse = await CreatePost(startupResponse.id, postInfo);
 
-		res.status(200).json(postResponse);
+		const notifyResponse = await NotifyInvestors(startupResponse.id);
+
+		if (!notifyResponse) {
+			return handleNotFoundResponse(
+				'There are no investors to notify of new post.',
+				res
+			);
+		}
+
+		res.status(200).json({ post: postResponse, investors: notifyResponse });
 	} catch (error) {
 		return handleErrorResponse('Create post', error, res);
 	}

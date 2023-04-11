@@ -40,6 +40,7 @@ async function updateUserEmail(user, email) {
 			},
 			data: {
 				email: email,
+				lastModified: new Date(),
 			},
 		});
 
@@ -131,6 +132,7 @@ async function updateUserPassword(user, newPassword) {
 			data: {
 				password: hashedPassword,
 				passwordSalt: salt,
+				lastModified: new Date(),
 			},
 		});
 

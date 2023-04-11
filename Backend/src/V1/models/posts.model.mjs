@@ -105,6 +105,7 @@ async function updatePost(startupId, postId, postInfo) {
 			data: {
 				title: postInfo.title,
 				description: postInfo.description,
+				lastModified: new Date(),
 			},
 		});
 

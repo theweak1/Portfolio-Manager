@@ -168,9 +168,54 @@ async function sendInvestorInvitationEmail(startupInfo, email) {
 	}
 }
 
+async function newUpdateNotification(startupName, name, email) {
+	try {
+		const NEW_POST_NOTIFICATION_TEMPLATE_ID =
+			process.env.NEW_POST_NOTIFICATION_TEMPLATE_ID ?? '';
+		const _email = {
+			from: {
+				email: FROM_ADDRESS,
+				name: 'Portfolio Manager',
+			},
+			template_id: NEW_POST_NOTIFICATION_TEMPLATE_ID,
+			personalizations: [
+				{
+					to: [
+						{
+							name: name,
+							email: email,
+						},
+					],
+					dynamic_template_data: {
+						companyName: startupName,
+					},
+				},
+			],
+			reply_to: {
+				email: FROM_ADDRESS,
+				name: 'Reply',
+			},
+		};
+
+		console.log(`mail to ${email} has been sent`);
+
+		return axios({
+			method: 'post',
+			url: EMAIL_SEND_URL,
+			headers: {
+				Authorization: `Bearer ${SENGRID_API_KEY}`,
+			},
+			data: _email,
+		});
+	} catch (error) {
+		throw error;
+	}
+}
+
 export {
 	sendResetPasswordEmail,
 	sendRequestStartupEmail,
 	sendApprovedStartupAccessEmail,
 	sendInvestorInvitationEmail,
+	newUpdateNotification,
 };

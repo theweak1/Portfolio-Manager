@@ -1,4 +1,5 @@
 import {
+	NotifyInvestors,
 	addNewInvestor,
 	findStartupById,
 	findStartupByUserId,
