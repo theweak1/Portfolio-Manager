@@ -1,17 +1,45 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
+import React from "react";
+import { createRoot } from "react-dom/client";
+import {
+  createBrowserRouter,
+  RouterProvider,
+  Outlet,
+} from "react-router-dom";
+import CapTable from "./routes/CapTable";
+import CFO from "./routes/CFO";
+import Updates from "./routes/Updates";
+import App from "./App";
 import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
+const AppLayout = () => (
+    <>
+      <div className="m-0 p-0 box-border font-serif">
+        <App />
+        <Outlet />
+      </div>
+    </>
 );
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
+const router = createBrowserRouter([
+  {
+    element: <AppLayout />,
+    children: [
+      {
+        path: "/",
+        element: <CFO />,
+      },
+      {
+        path: "captable",
+        element: <CapTable />,
+      },
+      {
+        path: "updates",
+        element: <Updates />,
+      },
+    ],
+  },
+]);
+
+createRoot(document.getElementById("root")).render(
+  <RouterProvider router={router} />
+);
