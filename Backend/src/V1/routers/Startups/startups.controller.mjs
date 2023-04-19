@@ -1,12 +1,14 @@
 import {
 	NotifyInvestors,
 	addNewInvestor,
+	deleteStartup,
 	findStartupById,
 	findStartupByUserId,
 	findUnApprovedStartups,
 	getInvestors,
 	getStartupByIdAndInvestorId,
 	investedStartupsbyInvestorId,
+	updateCodatId,
 	updateInvestorsList,
 	updateStartup,
 	validateStartupExistsByStartupId,
@@ -14,6 +16,7 @@ import {
 } from '../../models/startups.model.mjs';
 
 import {
+	findUserById,
 	updateUserApproval,
 	updateUserEmail,
 	updateUserPassword,
@@ -37,6 +40,8 @@ import {
 	sendApprovedStartupAccessEmail,
 	sendInvestorInvitationEmail,
 } from '../../services/mail.service.mjs';
+
+import { createCompany, deleteCompany } from '../../services/codat.service.mjs';
 
 async function httpGetStartupProfileByUserId(req, res) {
 	try {
@@ -132,10 +137,19 @@ async function httpApproveStartupAccess(req, res) {
 			);
 		}
 
-		const updatedUser = await updateUserApproval(startup.userId, true);
-		await sendApprovedStartupAccessEmail(startup.email);
+		const codatResponse = await createCompany(startup.companyName);
+		// TODO: Uncomment line below to send a notification to startup that the were accepted in the application
+		// await sendApprovedStartupAccessEmail(startup.email);
+		await updateCodatId(startupId, codatResponse.id);
 
-		return res.status(200).json(updatedUser);
+		const updatedUser = await updateUserApproval(startup.userId, true);
+		return res.status(200).json({
+			updatedUser,
+			codatRedirect: {
+				companyId: codatResponse.id,
+				redirectLink: codatResponse.redirect,
+			},
+		});
 	} catch (error) {
 		return handleErrorResponse('approve startup access', error, res);
 	}
@@ -286,6 +300,26 @@ async function httpGetSpecificStartupProfile(req, res) {
 	}
 }
 
+async function httpDeleteStartup(req, res) {
+	try {
+		const startupId = req.body.startupId;
+
+		const startup = await findStartupById(startupId);
+		if (!startup) {
+			return handleNotFoundResponse(
+				'No startup exists with the provided Id.',
+				res
+			);
+		}
+		// Delete startup from codat Companies service
+		await deleteCompany(startup.codatId);
+		const deletedStartup = await deleteStartup(startup.id);
+		res.status(200).json(deletedStartup);
+	} catch (error) {
+		return handleErrorResponse('delete startup by startup id', error, res);
+	}
+}
+
 export {
 	httpGetStartupProfileByUserId,
 	httpGetUnApprovedStartups,
@@ -296,4 +330,5 @@ export {
 	httpUpdateInvestor,
 	httpGetInvestors,
 	httpGetSpecificStartupProfile,
+	httpDeleteStartup,
 };

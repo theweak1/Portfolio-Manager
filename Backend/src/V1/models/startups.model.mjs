@@ -1,6 +1,10 @@
 import prisma from '../../database/index.mjs';
 
-import { buildErrorObject, excludeFields } from '../util/helpers.mjs';
+import {
+	buildErrorObject,
+	excludeFields,
+	handleNotFoundResponse,
+} from '../util/helpers.mjs';
 
 import { newUpdateNotification } from '../services/mail.service.mjs';
 
@@ -10,11 +14,12 @@ async function createStartup(userId, email, startupInfo) {
 			data: {
 				companyName: startupInfo.companyName,
 				email: email,
+				codatId: startupInfo.codatId,
 				userId: userId,
 			},
 		});
 
-		const startupWithoutId = excludeFields(createdStartup, ['id']);
+		const startupWithoutId = excludeFields(createdStartup, ['id', 'codatId']);
 		return startupWithoutId;
 	} catch (error) {
 		throw error;
@@ -194,6 +199,7 @@ async function addNewInvestor(startupId, investorId) {
 				},
 			},
 		});
+		return NewInvestor;
 	} catch (error) {
 		throw error;
 	}
@@ -308,6 +314,46 @@ async function getStartupByIdAndInvestorId(startupId, investorId) {
 	}
 }
 
+async function deleteStartup(startupId) {
+	try {
+		const startup = await validateStartupExistsByStartupId(startupId);
+
+		if (!startup) {
+			return handleNotFoundResponse('Could not find startup for this id', res);
+		}
+
+		const deletedStartup = await prisma.startup.delete({
+			where: {
+				id: startupId,
+			},
+		});
+
+		return deletedStartup;
+	} catch (error) {
+		throw error;
+	}
+}
+
+async function updateCodatId(id, companyId) {
+	try {
+		const updatedStartup = await prisma.startup.update({
+			where: {
+				id: id,
+			},
+			data: {
+				codatId: companyId,
+			},
+		});
+
+		const startupWithoutId = excludeFields(updatedStartup, ['id']);
+		return startupWithoutId;
+	} catch (error) {
+		throw error;
+	}
+}
+
+// ---------- Utility Functions ----------
+
 async function NotifyInvestors(startupId) {
 	try {
 		const investorsList = await getInvestors(startupId);
@@ -344,4 +390,6 @@ export {
 	getStartupByIdAndInvestorId,
 	validateStartupExistsByStartupId,
 	NotifyInvestors,
+	deleteStartup,
+	updateCodatId,
 };

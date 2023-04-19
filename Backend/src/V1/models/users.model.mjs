@@ -211,6 +211,7 @@ async function updateUserApproval(userId, approval) {
 			},
 			data: {
 				isApproved: approval,
+				lastModified: new Date(),
 			},
 		});
 
@@ -218,6 +219,8 @@ async function updateUserApproval(userId, approval) {
 			'id',
 			'password',
 			'passwordSalt',
+			'accessToken',
+			'refreshToken',
 		]);
 		return userFiltered;
 	} catch (error) {

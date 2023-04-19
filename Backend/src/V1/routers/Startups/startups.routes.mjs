@@ -1,9 +1,13 @@
 import express from 'express';
 
-import { authenticateJsonWebToken } from '../../services/auth.service.mjs';
+import {
+	authenticateJsonWebToken,
+	validateUserAccess,
+} from '../../services/auth.service.mjs';
 
 import {
 	httpApproveStartupAccess,
+	httpDeleteStartup,
 	httpGetInvestors,
 	httpGetSpecificStartupProfile,
 	httpGetStartupProfileByUserId,
@@ -19,7 +23,12 @@ const router = express.Router();
 router.get('/', authenticateJsonWebToken, httpGetStartupsByInvestorId);
 
 // TODO: need to create and admin acount to test this route
-router.get('/unapproved', authenticateJsonWebToken, httpGetUnApprovedStartups);
+router.get(
+	'/unapproved',
+	authenticateJsonWebToken,
+	validateUserAccess,
+	httpGetUnApprovedStartups
+);
 
 router.get('/investors', authenticateJsonWebToken, httpGetInvestors);
 
@@ -31,12 +40,20 @@ router.get(
 	httpGetSpecificStartupProfile
 );
 
+router.delete(
+	'/',
+	authenticateJsonWebToken,
+	validateUserAccess,
+	httpDeleteStartup
+);
+
 router.post('/', authenticateJsonWebToken, httpUpdateStartupProfile);
 
 // TODO: need to create and admin acount to test this route
 router.post(
 	'/approve-startup',
 	authenticateJsonWebToken,
+	validateUserAccess,
 	httpApproveStartupAccess
 );
 
