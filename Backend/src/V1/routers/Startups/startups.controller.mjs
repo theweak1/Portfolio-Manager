@@ -1,14 +1,9 @@
 import {
-	NotifyInvestors,
 	addNewInvestor,
-	deleteStartup,
-	findStartupById,
 	findStartupByUserId,
-	findUnApprovedStartups,
 	getInvestors,
 	getStartupByIdAndInvestorId,
 	investedStartupsbyInvestorId,
-	updateCodatId,
 	updateInvestorsList,
 	updateStartup,
 	validateStartupExistsByStartupId,
@@ -16,8 +11,6 @@ import {
 } from '../../models/startups.model.mjs';
 
 import {
-	findUserById,
-	updateUserApproval,
 	updateUserEmail,
 	updateUserPassword,
 	validateProfileUpdate,
@@ -32,16 +25,10 @@ import {
 	handleBadRequestResponse,
 	handleErrorResponse,
 	handleNotFoundResponse,
-	isValidUUID,
 	titleCase,
 } from '../../util/helpers.mjs';
 
-import {
-	sendApprovedStartupAccessEmail,
-	sendInvestorInvitationEmail,
-} from '../../services/mail.service.mjs';
-
-import { createCompany, deleteCompany } from '../../services/codat.service.mjs';
+import { sendInvestorInvitationEmail } from '../../services/mail.service.mjs';
 
 async function httpGetStartupProfileByUserId(req, res) {
 	try {
@@ -57,15 +44,6 @@ async function httpGetStartupProfileByUserId(req, res) {
 		return res.status(200).json(startupResponse);
 	} catch (error) {
 		return handleErrorResponse('get startup by user id', error, res);
-	}
-}
-
-async function httpGetUnApprovedStartups(req, res) {
-	try {
-		const startups = await findUnApprovedStartups();
-		return res.status(200).json(startups);
-	} catch (error) {
-		return handleErrorResponse('get unapproved startups', error, res);
 	}
 }
 
@@ -114,44 +92,6 @@ async function httpUpdateStartupProfile(req, res) {
 		return res.status(200).json(updateStartupResponse);
 	} catch (error) {
 		return handleErrorResponse('update startup profile', error, res);
-	}
-}
-
-async function httpApproveStartupAccess(req, res) {
-	try {
-		const startupId = req.body.startupId;
-
-		const isValid = await isValidUUID(startupId);
-		if (!isValid) {
-			return handleBadRequestResponse(
-				'This Id passed in the request does not have a valid format.',
-				res
-			);
-		}
-
-		const startup = await findStartupById(startupId);
-		if (!startup) {
-			return handleNotFoundResponse(
-				'No startup exists with the provided Id.',
-				res
-			);
-		}
-
-		const codatResponse = await createCompany(startup.companyName);
-		// TODO: Uncomment line below to send a notification to startup that the were accepted in the application
-		// await sendApprovedStartupAccessEmail(startup.email);
-		await updateCodatId(startupId, codatResponse.id);
-
-		const updatedUser = await updateUserApproval(startup.userId, true);
-		return res.status(200).json({
-			updatedUser,
-			codatRedirect: {
-				companyId: codatResponse.id,
-				redirectLink: codatResponse.redirect,
-			},
-		});
-	} catch (error) {
-		return handleErrorResponse('approve startup access', error, res);
 	}
 }
 
@@ -300,35 +240,12 @@ async function httpGetSpecificStartupProfile(req, res) {
 	}
 }
 
-async function httpDeleteStartup(req, res) {
-	try {
-		const startupId = req.body.startupId;
-
-		const startup = await findStartupById(startupId);
-		if (!startup) {
-			return handleNotFoundResponse(
-				'No startup exists with the provided Id.',
-				res
-			);
-		}
-		// Delete startup from codat Companies service
-		await deleteCompany(startup.codatId);
-		const deletedStartup = await deleteStartup(startup.id);
-		res.status(200).json(deletedStartup);
-	} catch (error) {
-		return handleErrorResponse('delete startup by startup id', error, res);
-	}
-}
-
 export {
 	httpGetStartupProfileByUserId,
-	httpGetUnApprovedStartups,
 	httpUpdateStartupProfile,
-	httpApproveStartupAccess,
 	httpGetStartupsByInvestorId,
 	httpNewInvestors,
 	httpUpdateInvestor,
 	httpGetInvestors,
 	httpGetSpecificStartupProfile,
-	httpDeleteStartup,
 };

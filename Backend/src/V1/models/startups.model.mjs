@@ -352,6 +352,24 @@ async function updateCodatId(id, companyId) {
 	}
 }
 
+async function getAllStartups() {
+	try {
+		const startups = await prisma.startup.findMany({
+			select: {
+				id: true,
+				companyName: true,
+				email: true,
+			},
+		});
+		if (!startups.length) {
+			return null;
+		}
+		return startups;
+	} catch (error) {
+		throw error;
+	}
+}
+
 // ---------- Utility Functions ----------
 
 async function NotifyInvestors(startupId) {
@@ -392,4 +410,5 @@ export {
 	NotifyInvestors,
 	deleteStartup,
 	updateCodatId,
+	getAllStartups,
 };
