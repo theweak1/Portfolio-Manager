@@ -1,10 +1,45 @@
-import Sidebar from "./components/Sidebar"
+import React from "react";
+import { createBrowserRouter, RouterProvider, Outlet } from "react-router-dom";
+import CapTable from "./routes/CapTable";
+import CFO from "./routes/CFO";
+import Updates from "./routes/Updates";
+// import Home from "./routes/Home";
 import './index.css';
+import Sidebar from "./components/Sidebar";
 
-export default function App() {
+const AppLayout = () => (
+  <div className="m-0 p-0 box-border font-serif">
+    <Sidebar />
+    <Outlet />
+  </div>
+);
+
+const router = createBrowserRouter([
+  {
+    element: <AppLayout />,
+    children: [
+      {
+        path: "/",
+        element: <CFO />,
+      },
+      {
+        path: "/captable",
+        element: <CapTable />,
+      },
+      {
+        path: "/updates",
+        element: <Updates />,
+      },
+    ],
+  },
+]);
+
+function App() {
   return (
-    <div>
-      <Sidebar/>
-    </div>
-  )
+    <RouterProvider router={router}>
+      <Outlet />
+    </RouterProvider>
+  );
 }
+
+export default App;

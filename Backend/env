@@ -1,0 +1,26 @@
+# Environment variables declared in this file are automatically made available to Prisma.
+# See the documentation for more detail: https://pris.ly/d/prisma-schema#accessing-environment-variables-from-the-schema
+
+# Prisma supports the native connection string format for PostgreSQL, MySQL, SQLite, SQL Server, MongoDB and CockroachDB.
+# See the documentation for all the connection string options: https://pris.ly/d/connection-strings
+
+#Database parameters
+DB_USER="portfoliomanager"
+DB_PASSWORD="BoW60SrqVKFMOBxi"
+DB_NAME="Production"
+
+DATABASE_URL="mongodb+srv://${DB_USER}:${DB_PASSWORD}@cluster0.wv880ep.mongodb.net/${DB_NAME}?retryWrites=true&w=majority"
+
+#Jason Web Token Parameters
+ACCESS_TOKEN_SECRET="+QKKszs%WZ+hcL()^cAI4&SgILAYrLYyGKeGw7mcSn&84sUa+HPtw*)QAVBeN$D*M+RFf8&4@AnwaUyLIV!pVIq5A9+eCbW27dZ5Hf*pB(Z3KnKu8XREVR!JF4WPKXz)"
+REFRESH_TOKEN_SECRET="x6xn99b8LALHt9*!^jjpKYIgvn(6V4tGI%V3J%SLLAzMrtXpcFC$J4U&czNnJ&!wx6xn99b8LALHt9*!^jjpKYIgvn(6V4tGI%V3J%SLLAzMrtXpcFC$J4U&czNnJ&!w"
+
+#SendGrid Parameters and Templates Id
+PORTFOLIO_ADDRESS= "portfolio-manager@hotmail.com"
+SENDGRID_API_KEY="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"
+SENDGRID_EMAIL_SEND_URL="https://api.sendgrid.com/v3/mail/send"
+RESET_PASSWORD_TEMPLATE_ID="d-dcd20d382dc048f0b06498dd69833b96"
+INVITE_EMAIL_TEMPLATE_ID="d-426a0b3f290b45f79c69d76bbdc01e8f"
+REQUEST_STARTUP_ACCESS_TEMPLATE_ID="d-03292008987e46ceb7820db24a111ee0"
+APPROVED_STARTUP_ACCESS_TEMPLATE_ID="d-53173e183e474518aa0d8d05a3ce09eb"
+
