@@ -32,6 +32,7 @@ const options = {
 app.use(cors(options));
 app.use(express.json());
 
+//Routes
 app.use(`/api/${API_VERSION}/auth`, authRouter);
 app.use(`/api/${API_VERSION}/investor`, investorRouter);
 app.use(`/api/${API_VERSION}/startup`, startupRouter);
