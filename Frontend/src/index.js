@@ -1,10 +1,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import Home from "./Home";
+import { BrowserRouter } from 'react-router-dom'
 import App from "./App"
 
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
- <App/>
+  
+    <App />
+  
 );
