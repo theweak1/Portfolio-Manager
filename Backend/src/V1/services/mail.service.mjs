@@ -197,8 +197,6 @@ async function newUpdateNotification(startupName, name, email) {
 			},
 		};
 
-		console.log(`mail to ${email} has been sent`);
-
 		return axios({
 			method: 'post',
 			url: EMAIL_SEND_URL,

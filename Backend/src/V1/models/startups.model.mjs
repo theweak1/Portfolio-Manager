@@ -6,6 +6,7 @@ import {
 	handleNotFoundResponse,
 } from '../util/helpers.mjs';
 
+import { getConnections } from '../services/codat.service.mjs';
 import { newUpdateNotification } from '../services/mail.service.mjs';
 
 async function createStartup(userId, email, startupInfo) {
@@ -169,15 +170,32 @@ async function investedStartupsbyInvestorId(investorId) {
 				id: true,
 				companyName: true,
 				email: true,
+				codatId: true,
+				blog: true,
 			},
+			// include: {
+			// 	posts: true,
+			// },
 		});
 
 		if (!startups.length) {
 			return null;
 		}
 
-		const filteredStartups = startups.map((s) =>
-			excludeFields(s, ['investorIds', 'userId'])
+		// loop through startups and get transactions for each one
+		const startupsWithTransactions = await Promise.all(
+			startups.map(async (startup) => {
+				const connectionIds = await getConnections(startup.codatId);
+				return {
+					...startup,
+					ids: connectionIds.results.map((result) => result.id),
+				};
+			})
+		);
+		console.log(startupsWithTransactions);
+		// console.log(startupsWithTransactions);
+		const filteredStartups = startupsWithTransactions.map((s) =>
+			excludeFields(s, ['investorIds', 'userId', 'ids'])
 		);
 		return filteredStartups;
 	} catch (error) {

@@ -34,4 +34,27 @@ async function deleteCompany(companyId) {
 	}
 }
 
-export { createCompany, deleteCompany };
+async function getConnections(companyId) {
+	try {
+		const response = await codatApiClient.get(
+			`/companies/${companyId}/connections`
+		);
+
+		return response.data;
+	} catch (error) {
+		throw error;
+	}
+}
+
+async function getTransactions(companyId, integrationId) {
+	try {
+		const response = await codatApiClient.get(
+			`/companies/${companyId}/connections/${integrationId}/data`
+		);
+
+		return response.data;
+	} catch (error) {
+		throw error;
+	}
+}
+export { createCompany, deleteCompany, getConnections };

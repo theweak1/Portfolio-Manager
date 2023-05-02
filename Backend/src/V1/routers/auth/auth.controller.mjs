@@ -140,6 +140,7 @@ async function httpSignupInvestor(req, res) {
 	}
 }
 
+// TODO: Create a Company Name verification function to avoid duplicate company names
 async function httpSignupStartup(req, res) {
 	try {
 		const userInfo = {
