@@ -6,8 +6,7 @@ export const SidebarData = [
   
     {
       title: "CFO",
-      path: "/",
-      
+      path: "/cfo",
     },
     {
       title: "Cap Table",
