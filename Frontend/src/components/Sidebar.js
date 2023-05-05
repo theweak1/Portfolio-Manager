@@ -14,20 +14,20 @@ export default function Sidebar() {
         <> 
                
             {/*top bar where the menu icon is located*/}
-            <div className="fixed flex justify-start top-0 left-0 h-full w-14 md:w-20 bg-darkGrey shadow-md">{/*navbar*/}
-                <Link to="#" className="m-4 md:m-5 text-2xl md:text-4xl bg-none text-white ">{/*menu-bars*/}
+            <div className="fixed flex justify-center items-start top-0 left-0 h-full w-12 sm:w-14 md:w-16 bg-white border-b-yellow shadow-sm">{/*navbar*/}
+                <Link to="#" className=" p-4 text-xl sm:text-2xl md:text-3xl text-darkGrey ">{/*menu-bars*/}
                     <FaIcons.FaBars onClick={()=>setSidebar(!sidebar)} />{/*menu icon and action*/}
                 </Link>
             </div>
 
             {/*open and close the menu*/}         {/*nav-menu when hidden/active(true) left-0*/}
-            <nav className={sidebar ? "fixed flex justify-center w-52 md:w-64 h-full top-0 left-0 transition-all duration-[100ms] ease-linear bg-darkGrey shadow-md" 
-                                    : "fixed flex justify-center w-52 md:w-64 h-full top-0 -left-full transition-all duration-[100ms] ease-linear bg-darkGrey shadow-md"}>
-                <ul className="w-full" onClick={()=>setSidebar(!sidebar)}> {/*nav-menu-items*/}   {/*nav-menu shown(false) -left-full*/}
+            <nav className={sidebar ? "fixed flex justify-center w-44 sm:w-52 md:w-60 h-full top-0 left-0 transition-all duration-[700ms] ease-out  bg-white shadow-sm" 
+                                    : "fixed flex justify-center w-44 sm:w-52 md:w-60 h-full top-0 -left-full transition-all duration-[700ms] ease-in bg-white shadow-sm"}>{/*nav-menu shown(false) -left-full*/}                                                                      
+                <ul className="w-full " onClick={()=>setSidebar(!sidebar)}> {/*nav-menu-items*/}  
                         
                     {/*where the close(X) icon is located*/}
-                    <li className="flex justify-start items-center h-12 md:h-16 w-full bg-white">{/*container for x*/}
-                        <Link to="#" className="px-44 md:px-52 text-2xl md:text-4xl bg-none text-darkGrey">{/*menu-cross (x)*/}
+                    <li className="flex justify-end items-end p-3 bg-white border-b-4 border-yellow">{/*container for x*/}
+                        <Link to="#" className="text-xl sm:text-2xl md:text-3xl text-darkGrey">{/*menu-cross (x)*/}
                             <AiIcons.AiOutlineClose />{/*close icon and action*/}
                         </Link>
                     </li>
@@ -36,7 +36,7 @@ export default function Sidebar() {
                         return (
                             <li key={index}>
                             <Link to={item.path} onClick={()=>setSidebar(!sidebar)}>{/*nav-text*/}
-                                <span className="flex items-center w-full h-full no-underline px-4 md:px-6 py-3 md:py-4 text-xl md:text-3xl text-white hover:bg-white hover:text-darkGrey">{item.title}</span>
+                                <span className="flex justify-start items-center p-5 mx-2 text-md sm:text-xl md:text-2xl rounded-sm text-darkGrey hover:bg-lightGrey hover:opacity-80 hover:bg-opacity-10 shadow-sm">{item.title}</span>
                             </Link>          
                             </li>
                                 
