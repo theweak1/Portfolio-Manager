@@ -1,6 +1,9 @@
 import jwt from 'jsonwebtoken';
-import { getUserTokens } from '../models/users.model.mjs';
-import { buildErrorObject } from '../util/helpers.mjs';
+import { findUserById, getUserTokens } from '../models/users.model.mjs';
+import {
+	buildErrorObject,
+	handleBadRequestResponse,
+} from '../util/helpers.mjs';
 
 async function authenticateJsonWebToken(req, res, next) {
 	const authHeader = req.headers['authorization'];
@@ -82,10 +85,25 @@ function getUserIdFromToken(token) {
 	return user.id;
 }
 
+async function validateUserAccess(req, res, next) {
+	const userId = req.userId;
+
+	const user = await findUserById(userId);
+	const role = user.role;
+	if (!role === 'Admin') {
+		return handleBadRequestResponse(
+			'You are not allowed to perform this action',
+			res
+		);
+	}
+	next();
+}
+
 export {
 	authenticateJsonWebToken,
 	generateAccessToken,
 	generateRefreshToken,
 	verifyRefreshToken,
 	getUserIdFromToken,
+	validateUserAccess,
 };

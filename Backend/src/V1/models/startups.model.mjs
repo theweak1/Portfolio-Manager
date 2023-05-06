@@ -1,7 +1,12 @@
 import prisma from '../../database/index.mjs';
 
-import { buildErrorObject, excludeFields } from '../util/helpers.mjs';
+import {
+	buildErrorObject,
+	excludeFields,
+	handleNotFoundResponse,
+} from '../util/helpers.mjs';
 
+import { getConnections } from '../services/codat.service.mjs';
 import { newUpdateNotification } from '../services/mail.service.mjs';
 
 async function createStartup(userId, email, startupInfo) {
@@ -10,11 +15,12 @@ async function createStartup(userId, email, startupInfo) {
 			data: {
 				companyName: startupInfo.companyName,
 				email: email,
+				codatId: startupInfo.codatId,
 				userId: userId,
 			},
 		});
 
-		const startupWithoutId = excludeFields(createdStartup, ['id']);
+		const startupWithoutId = excludeFields(createdStartup, ['id', 'codatId']);
 		return startupWithoutId;
 	} catch (error) {
 		throw error;
@@ -164,15 +170,32 @@ async function investedStartupsbyInvestorId(investorId) {
 				id: true,
 				companyName: true,
 				email: true,
+				codatId: true,
+				blog: true,
 			},
+			// include: {
+			// 	posts: true,
+			// },
 		});
 
 		if (!startups.length) {
 			return null;
 		}
 
-		const filteredStartups = startups.map((s) =>
-			excludeFields(s, ['investorIds', 'userId'])
+		// loop through startups and get transactions for each one
+		const startupsWithTransactions = await Promise.all(
+			startups.map(async (startup) => {
+				const connectionIds = await getConnections(startup.codatId);
+				return {
+					...startup,
+					ids: connectionIds.results.map((result) => result.id),
+				};
+			})
+		);
+		console.log(startupsWithTransactions);
+		// console.log(startupsWithTransactions);
+		const filteredStartups = startupsWithTransactions.map((s) =>
+			excludeFields(s, ['investorIds', 'userId', 'ids'])
 		);
 		return filteredStartups;
 	} catch (error) {
@@ -194,6 +217,7 @@ async function addNewInvestor(startupId, investorId) {
 				},
 			},
 		});
+		return NewInvestor;
 	} catch (error) {
 		throw error;
 	}
@@ -308,6 +332,64 @@ async function getStartupByIdAndInvestorId(startupId, investorId) {
 	}
 }
 
+async function deleteStartup(startupId) {
+	try {
+		const startup = await validateStartupExistsByStartupId(startupId);
+
+		if (!startup) {
+			return handleNotFoundResponse('Could not find startup for this id', res);
+		}
+
+		const deletedStartup = await prisma.startup.delete({
+			where: {
+				id: startupId,
+			},
+		});
+
+		return deletedStartup;
+	} catch (error) {
+		throw error;
+	}
+}
+
+async function updateCodatId(id, companyId) {
+	try {
+		const updatedStartup = await prisma.startup.update({
+			where: {
+				id: id,
+			},
+			data: {
+				codatId: companyId,
+			},
+		});
+
+		const startupWithoutId = excludeFields(updatedStartup, ['id']);
+		return startupWithoutId;
+	} catch (error) {
+		throw error;
+	}
+}
+
+async function getAllStartups() {
+	try {
+		const startups = await prisma.startup.findMany({
+			select: {
+				id: true,
+				companyName: true,
+				email: true,
+			},
+		});
+		if (!startups.length) {
+			return null;
+		}
+		return startups;
+	} catch (error) {
+		throw error;
+	}
+}
+
+// ---------- Utility Functions ----------
+
 async function NotifyInvestors(startupId) {
 	try {
 		const investorsList = await getInvestors(startupId);
@@ -344,4 +426,7 @@ export {
 	getStartupByIdAndInvestorId,
 	validateStartupExistsByStartupId,
 	NotifyInvestors,
+	deleteStartup,
+	updateCodatId,
+	getAllStartups,
 };

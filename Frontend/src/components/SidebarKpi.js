@@ -8,19 +8,20 @@ export default function SidebarKpi (){
     const [menuKpi, setMenuKpi] = useState(false);
     return(    
         <>
-            <div className="fixed flex justify-end right-0 top-1/5 h-3/6 md:h-4/6 w-14 md:w-20 bg-white shadow-md">{/*navbar*/}
-                <Link to="#k" className="m-4 md:m-5 text-2xl md:text-4xl bg-none text-darkGrey ">{/*menu-bars*/}
+            <div className="fixed flex justify-center right-0 top-32 h-72 sm:h-80 md:h-96 w-12 sm:w-14 md:w-16 transition-all duration-[700ms] ease-out bg-white shadow-md">{/*navbar*/}
+                <Link to="#k" className="p-3 text-xl sm:text-2xl md:text-3xl bg-none text-darkGrey ">{/*menu-bars*/}
                     <FaIcons.FaBars onClick={()=>setMenuKpi(!menuKpi)} />{/*menu icon and action*/}
                 </Link>
             </div>
 
-            <nav className={menuKpi ? "fixed flex justify-end w-52 md:w-64 top-1/5 h-3/6 md:h-4/6 right-0 transition-all duration-[100ms] ease-linear bg-white shadow-md" 
-                                    : "fixed flex justify-end w-52 md:w-64 top-1/5 h-3/6 md:h-4/6 -right-full transition-all duration-[100ms] ease-linear bg-white shadow-md"}>
-                        <ul className="w-full" onClick={()=>setMenuKpi(!menuKpi)}> {/*nav-menu-items*/}   {/*nav-menu shown(false) -left-full*/}
+             {/*open and close the menu*/}         {/*kpi-menu when hidden/active(true) right-0*/}
+            <nav className={menuKpi ? "fixed flex justify-center w-44 sm:w-52 md:w-60 top-32 h-72 sm:h-80 md:h-96 right-0 transition-all duration-[700ms] ease-out bg-white shadow-md" 
+                                    : "fixed flex justify-center w-44 sm:w-52 md:w-60 top-32 h-72 sm:h-80 md:h-96 -right-full transition-all duration-[700ms] ease-in bg-white shadow-md"}>
+                        <ul className="w-full" onClick={()=>setMenuKpi(!menuKpi)}> {/*kpi-menu-items*/}   {/*kpi-menu shown(false) -right-full*/}
                             
                             {/*where the close(X) icon is located*/}
-                            <li className="flex justify-end items-center h-12 md:h-16 w-full bg-darkGrey">{/*container for x*/}
-                                <Link to="#k" className=" mr-44 md:mr-52 text-2xl md:text-4xl bg-none text-white">{/*menu-cross (x)*/}
+                            <li className="flex justify-start items-start p-3 bg-white border-b-4 border-yellow">{/*container for x*/}
+                                <Link to="#k" className=" text-xl sm:text-2xl md:text-3xl text-darkGrey">{/*menu-cross (x)*/}
                                     <AiIcons.AiOutlineClose />{/*close icon and action*/}
                                 </Link>
                             </li>
