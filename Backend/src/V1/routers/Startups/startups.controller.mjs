@@ -1,9 +1,6 @@
 import {
-	NotifyInvestors,
 	addNewInvestor,
-	findStartupById,
 	findStartupByUserId,
-	findUnApprovedStartups,
 	getInvestors,
 	getStartupByIdAndInvestorId,
 	investedStartupsbyInvestorId,
@@ -14,7 +11,6 @@ import {
 } from '../../models/startups.model.mjs';
 
 import {
-	updateUserApproval,
 	updateUserEmail,
 	updateUserPassword,
 	validateProfileUpdate,
@@ -29,14 +25,10 @@ import {
 	handleBadRequestResponse,
 	handleErrorResponse,
 	handleNotFoundResponse,
-	isValidUUID,
 	titleCase,
 } from '../../util/helpers.mjs';
 
-import {
-	sendApprovedStartupAccessEmail,
-	sendInvestorInvitationEmail,
-} from '../../services/mail.service.mjs';
+import { sendInvestorInvitationEmail } from '../../services/mail.service.mjs';
 
 async function httpGetStartupProfileByUserId(req, res) {
 	try {
@@ -52,15 +44,6 @@ async function httpGetStartupProfileByUserId(req, res) {
 		return res.status(200).json(startupResponse);
 	} catch (error) {
 		return handleErrorResponse('get startup by user id', error, res);
-	}
-}
-
-async function httpGetUnApprovedStartups(req, res) {
-	try {
-		const startups = await findUnApprovedStartups();
-		return res.status(200).json(startups);
-	} catch (error) {
-		return handleErrorResponse('get unapproved startups', error, res);
 	}
 }
 
@@ -109,35 +92,6 @@ async function httpUpdateStartupProfile(req, res) {
 		return res.status(200).json(updateStartupResponse);
 	} catch (error) {
 		return handleErrorResponse('update startup profile', error, res);
-	}
-}
-
-async function httpApproveStartupAccess(req, res) {
-	try {
-		const startupId = req.body.startupId;
-
-		const isValid = await isValidUUID(startupId);
-		if (!isValid) {
-			return handleBadRequestResponse(
-				'This Id passed in the request does not have a valid format.',
-				res
-			);
-		}
-
-		const startup = await findStartupById(startupId);
-		if (!startup) {
-			return handleNotFoundResponse(
-				'No startup exists with the provided Id.',
-				res
-			);
-		}
-
-		const updatedUser = await updateUserApproval(startup.userId, true);
-		await sendApprovedStartupAccessEmail(startup.email);
-
-		return res.status(200).json(updatedUser);
-	} catch (error) {
-		return handleErrorResponse('approve startup access', error, res);
 	}
 }
 
@@ -288,9 +242,7 @@ async function httpGetSpecificStartupProfile(req, res) {
 
 export {
 	httpGetStartupProfileByUserId,
-	httpGetUnApprovedStartups,
 	httpUpdateStartupProfile,
-	httpApproveStartupAccess,
 	httpGetStartupsByInvestorId,
 	httpNewInvestors,
 	httpUpdateInvestor,

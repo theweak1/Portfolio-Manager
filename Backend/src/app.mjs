@@ -17,6 +17,9 @@ const { default: startupRouter } = await import(
 const { default: postRouter } = await import(
 	`./${API_VERSION}/routers/Posts/posts.routes.mjs`
 );
+const { default: adminRouter } = await import(
+	`./${API_VERSION}/routers/Admin/admin.routes.mjs`
+);
 
 dotenv.config();
 
@@ -37,5 +40,6 @@ app.use(`/api/${API_VERSION}/auth`, authRouter);
 app.use(`/api/${API_VERSION}/investor`, investorRouter);
 app.use(`/api/${API_VERSION}/startup`, startupRouter);
 app.use(`/api/${API_VERSION}/post`, postRouter);
+app.use(`/api/${API_VERSION}/admin`, adminRouter);
 
 export default app;

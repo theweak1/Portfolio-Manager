@@ -140,6 +140,7 @@ async function httpSignupInvestor(req, res) {
 	}
 }
 
+// TODO: Create a Company Name verification function to avoid duplicate company names
 async function httpSignupStartup(req, res) {
 	try {
 		const userInfo = {
@@ -196,7 +197,7 @@ async function httpSignupStartup(req, res) {
 		}
 		// TODO: Uncomment this line when doing full authentication test with admin area.
 		// await sendRequestStartupEmail(startupResponse.id,userInfo.email,startupInfo);
-
+		//TODO: Change isApproved to false
 		return res.status(200).json({
 			...startupResponse,
 			isApproved: true,
