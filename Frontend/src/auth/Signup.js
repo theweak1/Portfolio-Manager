@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import SignUpImg from '../assets/pic2.jpg'
-
+import {useNavigate} from 'react-router-dom'
+import { useHttpClient } from '../shared/hooks/http-hook';
 
 export default function Signup() {
   const [optionValue, setOptionValue] = useState("");
@@ -9,6 +10,9 @@ export default function Signup() {
   const [username, setUsername] = useState('')
   const [roleName, setRoleName] = useState('')
   const [role, setRole] = useState('')
+
+  const navigate = useNavigate()
+  const { error, sendRequest } = useHttpClient();
 
   const handleSelectChange = (event) => {
     const value = event.target.value;
@@ -23,6 +27,42 @@ export default function Signup() {
   const handleSubmit = async (e) => {
     e.preventDefault()
 
+    if (role === 'startup') {
+			const responseData = await sendRequest(
+				`${process.env.REACT_APP_BACKEND_URL}/auth/signup/${role}`,'POST',JSON.stringify({
+						email,
+						password,
+						role,
+						companyName: roleName,
+					}),
+					{
+						'content-type': 'application/json',
+					},
+				
+			);
+			if (responseData.email) {
+				console.log(responseData);
+
+				navigate('/cfo');
+			} else {
+				console.log(error);
+			}
+		} else {
+			const responseData = await sendRequest(
+				`${process.env.REACT_APP_BACKEND_URL}/auth/signup/${role}`,'POST',JSON.stringify({ email, password, role, name: roleName }),{
+						'content-type': 'application/json',
+					},
+				
+			);
+	
+			if (responseData.email) {
+				console.log(responseData);
+
+				navigate('/updates');
+			} else {
+				console.log(error);
+			}
+		}
   }
   
   return (
@@ -42,14 +82,6 @@ export default function Signup() {
             type='email'
             onChange={(e) => setEmail(e.target.value)} 
             value={email} />
-          </div>
-
-          <div className='flex flex-col text-white py-2'>
-            <label>Username</label>
-            <input className='rounded-lg bg-grey mt-2 p-2  focus:outline-none' 
-            type="text" 
-            onChange={(e) => setUsername(e.target.value)} 
-             value={username}  />
           </div>
 
           <div className='flex flex-col text-white py-2'>

@@ -1,18 +1,17 @@
 import React from "react";
 import '../index.css';
-import SidebarKpi from "../components/SidebarInversionista/SidebarKpi";
-import Sidebar from "../components/SidebarInversionista/Sidebar";
+
+import SidebarStartup from "../components/SidebarStartup/SidebarStartup";
 
 /*Esta es la pagina que se muestra al seleccionar una opcion del menu principal*/
-function CFO() {
+function CFOStartup() {
   return (
     
     <div className="flex h-screen items-center justify-center text-5xl bg-grey text-white">
-      <Sidebar />
-      <SidebarKpi/>
-      <h1>Aqui esta el CFO</h1>
+      <SidebarStartup/>
+      <h1>Aqui esta el CFO del Startup</h1>
     </div>
   );
 }
 
-export default CFO;
+export default CFOStartup;

@@ -1,4 +1,4 @@
-import '../index.css';
+import '../../index.css';
 /*Aqui estan los titulos que aparecen en las barras del menu y
 los caminos que te traen a las paginas */
 

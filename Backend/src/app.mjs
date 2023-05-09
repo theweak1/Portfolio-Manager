@@ -1,7 +1,6 @@
 //API Version
 const API_VERSION = 'v1';
 
-import cors from 'cors';
 import * as dotenv from 'dotenv';
 import express from 'express';
 
@@ -27,13 +26,20 @@ const CLIENT_HOST = process.env.CLIENT_HOST;
 const CLIENT_PORT = process.env.CLIENT_PORT;
 
 const app = express();
-const allowedOrigins = [`${CLIENT_HOST}:${CLIENT_PORT}`];
-const options = {
-	origin: allowedOrigins,
-};
 
-app.use(cors(options));
+
 app.use(express.json());
+
+app.use((req, res, next) => {
+	res.setHeader('Access-Control-Allow-Origin', '*');
+	res.setHeader(
+		'Access-Control-Allow-Headers',
+		'Origin, X-Requested-With, Content-Type, Accept, Authorization'
+	);
+	res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, DELETE');
+
+	next();
+});
 
 //Routes
 app.use(`/api/${API_VERSION}/auth`, authRouter);
