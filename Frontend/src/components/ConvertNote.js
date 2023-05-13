@@ -40,9 +40,7 @@ export default function ConvertNote() {
 			input.capital_Amount;
 
 		/*
-      when monthly interest is rounded to two decimal spaces the result in accrued interes increases. 
-      It was put this way because the value of mothly interest would be lesser but take up more space. 
-      And since it takes up more space its dificult to manipulate the data to only show two decimal spaces without rounding.
+      when monthly interest is rounded to two decimal spaces the result in accrued interes increases. It was put this way because the value of mothly interest would be lesser but take up more space. And since it takes up more space its dificult to manipulate the result to only show two decimal spaces without rounding we manipulated the table output instead.
        */
 		input.accrued_Interest = sum2.toFixed(2);
 
