@@ -38,7 +38,7 @@ export default function Sidebar() {
                         return (
                             <li key={index}>
                             <Link to={item.path} onClick={()=>setSidebar(!sidebar)}>{/*nav-text*/}
-                                <span className="flex justify-start items-center p-5 mx-2 text-md sm:text-xl md:text-2xl rounded-sm text-darkGrey hover:bg-lightGrey hover:opacity-80 hover:bg-opacity-10 shadow-sm">{item.title}</span>
+                                <span className="flex justify-start items-center p-5 mx-2 text-lg sm:text-xl md:text-2xl rounded-sm text-darkGrey hover:bg-lightGrey hover:opacity-80 hover:bg-opacity-10 shadow-sm">{item.title}</span>
                             </Link>          
                             </li>
                                 
