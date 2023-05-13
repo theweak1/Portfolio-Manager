@@ -48,9 +48,9 @@ model Startup {
   investorIds  String[]   @db.ObjectId
   investors    Investor[] @relation(fields: [investorIds], references: [id])
 
-  codatId String?
-
-  blog Post[]
+  codatId      String?
+  redirectLink String?
+  blog         Post[]
 }
 
 model Post {

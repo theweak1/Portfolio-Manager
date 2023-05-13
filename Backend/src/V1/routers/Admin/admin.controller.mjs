@@ -3,7 +3,7 @@ import {
 	findStartupById,
 	findUnApprovedStartups,
 	getAllStartups,
-	updateCodatId,
+	updateCodatId
 } from '../../models/startups.model.mjs';
 
 import { updateUserApproval } from '../../models/users.model.mjs';
@@ -12,7 +12,7 @@ import {
 	handleBadRequestResponse,
 	handleErrorResponse,
 	handleNotFoundResponse,
-	isValidUUID,
+	isValidUUID
 } from '../../util/helpers.mjs';
 
 import { sendApprovedStartupAccessEmail } from '../../services/mail.service.mjs';
@@ -51,15 +51,15 @@ async function httpApproveStartupAccess(req, res) {
 		const codatResponse = await createCompany(startup.companyName);
 		// TODO: Uncomment line below to send a notification to startup that the were accepted in the application
 		// await sendApprovedStartupAccessEmail(startup.email);
-		await updateCodatId(startupId, codatResponse.id);
+		await updateCodatId(startupId, codatResponse.id, codatResponse.redirect);
 
 		const updatedUser = await updateUserApproval(startup.userId, true);
 		return res.status(200).json({
 			updatedUser,
 			codatRedirect: {
 				companyId: codatResponse.id,
-				redirectLink: codatResponse.redirect,
-			},
+				redirectLink: codatResponse.redirect
+			}
 		});
 	} catch (error) {
 		return handleErrorResponse('approve startup access', error, res);
@@ -105,5 +105,5 @@ export {
 	httpGetUnApprovedStartups,
 	httpApproveStartupAccess,
 	httpDeleteStartup,
-	httpGetAllStartups,
+	httpGetAllStartups
 };

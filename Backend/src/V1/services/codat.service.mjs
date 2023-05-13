@@ -7,15 +7,15 @@ var codatApiClient = axios.create({
 	baseURL: baseUrl,
 	headers: {
 		Authorization: authHeaderValue,
-		'Content-Type': 'application/json;charset=UTF-8',
-	},
+		'Content-Type': 'application/json;charset=UTF-8'
+	}
 });
 
 async function createCompany(companyName) {
 	try {
 		const response = await codatApiClient.post('/companies', {
 			name: companyName,
-			description: 'Any additional information about the company',
+			description: 'Any additional information about the company'
 		});
 
 		return response.data;
@@ -34,10 +34,16 @@ async function deleteCompany(companyId) {
 	}
 }
 
-async function getConnections(companyId) {
+async function getBalanceSheet(companyId, periodLength, periodsToCompare) {
 	try {
 		const response = await codatApiClient.get(
-			`/companies/${companyId}/connections`
+			`/companies/${companyId}/data/financials/balanceSheet`,
+			{
+				params: {
+					periodLength: periodLength,
+					periodsToCompare: periodsToCompare
+				}
+			}
 		);
 
 		return response.data;
@@ -57,4 +63,4 @@ async function getTransactions(companyId, integrationId) {
 		throw error;
 	}
 }
-export { createCompany, deleteCompany, getConnections };
+export { createCompany, deleteCompany, getBalanceSheet };
