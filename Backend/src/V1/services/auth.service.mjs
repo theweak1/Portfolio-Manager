@@ -1,35 +1,36 @@
 import jwt from 'jsonwebtoken';
 import { findUserById, getUserTokens } from '../models/users.model.mjs';
-import {
-	buildErrorObject,
-	handleBadRequestResponse,
-} from '../util/helpers.mjs';
+
+import { HttpError } from '../models/http-error.mjs';
 
 async function authenticateJsonWebToken(req, res, next) {
 	const authHeader = req.headers['authorization'];
 	const token = authHeader && authHeader.split(' ')[1];
 
 	if (!token) {
-		const error = buildErrorObject(401, 'Your are not authenticated.');
-		return res.status(error.errorCode).json({ error: error });
+		const error = new HttpError('Your are not authenticated.', 401);
+		return next(error);
+		// return res.status(error.errorCode).json({ error: error });
 	}
 
 	const userTokens = await getUserTokens(token);
 	if (token !== userTokens?.accessToken || userTokens.isApproved == false) {
-		const error = buildErrorObject(
-			403,
-			'Your are not authorized to access these resources.'
+		const error = new HttpError(
+			'Your are not authorized to access these resources.',
+			403
 		);
-		return res.status(error.errorCode).json({ error: error });
+		return next(error);
+		// return res.status(error.errorCode).json({ error: error });
 	}
 
 	jwt.verify(token, process.env.ACCESS_TOKEN_SECRET || '', (err, user) => {
 		if (err) {
-			const error = buildErrorObject(
-				403,
-				'Your are not authorized to access these resources.'
+			const error = new HttpError(
+				'Your are not authorized to access these resources.',
+				403
 			);
-			return res.status(error.errorCode).json({ error: error });
+			return next(error);
+			// return res.status(error.errorCode).json({ error: error });
 		}
 
 		const userId = user;
@@ -42,18 +43,18 @@ async function authenticateJsonWebToken(req, res, next) {
 function generateAccessToken(id) {
 	const user = { id };
 	return jwt.sign(user, process.env.ACCESS_TOKEN_SECRET || '', {
-		expiresIn: '5h',
+		expiresIn: '5h'
 	});
 }
 
 function generateRefreshToken(id) {
 	const user = { id };
 	return jwt.sign(user, process.env.REFRESH_TOKEN_SECRET || '', {
-		expiresIn: '2h',
+		expiresIn: '2h'
 	});
 }
 
-function verifyRefreshToken(refreshToken) {
+function verifyRefreshToken(refreshToken, next) {
 	let accessToken = '';
 	let refreshedToken = '';
 
@@ -62,7 +63,9 @@ function verifyRefreshToken(refreshToken) {
 		process.env.REFRESH_TOKEN_SECRET || '',
 		(err, user) => {
 			if (err) {
-				return buildErrorObject(403, 'Token has expired.');
+				const error = new HttpError('Token has expired.', 403);
+				return next(error);
+				// return buildErrorObject(403, 'Token has expired.');
 			}
 
 			const userId = user;
@@ -91,10 +94,15 @@ async function validateUserAccess(req, res, next) {
 	const user = await findUserById(userId);
 	const role = user.role;
 	if (!role === 'Admin') {
-		return handleBadRequestResponse(
+		const error = new HttpError(
 			'You are not allowed to perform this action',
-			res
+			400
 		);
+		return next(error);
+		// return handleBadRequestResponse(
+		// 	'You are not allowed to perform this action',
+		// 	res
+		// );
 	}
 	next();
 }
@@ -105,5 +113,5 @@ export {
 	generateRefreshToken,
 	verifyRefreshToken,
 	getUserIdFromToken,
-	validateUserAccess,
+	validateUserAccess
 };

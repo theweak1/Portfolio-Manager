@@ -1,10 +1,7 @@
 import prisma from '../../database/index.mjs';
 
-import {
-	buildErrorObject,
-	excludeFields,
-	handleNotFoundResponse
-} from '../util/helpers.mjs';
+import { excludeFields } from '../util/helpers.mjs';
+import { HttpError } from './http-error.mjs';
 
 import { getBalanceSheet } from '../services/codat.service.mjs';
 import { newUpdateNotification } from '../services/mail.service.mjs';
@@ -20,7 +17,11 @@ async function createStartup(userId, email, startupInfo) {
 			}
 		});
 
-		const startupWithoutId = excludeFields(createdStartup, ['id', 'codatId']);
+		const startupWithoutId = excludeFields(createdStartup, [
+			'id',
+			'codatId',
+			'investorIds'
+		]);
 		return startupWithoutId;
 	} catch (error) {
 		throw error;
@@ -127,10 +128,11 @@ async function validateStartupExistsByUserId(userId) {
 			}
 		});
 		if (!startup) {
-			return buildErrorObject(
-				401,
-				'This startup does not exist in the system.'
-			);
+			return new HttpError('This startup does not exist in the system.', 401);
+			// return buildErrorObject(
+			// 	401,
+			// 	'This startup does not exist in the system.'
+			// );
 		}
 
 		return startup;
@@ -181,9 +183,22 @@ async function investedStartupsbyInvestorId(investorId) {
 		if (!startups.length) {
 			return null;
 		}
+		// TODO: Need to work with this code
+		// loop through startups and get transactions for each one
+		const startupsWithTransactions = await Promise.all(
+			startups.map(async (startup) => {
+				const connectionIds = await getConnections(startup.codatId);
+				return {
+					...startup,
+					ids: connectionIds.results.map((result) => result.id)
+				};
+			})
+		);
+		console.log(startupsWithTransactions);
+		// console.log(startupsWithTransactions);
+		const filteredStartups = startupsWithTransactions.map((s) =>
+			excludeFields(s, ['investorIds', 'userId', 'ids'])
 
-		const filteredStartups = startups.map((s) =>
-			excludeFields(s, ['investorIds', 'userId'])
 		);
 		return filteredStartups;
 	} catch (error) {
@@ -325,7 +340,8 @@ async function deleteStartup(startupId) {
 		const startup = await validateStartupExistsByStartupId(startupId);
 
 		if (!startup) {
-			return handleNotFoundResponse('Could not find startup for this id', res);
+			return new HttpError('Could not find startup for this id', 404);
+			// return handleNotFoundResponse('Could not find startup for this id', res);
 		}
 
 		const deletedStartup = await prisma.startup.delete({
@@ -347,8 +363,7 @@ async function updateCodatId(id, companyId, redirectLink) {
 				id: id
 			},
 			data: {
-				codatId: companyId,
-				redirectLink: redirectLink
+				codatId: companyId
 			}
 		});
 

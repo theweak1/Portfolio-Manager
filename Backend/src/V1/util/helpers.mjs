@@ -26,47 +26,4 @@ function excludeFields(record, keys) {
 	return record;
 }
 
-function handleErrorResponse(failedAt, error, res) {
-	errorLogger(error);
-	const errorResponse = {
-		errorCode: 500,
-		errorMessage: `The resquest to ${failedAt} failed. Please report this to Tech Support for further investigation.`,
-	};
-	return res.status(errorResponse.errorCode).json({
-		error: errorResponse,
-	});
-}
-
-function handleBadRequestResponse(message, res) {
-	const errorResponse = {
-		errorCode: 400,
-		errorMessage: message,
-	};
-	return res.status(errorResponse.errorCode).json({ error: errorResponse });
-}
-
-function handleNotFoundResponse(message, res) {
-	const errorResponse = {
-		errorCode: 404,
-		errorMessage: message,
-	};
-	return res.status(errorResponse.errorCode).json({ error: errorResponse });
-}
-
-function buildErrorObject(code, message) {
-	const error = {
-		errorCode: code,
-		errorMessage: message,
-	};
-	return error;
-}
-
-export {
-	titleCase,
-	isValidUUID,
-	excludeFields,
-	handleErrorResponse,
-	handleBadRequestResponse,
-	handleNotFoundResponse,
-	buildErrorObject,
-};
+export { titleCase, isValidUUID, excludeFields };

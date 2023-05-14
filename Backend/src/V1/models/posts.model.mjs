@@ -1,6 +1,7 @@
 import prisma from '../../database/index.mjs';
 
-import { excludeFields, handleNotFoundResponse } from '../util/helpers.mjs';
+import { excludeFields } from '../util/helpers.mjs';
+import { HttpError } from './http-error.mjs';
 
 async function StartupsWithPosts(investorId) {
 	try {
@@ -8,19 +9,19 @@ async function StartupsWithPosts(investorId) {
 			where: {
 				investors: {
 					some: {
-						id: investorId,
-					},
-				},
+						id: investorId
+					}
+				}
 			},
 			include: {
 				blog: {
 					select: {
 						lastModified: true,
 						title: true,
-						description: true,
-					},
-				},
-			},
+						description: true
+					}
+				}
+			}
 		});
 
 		if (!startups.length) {
@@ -44,10 +45,10 @@ async function CreatePost(startupId, postInfo) {
 				description: postInfo.description,
 				creator: {
 					connect: {
-						id: startupId,
-					},
-				},
-			},
+						id: startupId
+					}
+				}
+			}
 		});
 
 		return createdPost;
@@ -61,20 +62,22 @@ async function DeletePost(startupId, postId) {
 		const postToDelete = await validatePostExistence(postId);
 
 		if (!postToDelete) {
-			return handleNotFoundResponse('Could not find a post for this id', res);
+			return new HttpError('Could not find a post for this id', 404);
+			// return handleNotFoundResponse('Could not find a post for this id', res);
 		}
 
 		if (postToDelete.creatorId !== startupId) {
-			return buildErrorObject(
-				401,
-				'You are not authorized to delete this post'
-			);
+			return new HttpError('You are not authorized to delete this post', 401);
+			// return buildErrorObject(
+			// 	401,
+			// 	'You are not authorized to delete this post'
+			// );
 		}
 
 		const deletedPost = await prisma.post.delete({
 			where: {
-				id: postId,
-			},
+				id: postId
+			}
 		});
 
 		return deletedPost;
@@ -88,25 +91,27 @@ async function updatePost(startupId, postId, postInfo) {
 		const postToUpdate = await validatePostExistence(postId);
 
 		if (!postToUpdate) {
-			return handleNotFoundResponse('Could not find a post for this id', res);
+			return new HttpError('Could not find a post for this id', 404);
+			// return handleNotFoundResponse('Could not find a post for this id', res);
 		}
 
 		if (postToUpdate.creatorId !== startupId) {
-			return buildErrorObject(
-				401,
-				'You are not authorized to delete this post'
-			);
+			return new HttpError('You are not authorized to delete this post', 401);
+			// return buildErrorObject(
+			// 	401,
+			// 	'You are not authorized to delete this post'
+			// );
 		}
 
 		const UpdatedPost = await prisma.post.update({
 			where: {
-				id: postId,
+				id: postId
 			},
 			data: {
 				title: postInfo.title,
 				description: postInfo.description,
-				lastModified: new Date(),
-			},
+				lastModified: new Date()
+			}
 		});
 
 		return UpdatedPost;
@@ -119,11 +124,11 @@ async function updatePost(startupId, postId, postInfo) {
 async function validatePostExistence(postId) {
 	const post = await prisma.post.findUnique({
 		where: {
-			id: postId,
+			id: postId
 		},
 		select: {
-			creatorId: true,
-		},
+			creatorId: true
+		}
 	});
 	return post;
 }

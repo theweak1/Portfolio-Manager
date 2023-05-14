@@ -8,44 +8,55 @@ import {
 
 import { updateUserApproval } from '../../models/users.model.mjs';
 
-import {
-	handleBadRequestResponse,
-	handleErrorResponse,
-	handleNotFoundResponse,
-	isValidUUID
-} from '../../util/helpers.mjs';
+
+import { HttpError, handleErrorResponse } from '../../models/http-error.mjs';
+import { isValidUUID } from '../../util/helpers.mjs';
+
 
 import { sendApprovedStartupAccessEmail } from '../../services/mail.service.mjs';
 
 import { createCompany, deleteCompany } from '../../services/codat.service.mjs';
 
-async function httpGetUnApprovedStartups(req, res) {
+async function httpGetUnApprovedStartups(req, res, next) {
 	try {
 		const startups = await findUnApprovedStartups();
 		return res.status(200).json(startups);
-	} catch (error) {
-		return handleErrorResponse('get unapproved startups', error, res);
+	} catch (err) {
+		const error = new HttpError('get unapproved startups', 500);
+		return next(error);
+		// return handleErrorResponse('get unapproved startups', error, res);
 	}
 }
 
-async function httpApproveStartupAccess(req, res) {
+async function httpApproveStartupAccess(req, res, next) {
 	try {
 		const startupId = req.body.startupId;
 
 		const isValid = await isValidUUID(startupId);
 		if (!isValid) {
-			return handleBadRequestResponse(
+			const error = new HttpError(
 				'This Id passed in the request does not have a valid format.',
-				res
+				400
 			);
+			return next(error);
+
+			// return handleBadRequestResponse(
+			// 	'This Id passed in the request does not have a valid format.',
+			// 	res
+			// );
 		}
 
 		const startup = await findStartupById(startupId);
 		if (!startup) {
-			return handleNotFoundResponse(
+			const error = new HttpError(
 				'No startup exists with the provided Id.',
-				res
+				404
 			);
+			return next(error);
+			// return handleNotFoundResponse(
+			// 	'No startup exists with the provided Id.',
+			// 	res
+			// );
 		}
 
 		const codatResponse = await createCompany(startup.companyName);
@@ -66,16 +77,20 @@ async function httpApproveStartupAccess(req, res) {
 	}
 }
 
-async function httpDeleteStartup(req, res) {
+async function httpDeleteStartup(req, res, next) {
 	try {
 		const startupId = req.body.startupId;
 
 		const startup = await findStartupById(startupId);
 		if (!startup) {
-			return handleNotFoundResponse(
+			const error = new HttpError(
 				'No startup exists with the provided Id.',
-				res
+				404
 			);
+			return next(error);
+			// return handleNotFoundResponse('No startup exists with the provided Id.',
+			// 	res
+			// );
 		}
 		// Delete startup from codat Companies service
 		await deleteCompany(startup.codatId);
@@ -86,14 +101,16 @@ async function httpDeleteStartup(req, res) {
 	}
 }
 
-async function httpGetAllStartups(req, res) {
+async function httpGetAllStartups(req, res, next) {
 	try {
 		const startups = await getAllStartups();
 		if (!startups) {
-			return handleNotFoundResponse(
-				'There are no startups in the system.',
-				res
-			);
+			const error = new HttpError('There are no startups in the system.', 404);
+			return next(error);
+			// return handleNotFoundResponse(
+			// 	'There are no startups in the system.',
+			// 	res
+			// );
 		}
 		res.status(200).json(startups);
 	} catch (error) {
