@@ -8,8 +8,10 @@ import {
 
 import { updateUserApproval } from '../../models/users.model.mjs';
 
+
 import { HttpError, handleErrorResponse } from '../../models/http-error.mjs';
 import { isValidUUID } from '../../util/helpers.mjs';
+
 
 import { sendApprovedStartupAccessEmail } from '../../services/mail.service.mjs';
 
@@ -60,7 +62,7 @@ async function httpApproveStartupAccess(req, res, next) {
 		const codatResponse = await createCompany(startup.companyName);
 		// TODO: Uncomment line below to send a notification to startup that the were accepted in the application
 		// await sendApprovedStartupAccessEmail(startup.email);
-		await updateCodatId(startupId, codatResponse.id);
+		await updateCodatId(startupId, codatResponse.id, codatResponse.redirect);
 
 		const updatedUser = await updateUserApproval(startup.userId, true);
 		return res.status(200).json({

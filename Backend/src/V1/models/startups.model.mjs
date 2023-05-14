@@ -3,7 +3,7 @@ import prisma from '../../database/index.mjs';
 import { excludeFields } from '../util/helpers.mjs';
 import { HttpError } from './http-error.mjs';
 
-import { getConnections } from '../services/codat.service.mjs';
+import { getBalanceSheet } from '../services/codat.service.mjs';
 import { newUpdateNotification } from '../services/mail.service.mjs';
 
 async function createStartup(userId, email, startupInfo) {
@@ -198,6 +198,7 @@ async function investedStartupsbyInvestorId(investorId) {
 		// console.log(startupsWithTransactions);
 		const filteredStartups = startupsWithTransactions.map((s) =>
 			excludeFields(s, ['investorIds', 'userId', 'ids'])
+
 		);
 		return filteredStartups;
 	} catch (error) {
@@ -355,7 +356,7 @@ async function deleteStartup(startupId) {
 	}
 }
 
-async function updateCodatId(id, companyId) {
+async function updateCodatId(id, companyId, redirectLink) {
 	try {
 		const updatedStartup = await prisma.startup.update({
 			where: {
