@@ -11,14 +11,14 @@ import CatImg from "../assets/cat.jpg";
 const posts = [
   {
     id: 1,
-    avatar: CatImg,
+    title: 'New Update',
     author: 'John Doe',
     text: 'Hello world test test test test test test test test !',
     date: 'May 1, 2023'
   },
   {
     id: 2,
-    avatar: CatImg,
+    title: 'New Update',
     author: 'Jane Smith',
     text: 'How are you?',
     date: 'May 2, 2023'
