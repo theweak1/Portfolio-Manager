@@ -72,11 +72,11 @@ function PostList(props) {
 
   return (
     //everything in updates is contained in the first div
-    <div className='fixed flex justify-start right-20 left-20 h-screen top-32 p-8 text-darkGrey bg-white'>
+    <div className='fixed flex justify-start right-20 left-20 h-[50rem] top-32 p-8 text-darkGrey bg-white'>
         {/*This is where the form to submit is located */}
-      <form onSubmit={handlePostSubmit} className="flex text-2xl bg-grey w-[40rem] h-[55%]">
-        <table>
-          
+      <form onSubmit={handlePostSubmit} className="flex text-2xl bg-grey w-[40rem] h-[40rem]">
+        
+        <table className='table-fixed w-full'>
           <thead>
             <th>
               <td>
@@ -106,6 +106,9 @@ function PostList(props) {
                 required
                 />
               </td>
+            </tr>
+
+            <tr>
               <td>
                  <input
                   type="text"
@@ -120,21 +123,23 @@ function PostList(props) {
             </tr>
             
             <tr>
-              <input
+              <textarea
               type="text"
               name="text"
               value={newPost.text}
               onChange={handleInputChange}
               placeholder="Text"
-              className="border border-gray-300 rounded-md m-2"
+              className="border border-gray-300 rounded-md h-[20rem] w-[39rem] m-2 resize-none"
               required
               />
             </tr>
-            
+            <tr>
+              <button type="submit" className="bg-yellow bg-opacity-90 text-darkGrey rounded-md m-2 p-2 px-6">
+                Post
+              </button>
+            </tr>
           </tbody>
-          <button type="submit" className="bg-yellow bg-opacity-90 text-darkGrey rounded-md m-2 p-2 px-6">
-              Post
-          </button>
+          
         </table>
       </form>
 
