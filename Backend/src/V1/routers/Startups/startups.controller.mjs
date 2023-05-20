@@ -7,38 +7,40 @@ import {
 	updateInvestorsList,
 	updateStartup,
 	validateStartupExistsByStartupId,
-	validateStartupExistsByUserId,
+	validateStartupExistsByUserId
 } from '../../models/startups.model.mjs';
 
 import {
 	updateUserEmail,
 	updateUserPassword,
-	validateProfileUpdate,
+	validateProfileUpdate
 } from '../../models/users.model.mjs';
 
 import {
 	findInvestorByEmail,
-	findInvestorByUserId,
+	findInvestorByUserId
 } from '../../models/investors.model.mjs';
 
-import {
-	handleBadRequestResponse,
-	handleErrorResponse,
-	handleNotFoundResponse,
-	titleCase,
-} from '../../util/helpers.mjs';
+import { handleErrorResponse, HttpError } from '../../models/http-error.mjs';
+
+import { titleCase } from '../../util/helpers.mjs';
 
 import { sendInvestorInvitationEmail } from '../../services/mail.service.mjs';
 
-async function httpGetStartupProfileByUserId(req, res) {
+async function httpGetStartupProfileByUserId(req, res, next) {
 	try {
 		const userId = req.userId;
 		const startupResponse = await findStartupByUserId(userId);
 		if (!startupResponse) {
-			return handleBadRequestResponse(
+			const error = new HttpError(
 				'This startup does not exist in the system.',
-				res
+				400
 			);
+			return next(error);
+			// return handleBadRequestResponse(
+			// 	'This startup does not exist in the system.',
+			// 	res
+			// );
 		}
 
 		return res.status(200).json(startupResponse);
@@ -47,32 +49,34 @@ async function httpGetStartupProfileByUserId(req, res) {
 	}
 }
 
-async function httpUpdateStartupProfile(req, res) {
+async function httpUpdateStartupProfile(req, res, next) {
 	try {
 		const userInfo = {
 			id: req.userId,
 			email: req.body.email,
 			password: req.body.currentPassword,
-			newPassword: req.body.newPassword,
+			newPassword: req.body.newPassword
 		};
 		const startupInfo = {
-			companyName: titleCase(req.body.companyName),
+			companyName: titleCase(req.body.companyName)
 		};
 
 		const validatedUserResponse = await validateProfileUpdate(userInfo);
-		if ('errorCode' in validatedUserResponse) {
-			return res.status(validatedUserResponse.errorCode).json({
-				error: validatedUserResponse,
-			});
+		if ('code' in validatedUserResponse) {
+			return next(validatedUserResponse);
+			// return res.status(validatedUserResponse.errorCode).json({
+			// 	error: validatedUserResponse,
+			// });
 		}
 
 		const validatedStartupResponse = await validateStartupExistsByUserId(
 			validatedUserResponse.id
 		);
-		if ('errorCode' in validatedStartupResponse) {
-			return res.status(validatedStartupResponse.errorCode).json({
-				error: validatedStartupResponse,
-			});
+		if ('code' in validatedStartupResponse) {
+			return next(validatedStartupResponse);
+			// return res.status(validatedStartupResponse.errorCode).json({
+			// 	error: validatedStartupResponse,
+			// });
 		}
 
 		if (userInfo.email) {
@@ -95,25 +99,34 @@ async function httpUpdateStartupProfile(req, res) {
 	}
 }
 
-async function httpGetStartupsByInvestorId(req, res) {
+async function httpGetStartupsByInvestorId(req, res, next) {
 	try {
 		const userId = req.userId;
 
 		const investorResponse = await findInvestorByUserId(userId);
 		if (!investorResponse) {
-			return handleBadRequestResponse(
+			const error = new HttpError(
 				'This investor does not exist in the system.',
-				res
+				400
 			);
+			return next(error);
+			// return handleBadRequestResponse(
+			// 	'This investor does not exist in the system.',
+			// 	res
+			// );
 		}
 
 		const startups = await investedStartupsbyInvestorId(investorResponse.id);
 
 		if (!startups) {
-			return handleNotFoundResponse(
+			const error = new HttpError(
 				'You are not inveted to view any startups portfolio.',
-				res
+				404
 			);
+			// return handleNotFoundResponse(
+			// 	'You are not inveted to view any startups portfolio.',
+			// 	res
+			// );
 		}
 
 		return res.status(200).json(startups);
@@ -122,15 +135,20 @@ async function httpGetStartupsByInvestorId(req, res) {
 	}
 }
 
-async function httpNewInvestors(req, res) {
+async function httpNewInvestors(req, res, next) {
 	try {
 		const userId = req.userId;
 		const startupResponse = await findStartupByUserId(userId);
 		if (!startupResponse) {
-			return handleBadRequestResponse(
+			const error = new HttpError(
 				'This startup does not exist in the system.',
-				res
+				400
 			);
+			return next(error);
+			// return handleBadRequestResponse(
+			// 	'This startup does not exist in the system.',
+			// 	res
+			// );
 		}
 		const newInvestors = req.body.investors;
 
@@ -152,15 +170,20 @@ async function httpNewInvestors(req, res) {
 	}
 }
 
-async function httpUpdateInvestor(req, res) {
+async function httpUpdateInvestor(req, res, next) {
 	try {
 		const userId = req.userId;
 		const startupResponse = await findStartupByUserId(userId);
 		if (!startupResponse) {
-			return handleBadRequestResponse(
+			const error = new HttpError(
 				'This startup does not exist in the system.',
-				res
+				400
 			);
+			return next(error);
+			// return handleBadRequestResponse(
+			// 	'This startup does not exist in the system.',
+			// 	res
+			// );
 		}
 		const InvestorList = req.body.investors;
 
@@ -177,15 +200,20 @@ async function httpUpdateInvestor(req, res) {
 	}
 }
 
-async function httpGetInvestors(req, res) {
+async function httpGetInvestors(req, res, next) {
 	try {
 		const userId = req.userId;
 		const startupResponse = await findStartupByUserId(userId);
 		if (!startupResponse) {
-			return handleBadRequestResponse(
+			const error = new HttpError(
 				'This startup does not exist in the system.',
-				res
+				400
 			);
+			return next(error);
+			// return handleBadRequestResponse(
+			// 	'This startup does not exist in the system.',
+			// 	res
+			// );
 		}
 
 		const investors = await getInvestors(startupResponse.id);
@@ -196,26 +224,32 @@ async function httpGetInvestors(req, res) {
 	}
 }
 
-async function httpGetSpecificStartupProfile(req, res) {
+async function httpGetSpecificStartupProfile(req, res, next) {
 	try {
 		const userId = req.userId;
 		const investorResponse = await findInvestorByUserId(userId);
 
 		if (!investorResponse) {
-			return handleBadRequestResponse(
+			const error = new HttpError(
 				'This investor does not exist in the system.',
-				res
+				400
 			);
+			return next(error);
 		}
 		const startupId = req.params.startupId;
 
 		const startupResponse = await validateStartupExistsByStartupId(startupId);
 
 		if (!startupResponse) {
-			return handleBadRequestResponse(
+			const error = new HttpError(
 				'This startup does not exist in the system.',
-				res
+				400
 			);
+			return next(error);
+			// return handleBadRequestResponse(
+			// 	'This startup does not exist in the system.',
+			// 	res
+			// );
 		}
 
 		const startup = await getStartupByIdAndInvestorId(
@@ -224,10 +258,15 @@ async function httpGetSpecificStartupProfile(req, res) {
 		);
 
 		if (!startup) {
-			return handleNotFoundResponse(
+			const error = new HttpError(
 				'You are not invited to view this startup portfolio.',
-				res
+				404
 			);
+			return next(error);
+			// return handleNotFoundResponse(
+			// 	'You are not invited to view this startup portfolio.',
+			// 	res
+			// );
 		}
 
 		res.status(200).json(startup);
@@ -247,5 +286,5 @@ export {
 	httpNewInvestors,
 	httpUpdateInvestor,
 	httpGetInvestors,
-	httpGetSpecificStartupProfile,
+	httpGetSpecificStartupProfile
 };

@@ -3,16 +3,21 @@ import prisma from '../../database/index.mjs';
 
 import { getUserIdFromToken } from '../services/auth.service.mjs';
 
-import { buildErrorObject, excludeFields } from '../util/helpers.mjs';
+import { excludeFields } from '../util/helpers.mjs';
+import { HttpError } from './http-error.mjs';
 
 async function createUser(email, password, role, isApproved) {
 	try {
 		const existingUser = await findUserByEmail(email);
 		if (existingUser) {
-			return buildErrorObject(
-				400,
-				'Email is already taken, please provide another email address.'
+			return new HttpError(
+				'Email is already taken, please provide another email address.',
+				400
 			);
+			// return buildErrorObject(
+			// 	400,
+			// 	'Email is already taken, please provide another email address.'
+			// );
 		}
 		let salt = generateSalt(32);
 		let hashedPassword = sha512(password.toString(), salt);
@@ -23,8 +28,8 @@ async function createUser(email, password, role, isApproved) {
 				password: hashedPassword,
 				passwordSalt: salt,
 				role: role,
-				isApproved: isApproved,
-			},
+				isApproved: isApproved
+			}
 		});
 		return createdUser;
 	} catch (error) {
@@ -36,12 +41,12 @@ async function updateUserEmail(user, email) {
 	try {
 		const updatedUser = await prisma.user.update({
 			where: {
-				id: user.id,
+				id: user.id
 			},
 			data: {
 				email: email,
-				lastModified: new Date(),
-			},
+				lastModified: new Date()
+			}
 		});
 
 		return updatedUser;
@@ -54,27 +59,36 @@ async function isUserAuthorized(email, password) {
 	try {
 		const user = await findUserByEmail(email);
 		if (!user) {
-			return buildErrorObject(401, "A user with this email doesn't exist.");
+			return new HttpError("A user with this email doesn't exist.", 401);
+			// return buildErrorObject(401, "A user with this email doesn't exist.");
 		}
 
 		let hashedPasswordFromRequest = sha512(password, user.passwordSalt);
 		if (hashedPasswordFromRequest !== user.password) {
-			return buildErrorObject(
-				401,
-				'Provided password is incorrect for this user.'
+			return new HttpError(
+				'Provided password is incorrect for this user.',
+				401
 			);
+			// return buildErrorObject(
+			// 	401,
+			// 	'Provided password is incorrect for this user.'
+			// );
 		}
 
 		if (!user.isApproved) {
-			return buildErrorObject(
-				400,
-				'User does not have approval to access the system.'
+			return new HttpError(
+				'User does not have approval to access the system.',
+				400
 			);
+			// return buildErrorObject(
+			// 	400,
+			// 	'User does not have approval to access the system.'
+			// );
 		}
 
 		const userWithoutPassord = excludeFields(user, [
 			'password',
-			'passwordSalt',
+			'passwordSalt'
 		]);
 		return userWithoutPassord;
 	} catch (error) {
@@ -86,8 +100,8 @@ async function findUserById(userId) {
 	try {
 		const user = await prisma.user.findUnique({
 			where: {
-				id: userId,
-			},
+				id: userId
+			}
 		});
 
 		return user;
@@ -100,8 +114,8 @@ async function findEmailById(userId) {
 	try {
 		const user = await prisma.user.findUnique({
 			where: {
-				id: userId,
-			},
+				id: userId
+			}
 		});
 
 		if (!user) {
@@ -113,7 +127,7 @@ async function findEmailById(userId) {
 			'accessToken',
 			'refreshToken',
 			'password',
-			'passwordSalt',
+			'passwordSalt'
 		]);
 	} catch (error) {
 		throw error;
@@ -127,13 +141,13 @@ async function updateUserPassword(user, newPassword) {
 
 		const updatedUser = await prisma.user.update({
 			where: {
-				id: user.id,
+				id: user.id
 			},
 			data: {
 				password: hashedPassword,
 				passwordSalt: salt,
-				lastModified: new Date(),
-			},
+				lastModified: new Date()
+			}
 		});
 
 		const userToReturn = excludeFields(updatedUser, [
@@ -141,7 +155,7 @@ async function updateUserPassword(user, newPassword) {
 			'password',
 			'passwordSalt',
 			'accessToken',
-			'refreshToken',
+			'refreshToken'
 		]);
 		return userToReturn;
 	} catch (error) {
@@ -153,8 +167,8 @@ async function findUserByEmail(email) {
 	try {
 		const user = await prisma.user.findUnique({
 			where: {
-				email: email,
-			},
+				email: email
+			}
 		});
 		return user;
 	} catch (error) {
@@ -168,8 +182,8 @@ async function getUserTokens(token) {
 
 		const user = await prisma.user.findUnique({
 			where: {
-				id: userId,
-			},
+				id: userId
+			}
 		});
 
 		if (!user) return null;
@@ -184,18 +198,18 @@ async function updateUserTokens(userId, accessToken, refreshToken) {
 	try {
 		const user = await prisma.user.update({
 			where: {
-				id: userId,
+				id: userId
 			},
 			data: {
 				accessToken: accessToken,
-				refreshToken: refreshToken,
-			},
+				refreshToken: refreshToken
+			}
 		});
 
 		const userFiltered = excludeFields(user, [
 			'id',
 			'password',
-			'passwordSalt',
+			'passwordSalt'
 		]);
 		return userFiltered;
 	} catch (error) {
@@ -207,12 +221,12 @@ async function updateUserApproval(userId, approval) {
 	try {
 		const user = await prisma.user.update({
 			where: {
-				id: userId,
+				id: userId
 			},
 			data: {
 				isApproved: approval,
-				lastModified: new Date(),
-			},
+				lastModified: new Date()
+			}
 		});
 
 		const userFiltered = excludeFields(user, [
@@ -220,7 +234,7 @@ async function updateUserApproval(userId, approval) {
 			'password',
 			'passwordSalt',
 			'accessToken',
-			'refreshToken',
+			'refreshToken'
 		]);
 		return userFiltered;
 	} catch (error) {
@@ -234,18 +248,20 @@ async function validateProfileUpdate(userInfo) {
 		// Validate that User Exists
 		const user = await prisma.user.findUnique({
 			where: {
-				id: userInfo.id,
-			},
+				id: userInfo.id
+			}
 		});
 		if (!user) {
-			return buildErrorObject(401, 'This user does not exist in the system.');
+			return new HttpError('This user does not exist in the system.', 401);
+			// return buildErrorObject(401, 'This user does not exist in the system.');
 		}
 
 		// Validate if Email Already Exists
 		if (userInfo.email !== user.email && !!userInfo.email) {
 			const userWithEmailExists = await findUserByEmail(userInfo.email);
 			if (userWithEmailExists) {
-				return buildErrorObject(400, 'A user with this email already exists.');
+				return new HttpError('A user with this email already exists.', 400);
+				// return buildErrorObject(400, 'A user with this email already exists.');
 			}
 		}
 
@@ -260,10 +276,11 @@ async function validateProfileUpdate(userInfo) {
 				user.passwordSalt
 			);
 			if (hashedPasswordFromRequest !== user.password) {
-				return buildErrorObject(
-					401,
-					'Current password is incorrect for this user.'
-				);
+				return new HttpError('Current password is incorrect for this user,401');
+				// return buildErrorObject(
+				// 	401,
+				// 	'Current password is incorrect for this user.'
+				// );
 			}
 		}
 
@@ -298,5 +315,5 @@ export {
 	getUserTokens,
 	updateUserApproval,
 	updateUserTokens,
-	validateProfileUpdate,
+	validateProfileUpdate
 };
