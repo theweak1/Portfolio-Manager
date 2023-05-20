@@ -1,4 +1,5 @@
 import React, { useState,useEffect } from 'react';
+import Date from './Date';
 
 function Table() {
   const [data, setData] = useState([
@@ -51,7 +52,7 @@ function Table() {
 
   const handleAddRowPreRound = () => {
     setPreRoundData([...preRoundData, ['', 0, 0, 0, 0, 0, 0, 0]]);
-  };
+};
 
   const handleAddRowSeedRound = () => {
     setSeedRoundData([...seedRoundData, ['', 0, 0, 0, 0, 0, 0, 0]]);
@@ -61,87 +62,140 @@ function Table() {
     setSeriesRoundData([...seriesRoundData, ['', 0, 0, 0, 0, 0, 0, 0]]);
   };
 
+  function numberFormatter(num) {
+    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  }
+  
   const handleInputChange = (event, rowIndex, columnIndex) => {
-    const newData = [...data];
-    if (columnIndex === 2) {
-      newData[rowIndex][columnIndex] = event.target.value.trim() === '' ? 0 : parseInt(event.target.value, 10);
-    } else if (columnIndex === 3) {
-      newData[rowIndex][columnIndex] = event.target.value.trim() === '' ? 0 : parseInt(event.target.value, 10);
-      newData[rowIndex][2] = newData[rowIndex][3] * sharePrice;
-      newData[rowIndex][5] = newData[rowIndex][3];
+  const newData = [...data];
+  let value = event.target.value.replace(/,/g, ''); // Remove commas from the string first
+  if (value.trim() === '') value = '0';
+  if (columnIndex >= 2 && columnIndex <= 5) {
+    value = parseInt(value, 10);
+  } else if (columnIndex === 6 || columnIndex === 7) {
+    value = value.replace('%', '');
+  }
 
-    } else if (columnIndex === 4 ) {
-      newData[rowIndex][columnIndex] = event.target.value.trim() === '' ? 0 : parseInt(event.target.value, 10);
-      newData[rowIndex][7] = (newData[rowIndex][4] + newData[rowIndex][5]) / (handleSumAllOptionShares() + handleSumAllShareOwnership());
-    } 
-    else if (columnIndex === 5) {
-      newData[rowIndex][columnIndex] = event.target.value.trim() === '' ? 0 : parseInt(event.target.value, 10);
-      newData[rowIndex][6] = newData[rowIndex][5] / handleSumAllShareOwnership();
-    } 
-    else if (columnIndex === 6) {
-      newData[rowIndex][columnIndex] = event.target.value.trim() === '' ? 0 : parseInt(event.target.value, 10);
-     
-    } 
-    else{
-      newData[rowIndex][columnIndex] = event.target.value.trim();
-      newData[rowIndex][7] = (newData[rowIndex][4] + newData[rowIndex][5]) / (handleSumAllOptionShares() + handleSumAllShareOwnership());
-    }
-    setData(newData);
-  };
+  if (columnIndex === 2) {
+    newData[rowIndex][columnIndex] = value;
+  } 
+  else if (columnIndex === 3) {
+    newData[rowIndex][columnIndex] = value;
+    newData[rowIndex][2] = newData[rowIndex][3] * sharePrice;
+    newData[rowIndex][5] = newData[rowIndex][3];
+
+  } else if (columnIndex === 4) {
+    newData[rowIndex][columnIndex] = value;
+    newData[rowIndex][7] = (newData[rowIndex][4] + newData[rowIndex][5]) / (handleSumAllOptionShares() + handleSumAllShareOwnership());
+  } 
+  else if (columnIndex === 5) {
+    newData[rowIndex][columnIndex] = value;
+    newData[rowIndex][6] = newData[rowIndex][5] / handleSumAllShareOwnership();
+    newData[rowIndex][7] = (newData[rowIndex][4] + newData[rowIndex][5]) / (handleSumAllOptionShares() + handleSumAllShareOwnership());
+  } 
+  else if (columnIndex === 6) {
+    newData[rowIndex][columnIndex] = value;
+  } 
+  else if(columnIndex===7){
+    newData[rowIndex][columnIndex] = value;
+    newData[rowIndex][7] = (newData[rowIndex][4] + newData[rowIndex][5]) / (handleSumAllOptionShares() + handleSumAllShareOwnership());
+  }
+  else{
+    newData[rowIndex][columnIndex] = event.target.value.trim();
+  }
+
+  setData(newData);
+};
+
 
   const handleInputChangeMembers = (event, rowIndex, columnIndex) => {
     const newMembersData = [...membersData];
-    if (columnIndex === 2) {
-      newMembersData[rowIndex][columnIndex] = event.target.value.trim() === '' ? 0 : parseInt(event.target.value, 10);
+    let value = event.target.value.replace(/,/g, ''); // Remove commas from the string first
+  if (value.trim() === '') value = '0';
+  if (columnIndex >= 1 && columnIndex <= 5) {
+    value = parseInt(value, 10);
+  } else if (columnIndex === 6 || columnIndex === 7) {
+    value = value.replace('%', '');
+  }
+    if (columnIndex === 1) {
+      newMembersData[rowIndex][columnIndex] = value; }
+    else if (columnIndex === 2) {
+      newMembersData[rowIndex][columnIndex] = value;
     } else if (columnIndex === 3) {
-      newMembersData[rowIndex][columnIndex] = event.target.value.trim() === '' ? 0 : parseInt(event.target.value, 10);
+      newMembersData[rowIndex][columnIndex] = value;
       newMembersData[rowIndex][5] = newMembersData[rowIndex][3];
     } else if (columnIndex === 4 ) {
-      newMembersData[rowIndex][columnIndex] = event.target.value.trim() === '' ? 0 : parseInt(event.target.value, 10);
+      newMembersData[rowIndex][columnIndex] = value;
       newMembersData[rowIndex][7] = (newMembersData[rowIndex][4] + newMembersData[rowIndex][5]) / (handleSumAllOptionShares() + handleSumAllShareOwnership());
     } 
 
     else if (columnIndex === 5) {
-      newMembersData[rowIndex][columnIndex] = event.target.value.trim() === '' ? 0 : parseInt(event.target.value, 10);
+      newMembersData[rowIndex][columnIndex] = value;
       newMembersData[rowIndex][2] = newMembersData[rowIndex][5] * sharePrice;
       newMembersData[rowIndex][6] = newMembersData[rowIndex][5] / handleSumAllShareOwnership();
     } 
     
     else if (columnIndex === 6) {
-      newMembersData[rowIndex][columnIndex] = event.target.value.trim() === '' ? 0 : parseInt(event.target.value, 10);
-     
+      newMembersData[rowIndex][columnIndex] = value;
+      
     } 
+    else if (columnIndex ===7){
+      newMembersData[rowIndex][columnIndex] = value;
+      newMembersData[rowIndex][7] = (newMembersData[rowIndex][4] + newMembersData[rowIndex][5]) / (handleSumAllOptionShares() + handleSumAllShareOwnership());
+      
+    }
     else{
-      newMembersData[rowIndex][columnIndex] = event.target.value.trim() ;
+      newMembersData[rowIndex][columnIndex] = value;
       newMembersData[rowIndex][7] = (newMembersData[rowIndex][4] + newMembersData[rowIndex][5]) / (handleSumAllOptionShares() + handleSumAllShareOwnership());
     }
+   
     setMembersData(newMembersData);
   };
 
   const handleInputChangePreRound = (event, rowIndex, columnIndex) => {
     const newPreRoundData = [...preRoundData];
-    if (columnIndex === 1) {
-      newPreRoundData[rowIndex][columnIndex] = event.target.value.trim() === '' ? 0 : parseInt(event.target.value, 10);
-    } else if (columnIndex === 2) {
-      newPreRoundData[rowIndex][columnIndex] = event.target.value.trim() === '' ? 0 : parseInt(event.target.value, 10);
+    let value = event.target.value.replace(/,/g, ''); // Remove commas from the string first
+    if (value.trim() === '') value = '0';
+    if (columnIndex >= 2 && columnIndex <= 5) {
+      value = parseInt(value, 10);
+    } else if (columnIndex === 6 || columnIndex === 7) {
+      value = value.replace('%', '');
+    }
+
+    if (columnIndex === 2) {
+      newPreRoundData[rowIndex][columnIndex] = value;
       const angelPrice = angelPriceShare();
-      newPreRoundData[rowIndex][3] = angelPrice !== 0 ? newPreRoundData[rowIndex][2] / angelPrice : 0;
-      newPreRoundData[rowIndex][5] = newPreRoundData[rowIndex][3]; // Update column 5 with the new value
-    } else if (columnIndex === 3) {
-      newPreRoundData[rowIndex][columnIndex] = event.target.value.trim() === '' ? 0 : parseInt(event.target.value, 10);
-      newPreRoundData[rowIndex][5]=newPreRoundData[rowIndex][3];
-      const angelPrice = angelPriceShare();
-      newPreRoundData[rowIndex][3] = angelPrice !== 0 ? newPreRoundData[rowIndex][2] / angelPrice : 0;
-    } else if (columnIndex === 4) {
-      newPreRoundData[rowIndex][columnIndex] = event.target.value.trim() === '' ? 0 : parseInt(event.target.value, 10);
-      newPreRoundData[rowIndex][7] = (newPreRoundData[rowIndex][4] + newPreRoundData[rowIndex][5]) / (handleSumAllOptionShares() + handleSumAllShareOwnership());
-    } else if (columnIndex === 5) {
       
+      newPreRoundData[rowIndex][3] = angelPrice !== 0 ? Math.round(newPreRoundData[rowIndex][2] / angelPrice) : 0;
+
+      newPreRoundData[rowIndex][5] = newPreRoundData[rowIndex][3];
+    } else if (columnIndex === 3) {
+      newPreRoundData[rowIndex][columnIndex] = value;
+      newPreRoundData[rowIndex][5] = newPreRoundData[rowIndex][3];
+      
+    } else if (columnIndex === 4 ) {
+      newPreRoundData[rowIndex][columnIndex] = value;
+      
+    } 
+    else if (columnIndex === 5 ) {
+      newPreRoundData[rowIndex][columnIndex] = value;
       newPreRoundData[rowIndex][6] = newPreRoundData[rowIndex][5] / handleSumAllShareOwnership();
-    } else {
-      newPreRoundData[rowIndex][columnIndex] = event.target.value.trim();
       newPreRoundData[rowIndex][7] = (newPreRoundData[rowIndex][4] + newPreRoundData[rowIndex][5]) / (handleSumAllOptionShares() + handleSumAllShareOwnership());
     }
+    else if (columnIndex === 6 ) {
+      newPreRoundData[rowIndex][columnIndex] = value;
+      
+    }
+    else if (columnIndex === 7 ) {
+      newPreRoundData[rowIndex][columnIndex] = value;
+      newPreRoundData[rowIndex][6] = newPreRoundData[rowIndex][5] / handleSumAllShareOwnership();
+      
+    }
+      else{
+        newPreRoundData[rowIndex][columnIndex] = value;
+        
+      }
+    
     setPreRoundData(newPreRoundData);
   };
   
@@ -149,59 +203,85 @@ function Table() {
 
   const handleInputChangeSeedRound = (event, rowIndex, columnIndex) => {
     const newSeedRoundData = [...seedRoundData];
+    let value = event.target.value.replace(/,/g, ''); // Remove commas from the string first
+  if (value.trim() === '') value = '0';
+  if (columnIndex >= 2 && columnIndex <= 5) {
+    value = parseInt(value, 10);
+  } else if (columnIndex === 6 || columnIndex === 7) {
+    value = value.replace('%', '');
+  }
     if (columnIndex === 2) {
-      newSeedRoundData[rowIndex][columnIndex] = event.target.value.trim() === '' ? 0 : parseInt(event.target.value, 10);
+      newSeedRoundData[rowIndex][columnIndex] = value;
       const seedPrice = seedPriceShare();
       
-      newSeedRoundData[rowIndex][3] = seedPrice !== 0 ? newSeedRoundData[rowIndex][2] / seedPrice : 0;
+      newSeedRoundData[rowIndex][3] = seedPrice !== 0 ? Math.round(newSeedRoundData[rowIndex][2] / seedPrice) : 0;
     } else if (columnIndex === 3) {
-      newSeedRoundData[rowIndex][columnIndex] = event.target.value.trim() === '' ? 0 : parseInt(event.target.value, 10);
+      newSeedRoundData[rowIndex][columnIndex] = value;
       
     } else if (columnIndex === 4 ) {
-      newSeedRoundData[rowIndex][columnIndex] = event.target.value.trim() === '' ? 0 : parseInt(event.target.value, 10);
+      newSeedRoundData[rowIndex][columnIndex] = value;
       newSeedRoundData[rowIndex][7] = (newSeedRoundData[rowIndex][4] + newSeedRoundData[rowIndex][5]) / (handleSumAllOptionShares() + handleSumAllShareOwnership());
     } 
     else if (columnIndex === 5 ) {
-      newSeedRoundData[rowIndex][columnIndex] = event.target.value.trim() === '' ? 0 : parseInt(event.target.value, 10);
+      newSeedRoundData[rowIndex][columnIndex] = value;
       newSeedRoundData[rowIndex][6] = newSeedRoundData[rowIndex][5] / handleSumAllShareOwnership();
+    }
+    else if (columnIndex === 6 ) {
+      newSeedRoundData[rowIndex][columnIndex] = value;
+     
+    }
+    else if (columnIndex === 7 ) {
+      newSeedRoundData[rowIndex][columnIndex] = value;
+      
     }
       else{
         newSeedRoundData[rowIndex][columnIndex] = event.target.value.trim() ;
         newSeedRoundData[rowIndex][7] = (newSeedRoundData[rowIndex][4] + newSeedRoundData[rowIndex][5]) / (handleSumAllOptionShares() + handleSumAllShareOwnership());
       }
+    
     setSeedRoundData(newSeedRoundData);
   };
   
   const handleInputChangeSeriesRound = (event, rowIndex, columnIndex) => {
     const newSeriesRoundData = [...seriesRoundData];
+    let value = event.target.value.replace(/,/g, ''); // Remove commas from the string first
+    if (value.trim() === '') value = '0';
+    if (columnIndex >= 2 && columnIndex <= 5) {
+      value = parseInt(value, 10);
+    } else if (columnIndex === 6 || columnIndex === 7) {
+      value = value.replace('%', '');
+    }
     if (columnIndex === 2) {
-      newSeriesRoundData[rowIndex][columnIndex] = event.target.value.trim() === '' ? 0 : parseInt(event.target.value, 10);
+      newSeriesRoundData[rowIndex][columnIndex] = value;
       const seriesPrice = seriesPriceShare();
       
-      newSeriesRoundData[rowIndex][3] = seriesPrice !== 0 ? newSeriesRoundData[rowIndex][2] / seriesPrice : 0;
+      newSeriesRoundData[rowIndex][3] = seriesPrice !== 0 ? Math.round(newSeriesRoundData[rowIndex][2] / seriesPrice) : 0;
     } else if (columnIndex === 3) {
-      newSeriesRoundData[rowIndex][columnIndex] = event.target.value.trim() === '' ? 0 : parseInt(event.target.value, 10);
+      newSeriesRoundData[rowIndex][columnIndex] = value;
       
     } else if (columnIndex === 4 ) {
-      newSeriesRoundData[rowIndex][columnIndex] = event.target.value.trim() === '' ? 0 : parseInt(event.target.value, 10);
+      newSeriesRoundData[rowIndex][columnIndex] = value;
       
     } 
     else if (columnIndex === 5 ) {
-      newSeriesRoundData[rowIndex][columnIndex] = event.target.value.trim() === '' ? 0 : parseInt(event.target.value, 10);
+      newSeriesRoundData[rowIndex][columnIndex] = value;
       newSeriesRoundData[rowIndex][6] = newSeriesRoundData[rowIndex][5] / handleSumAllShareOwnership();
       newSeriesRoundData[rowIndex][7] = (newSeriesRoundData[rowIndex][4] + newSeriesRoundData[rowIndex][5]) / (handleSumAllOptionShares() + handleSumAllShareOwnership());
     }
     else if (columnIndex === 6 ) {
-      newSeriesRoundData[rowIndex][columnIndex] = event.target.value.trim() === '' ? 0 : parseInt(event.target.value, 10);
+      newSeriesRoundData[rowIndex][columnIndex] = value;
+      
     }
     else if (columnIndex === 7 ) {
-      newSeriesRoundData[rowIndex][columnIndex] = event.target.value.trim() === '' ? 0 : parseInt(event.target.value, 10);
+      newSeriesRoundData[rowIndex][columnIndex] = value;
       newSeriesRoundData[rowIndex][6] = newSeriesRoundData[rowIndex][5] / handleSumAllShareOwnership();
+      
     }
       else{
         newSeriesRoundData[rowIndex][columnIndex] = event.target.value.trim() ;
         
       }
+   
     setSeriesRoundData(newSeriesRoundData);
   };
   const handleNumberOfShares = (event) => {
@@ -209,7 +289,17 @@ function Table() {
   };
 
   const handleSharePrice = (event) => {
-    setSharePrice(event.target.value.trim() === '' ? 0 : parseFloat(event.target.value, 10));
+    const newSharePrice = event.target.value.trim() === '' ? 0 : parseFloat(event.target.value, 10);
+    
+    // Update column [2] for each row in the data array
+    const newData = data.map((row) => {
+      const newRow = [...row];
+      newRow[2] = newRow[3] * newSharePrice;
+      return newRow;
+    });
+  
+    setSharePrice(newSharePrice);
+    setData(newData);
   };
 
   const handlePreMoneyValuation= (event) => {
@@ -364,6 +454,7 @@ return sum;
       return 0;
     }
     const total = preMoneyValuation / subtotal;
+    
     return total;
   };
   
@@ -374,6 +465,7 @@ return sum;
       return 0;
     }
     const total = preMoneyValuationSeed / subtotal;
+    
     return total;
   };
 
@@ -383,6 +475,7 @@ return sum;
       return 0;
     }
     const total = preMoneyValuationSeriesRound / subtotal;
+   
     return total;
   };
 
@@ -499,34 +592,47 @@ return sum;
 //Sums values of the Ownership percentaje on each rows
 
 
-  const percentOwnership = () => {
-    let sum = 0;
-    for (let i = 0; i < data.length; i++) {
-      sum += data[i][6];
+const percentOwnership = () => {
+  let sum = 0;
+  for (let i = 0; i < data.length; i++) {
+    const num = parseFloat(data[i][6]);
+    if (!isNaN(num)) {
+      sum += num;
     }
-    return sum;
-  };
+  }
+  return parseFloat(sum.toFixed(4));
+};
 
   const percentOwnershipMembers = () => {
     let sum = 0;
     for (let i = 0; i < membersData.length; i++) {
-      sum += membersData[i][6];
+      const num = parseFloat(membersData[i][6]);
+      if (!isNaN(num)) {
+        sum += num;
+      }
     }
-    return sum;
+    return parseFloat(sum.toFixed(4));
   };
 
   const percentOwnershipPreRound = () => {
     let sum = 0;
     for (let i = 0; i < preRoundData.length; i++) {
-      sum += preRoundData[i][6];
+      const num = parseFloat(preRoundData[i][6]);
+      if (!isNaN(num)) {
+        sum += num;
+      }
+     
     }
-    return sum;
+    return parseFloat(sum.toFixed(4));
   };
 
   const percentOwnershipSeedRound = () => {
     let sum = 0;
     for (let i = 0; i < seedRoundData.length; i++) {
-      sum += seedRoundData[i][6];
+      const num = parseFloat(seedRoundData[i][6]);
+      if (!isNaN(num)) {
+        sum += num;
+      }
     }
     return sum;
   };
@@ -536,7 +642,7 @@ return sum;
     for (let i = 0; i < seriesRoundData.length; i++) {
       sum += seriesRoundData[i][6];
     }
-    return sum;
+    return parseFloat(sum.toFixed(4));
   };
 
   const sumOfOwnershipPercent = () => {
@@ -548,41 +654,56 @@ return sum;
   const dilutedOwnership = () => {
     let sum = 0;
     for (let i = 0; i < data.length; i++) {
-      sum += data[i][7];
+      const num = parseFloat(data[i][7]);
+      if (!isNaN(num)) {
+        sum += num;
+      }
     }
-    return sum;
+    return parseFloat(sum.toFixed(4));
   };
 
   const dilutedOwnershipMembers = () => {
     let sum = 0;
     for (let i = 0; i < membersData.length; i++) {
-      sum += membersData[i][7];
+      const num = parseFloat(membersData[i][7]);
+      if (!isNaN(num)) {
+        sum += num;
+      }
     }
-    return sum;
+    return parseFloat(sum.toFixed(4));
   };
 
   const dilutedOwnershipPreRound = () => {
     let sum = 0;
     for (let i = 0; i < preRoundData.length; i++) {
-      sum += preRoundData[i][7];
+      const num = parseFloat(preRoundData[i][7]);
+      if (!isNaN(num)) {
+        sum += num;
+      }
     }
-    return sum;
+    return parseFloat(sum.toFixed(4));
   };
 
   const dilutedOwnershipSeedRound = () => {
     let sum = 0;
     for (let i = 0; i < seedRoundData.length; i++) {
-      sum += seedRoundData[i][7];
+      const num = parseFloat(seedRoundData[i][7]);
+      if (!isNaN(num)) {
+        sum += num;
+      }
     }
-    return sum;
+    return parseFloat(sum.toFixed(4));
   };
 
   const dilutedOwnershipSeriesRound = () => {
     let sum = 0;
     for (let i = 0; i < seriesRoundData.length; i++) {
-      sum += seriesRoundData[i][7];
+      const num = parseFloat(seriesRoundData[i][7]);
+      if (!isNaN(num)) {
+        sum += num;
+      }
     }
-    return sum;
+    return parseFloat(sum.toFixed(4));
   };
 
   const dilutedOwnershipSum = () => {
@@ -678,8 +799,39 @@ return sum;
     setSeriesPriceShareValue(calculatedSeriesPriceShare);
   }, [seriesPriceShare]);
   
+  const handleDeleteRowData = (rowIndex) => {
+    const newData = [...data];
+    newData.splice(rowIndex, 1);
+    setData(newData);
+  };
   
+  
+  const handleDeleteRowMembers = (rowIndex) => {
+    const newMembersData = [...membersData];
+    newMembersData.splice(rowIndex, 1);
+    setMembersData(newMembersData);
+  };
 
+  const handleDeleteRowPreRound = (rowIndex) => {
+    const newPreRoundData = [...preRoundData];
+    newPreRoundData.splice(rowIndex, 1);
+    setPreRoundData(newPreRoundData);
+  };
+
+  const handleDeleteRowSeedRound = (rowIndex) => {
+    const newSeedRoundData = [...seedRoundData];
+    newSeedRoundData.splice(rowIndex, 1);
+    setSeedRoundData(newSeedRoundData);
+  };
+  
+  const handleDeleteRowSeriesRound = (rowIndex) => {
+    const newSeriesRoundData = [...seriesRoundData];
+    newSeriesRoundData.splice(rowIndex, 1);
+    setSeriesRoundData(newSeriesRoundData);
+  };
+  
+  
+  
   console.log(JSON.stringify({ data, membersData, preRoundData, seedRoundData, 
     seriesRoundData ,shares, sharePrice, angelRound,preMoneyValuation,
     seedRound, preMoneyValuationSeed,seriesRound,preMoneyValuationSeriesRound})); 
@@ -691,15 +843,15 @@ return sum;
       <div>
       <table className="w-full table-fixed">
         <thead>
-          <tr className="   text-white bg-darkGrey">
+          <tr className="   text-white bg-darkGrey text-center">
             <th>Name</th>
             <th></th>
             <th>Investment amount</th>
             <th>#shares</th>
             <th>Option shares</th>
-            <th>Issued and outstandings # shares Ownership as of today's date</th>
-            <th>% Ownership as of today's date</th>
-            <th>% fully diluted ownership as of today's date</th>
+            <th>Issued and outstandings # shares Ownership as of {<Date/>}</th>
+            <th >% Ownership as of {<Date/>}</th>
+            <th>% fully diluted ownership as of {<Date/>}</th>
           </tr>
           <tr>
             <th className="text-white bg-lightGrey border-black">Founders</th>
@@ -709,7 +861,7 @@ return sum;
             <th className='border border-black'>
               <input
               className='bg-yellow bg-opacity-50 w-full'
-                type="number"
+                type="text"
                 value={shares}
                 onChange={handleNumberOfShares}
               />
@@ -735,24 +887,29 @@ return sum;
             <th>{numberOfShares()}</th>
             <th>{optionShares()}</th>
             <th>{sharesOwnership()}</th>
-            <th>{percentOwnership()} </th>
-            <th>{dilutedOwnership()} </th>
+            <th>{100*percentOwnership()}% </th>
+            <th>{100*dilutedOwnership()}%</th>
           </tr>
         </thead>
-        <tbody >
+        <tbody className="">
   {data.map((row, rowIndex) => (
-    <tr key={rowIndex} className="border-black border-2 " >
+    <tr key={rowIndex} className="border-black ">
       {row.map((cell, columnIndex) => (
         <td key={columnIndex} className="border-black border-2">
           <input
-          className={`${columnIndex === 0 ||columnIndex === 1 || columnIndex === 3 ||columnIndex === 4 ? 'bg-yellow bg-opacity-50 w-full' : ''}`}
-            type="text"
-            value={cell}
-            onChange={(event) => handleInputChange(event, rowIndex, columnIndex)}
-            readOnly={columnIndex === 2 ||  columnIndex === 5 ||columnIndex === 6 || columnIndex ===  7}
-          />
+           className={`${columnIndex === 0 ||columnIndex === 1 || columnIndex === 3 ||columnIndex === 4 ? 'bg-yellow bg-opacity-50 w-full' : ''}`}
+           type="text"
+           value={
+            (columnIndex === 6 || columnIndex === 7) ? `${parseFloat(cell*100).toFixed(2)}%` :
+            (columnIndex >= 2 && columnIndex <= 5) ? numberFormatter(cell) :
+            cell}           
+          onChange={(event) => handleInputChange(event, rowIndex, columnIndex)}
+           readOnly={columnIndex === 2 ||  columnIndex === 5 ||columnIndex === 6 || columnIndex ===  7} />
         </td>
       ))}
+      <td >
+        <button className='ml-12  py-1 px-4 bg-gray-500 hover:bg-red-600 text-white font-bold rounded-lg text-base  ' onClick={() => handleDeleteRowData(rowIndex)}>Delete</button>
+      </td>
     </tr>
   ))}
 </tbody>
@@ -773,7 +930,7 @@ return sum;
             <th className='border border-black'>
               <input
                className='bg-yellow bg-opacity-50 w-full'
-                type="number"
+                type="text"
                 value={shares}
                 onChange={handleNumberOfShares}
               />
@@ -799,8 +956,8 @@ return sum;
             <th>{numberOfMemberShares()}</th>
             <th>{MembersOptionShares()}</th>
             <th>{MemberSharesOwnership()}</th>
-            <th>{percentOwnershipMembers()} </th>
-            <th>{dilutedOwnershipMembers()} </th>
+            <th>{100*percentOwnershipMembers()}%</th>
+            <th>{100*dilutedOwnershipMembers()}%</th>
           </tr>
         </thead>
         <tbody className="">
@@ -811,12 +968,18 @@ return sum;
           <input
             className={`${columnIndex === 0|| columnIndex === 1 || columnIndex === 3 || columnIndex === 4 ? 'bg-yellow bg-opacity-50 w-full' : ''}`}
             type="text"
-            value={cell}
+            value={
+              (columnIndex === 6 || columnIndex === 7) ? `${parseFloat(cell*100).toFixed(2)}%` :
+              (columnIndex >= 1 && columnIndex <= 5) ? numberFormatter(cell) :
+              cell}               
             onChange={(event) => handleInputChangeMembers(event, rowIndex, columnIndex)}
             readOnly={columnIndex === 2 || columnIndex === 5 || columnIndex === 6 || columnIndex ===  7}
           />
         </td>
       ))}
+      <td >
+        <button className='ml-12  py-1 px-4 bg-gray-500 hover:bg-red-600 text-white font-bold rounded-lg text-base  ' onClick={() => handleDeleteRowMembers(rowIndex)}>Delete</button>
+      </td>
     </tr>
   ))}
 </tbody>
@@ -834,7 +997,7 @@ return sum;
             <th className="border border-black">
               <input
                 className='bg-yellow bg-opacity-50 w-full'
-                type="number"
+                type="text"
                 value={angelRound}
                 onChange={handleAngelRound}
               />
@@ -847,7 +1010,7 @@ return sum;
             <th className="border border-black">
               <input
                 className='bg-yellow bg-opacity-50 w-full'
-                type="number"
+                type="text"
                 value={preMoneyValuation}
                 onChange={handlePreMoneyValuation}
               />
@@ -873,27 +1036,36 @@ return sum;
             <th>{numberOfPreRoundShares()}</th>
             <th></th>
             <th>{preRoundSharesOwnership()}</th>
-            <th>{percentOwnershipPreRound()} </th>
-            <th>{dilutedOwnershipPreRound()} </th>
+            <th>{100*percentOwnershipPreRound()}%</th>
+            <th>{100*dilutedOwnershipPreRound()}%</th>
           </tr>
         </thead>
-        <tbody>
+        
+        <tbody className="">
   {preRoundData.map((row, rowIndex) => (
-    <tr key={rowIndex} className="border-black border-2">
+    <tr key={rowIndex} className="border-black ">
       {row.map((cell, columnIndex) => (
         <td key={columnIndex} className="border-black border-2">
           <input
             className={`${columnIndex === 0 ||columnIndex === 1 || columnIndex === 2 ? 'bg-yellow bg-opacity-50 w-full' : ''}`}
             type="text"
-            value={cell}
-            onChange={(event) => handleInputChangePreRound(event, rowIndex, columnIndex)}
+            value={
+              (columnIndex === 6 || columnIndex === 7) ? `${parseFloat(cell*100).toFixed(2)}%` :
+              (columnIndex >= 2 && columnIndex <= 5) ? numberFormatter(cell) :
+              cell}               
+              onChange={(event) => handleInputChangePreRound(event, rowIndex, columnIndex)}
             readOnly={columnIndex === 3 ||columnIndex === 4 ||columnIndex === 5 ||  columnIndex === 6 || columnIndex ===  7}
           />
         </td>
       ))}
+      <td >
+        <button className='ml-12  py-1 px-4 bg-gray-500 hover:bg-red-600 text-white font-bold rounded-lg text-base  ' onClick={() => handleDeleteRowPreRound(rowIndex)}>Delete</button>
+      </td>
     </tr>
   ))}
 </tbody>
+
+
       </table>
      
 
@@ -944,24 +1116,30 @@ return sum;
             <th>{numberOfSeedRoundShares()}</th>
             <th></th>
             <th>{seedRoundSharesOwnership()}</th>
-            <th>{percentOwnershipSeedRound()} </th>
-            <th>{dilutedOwnershipSeedRound()} </th>
+            <th>{100*percentOwnershipSeedRound()}%</th>
+            <th>{100*dilutedOwnershipSeedRound()}%</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody className="">
   {seedRoundData.map((row, rowIndex) => (
-    <tr key={rowIndex} className="border-black border-2">
+    <tr key={rowIndex} className="border-black ">
       {row.map((cell, columnIndex) => (
         <td key={columnIndex} className="border-black border-2">
           <input
             className={`${columnIndex === 0 ||columnIndex === 1 || columnIndex === 2 ? 'bg-yellow bg-opacity-50 w-full' : ''}`}
             type="text"
-            value={cell}
-            onChange={(event) => handleInputChangeSeedRound(event, rowIndex, columnIndex)}
+            value={
+              (columnIndex === 6 || columnIndex === 7) ? `${parseFloat(cell*100).toFixed(2)}%` :
+              (columnIndex >= 2 && columnIndex <= 5) ? numberFormatter(cell) :
+              cell}           
+              onChange={(event) => handleInputChangeSeedRound(event, rowIndex, columnIndex)}
             readOnly={columnIndex === 3 ||columnIndex === 4 ||columnIndex === 5 ||  columnIndex === 6 || columnIndex ===  7}
           />
         </td>
       ))}
+      <td >
+        <button className='ml-12  py-1 px-4 bg-gray-500 hover:bg-red-600 text-white font-bold rounded-lg text-base  ' onClick={() => handleDeleteRowSeedRound(rowIndex)}>Delete</button>
+      </td>
     </tr>
   ))}
 </tbody>
@@ -979,7 +1157,7 @@ return sum;
             <th className='border border-black'>
               <input
                 className='bg-yellow bg-opacity-50 w-full'
-                type="number"
+                type="text"
                 value={seriesRound}
                 onChange={handleSeriesRound}
               />
@@ -992,7 +1170,7 @@ return sum;
             <th className="border border-black">
               <input
                 className='bg-yellow bg-opacity-50 w-full'
-                type="number"
+                type="text"
                 value={preMoneyValuationSeriesRound}
                 onChange={handlePreMoneyValuationSeriesRound}
               />
@@ -1018,24 +1196,30 @@ return sum;
             <th>{numberOfSeriesRoundShares()}</th>
             <th></th>
             <th>{seriesRoundSharesOwnership()}</th>
-            <th>{percentOwnershipSeriesRound()} </th>
-            <th>{dilutedOwnershipSeriesRound()} </th>
+            <th>{100*percentOwnershipSeriesRound()}%</th>
+            <th>{100*dilutedOwnershipSeriesRound()}%</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody className="">
   {seriesRoundData.map((row, rowIndex) => (
-    <tr key={rowIndex} className="border-black border-2">
+    <tr key={rowIndex} className="border-black ">
       {row.map((cell, columnIndex) => (
         <td key={columnIndex} className="border-black border-2">
           <input
             className={`${columnIndex === 0 ||columnIndex === 1 || columnIndex === 2 ? 'bg-yellow bg-opacity-50 w-full' : ''}`}
             type="text"
-            value={cell}
-            onChange={(event) => handleInputChangeSeriesRound(event, rowIndex, columnIndex)}
+            value={
+              (columnIndex === 6 || columnIndex === 7) ? `${parseFloat(cell*100).toFixed(2)}%` :
+              (columnIndex >= 2 && columnIndex <= 5) ? numberFormatter(cell) :
+              cell}           
+              onChange={(event) => handleInputChangeSeriesRound(event, rowIndex, columnIndex)}
             readOnly={columnIndex === 3 ||columnIndex === 4 ||columnIndex === 5 ||  columnIndex === 6 || columnIndex ===  7}
           />
         </td>
       ))}
+      <td >
+        <button className='ml-12  py-1 px-4 bg-gray-500 hover:bg-red-600 text-white font-bold rounded-lg text-base  ' onClick={() => handleDeleteRowSeriesRound(rowIndex)}>Delete</button>
+      </td>
     </tr>
   ))}
 </tbody>
@@ -1045,22 +1229,21 @@ return sum;
       <button onClick={handleAddRowSeriesRound} className='w-full my-5 py-2 bg-yellow shadow-lg shadow-yellow-500/50 hover:shadow-yellow-500/40 text-black font-semibold rounded-lg'>Add Row</button>
     </div>
     <div >
-      <table className="w-full table-fixed">
-        <thead >
-          <tr >
-            <th className="border-black border-2 text-white bg-grey">Total</th>
-            <th className="border-black border-2"></th>
-            <th className="border-black border-2 text-white bg-grey">{handleSumAllInvestmentAmount()}</th>
-            <th className="border-black border-2"></th>
-            <th className="border-black border-2 text-white bg-grey">{handleSumAllOptionShares()}</th>
-            <th className="border-black border-2 text-white bg-grey">{handleSumAllShareOwnership()}</th>
-            <th className="border-black border-2 text-white bg-grey">{sumOfOwnershipPercent()}</th>
-            <th className="border-black border-2 text-white bg-grey">{dilutedOwnershipSum()}</th>
+    <table className="w-full table-fixed">
+  <thead >
+    <tr >
+      <th className="border-black border-2 text-white bg-grey">Total</th>
+      <th className="border-black border-2"></th>
+      <th className="border-black border-2 text-white bg-grey">{numberFormatter(handleSumAllInvestmentAmount())}</th>
+      <th className="border-black border-2"></th>
+      <th className="border-black border-2 text-white bg-grey">{numberFormatter(handleSumAllOptionShares())}</th>
+      <th className="border-black border-2 text-white bg-grey">{numberFormatter(handleSumAllShareOwnership())}</th>
+      <th className="border-black border-2 text-white bg-grey">{sumOfOwnershipPercent()}%</th>
+      <th className="border-black border-2 text-white bg-grey">{dilutedOwnershipSum()}%</th>
+    </tr>
+  </thead>
+</table>
 
-
-          </tr>
-        </thead>
-      </table>
     </div>
     </div>
     
