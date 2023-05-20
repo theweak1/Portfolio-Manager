@@ -52,10 +52,16 @@ async function getBalanceSheet(companyId, periodLength, periodsToCompare) {
 	}
 }
 
-async function getTransactions(companyId, integrationId) {
+async function getProfitAndLoss(companyId, periodLength, periodsToCompare) {
 	try {
 		const response = await codatApiClient.get(
-			`/companies/${companyId}/connections/${integrationId}/data`
+			`/companies/${companyId}/data/financials/profitAndLoss`,
+			{
+				params: {
+					periodLength: periodLength,
+					periodsToCompare: periodsToCompare
+				}
+			}
 		);
 
 		return response.data;
@@ -63,4 +69,5 @@ async function getTransactions(companyId, integrationId) {
 		throw error;
 	}
 }
-export { createCompany, deleteCompany, getBalanceSheet };
+
+export { createCompany, deleteCompany, getBalanceSheet, getProfitAndLoss };

@@ -175,30 +175,14 @@ async function investedStartupsbyInvestorId(investorId) {
 				codatId: true,
 				blog: true
 			}
-			// include: {
-			// 	posts: true,
-			// },
 		});
 
 		if (!startups.length) {
 			return null;
 		}
-		// TODO: Need to work with this code
-		// loop through startups and get transactions for each one
-		const startupsWithTransactions = await Promise.all(
-			startups.map(async (startup) => {
-				const connectionIds = await getConnections(startup.codatId);
-				return {
-					...startup,
-					ids: connectionIds.results.map((result) => result.id)
-				};
-			})
-		);
-		console.log(startupsWithTransactions);
-		// console.log(startupsWithTransactions);
-		const filteredStartups = startupsWithTransactions.map((s) =>
-			excludeFields(s, ['investorIds', 'userId', 'ids'])
 
+		const filteredStartups = startups.map((s) =>
+			excludeFields(s, ['investorIds', 'userId'])
 		);
 		return filteredStartups;
 	} catch (error) {
