@@ -3,8 +3,8 @@ import Date from './Date';
 
 function Table() {
   const [data, setData] = useState([
-    ['', '', 0, 0, 0, 0, 0, 0],
-    ['', '', 0, 0, 0, 0, 0, 0]
+    ['', 0, 0, 0, 0, 0, 0, 0],
+    ['', 0, 0, 0, 0, 0, 0, 0]
   ]);
 
   const [membersData, setMembersData] = useState([
@@ -285,7 +285,8 @@ function Table() {
     setSeriesRoundData(newSeriesRoundData);
   };
   const handleNumberOfShares = (event) => {
-    setShares(event.target.value.trim() === '' ? 0 : parseFloat(event.target.value, 10));
+    let value = event.target.value.replace(/,/g, '');
+    setShares(value.trim() === '' ? 0 : parseFloat(value));
   };
 
   const handleSharePrice = (event) => {
@@ -303,28 +304,34 @@ function Table() {
   };
 
   const handlePreMoneyValuation= (event) => {
-    setPreMoneyValuation(event.target.value.trim() === '' ? 0 : parseFloat(event.target.value, 10));
+    let value = event.target.value.replace(/,/g, '');
+    setPreMoneyValuation(value.trim() === '' ? 0 : parseFloat(value));
   };
 
   const handlePreMoneyValuationSeed = (event) => {
-    setPreMoneyValuationSeed(event.target.value.trim() === '' ? 0 : parseFloat(event.target.value, 10));
+    let value = event.target.value.replace(/,/g, '');
+    setPreMoneyValuationSeed(value.trim() === '' ? 0 : parseFloat(value));
   };
 
   const handlePreMoneyValuationSeriesRound = (event) => {
-    setPreMoneyValuationSeriesRound(event.target.value.trim() === '' ? 0 : parseFloat(event.target.value, 10));
+    let value = event.target.value.replace(/,/g, '');
+    setPreMoneyValuationSeriesRound(value.trim() === '' ? 0 : parseFloat(value));
   };
 
   
   const handleAngelRound = (event) => {
-    setAngelRound(event.target.value.trim() === '' ? 0 : parseFloat(event.target.value, 10));
+    let value = event.target.value.replace(/,/g, '');
+    setAngelRound(value.trim() === '' ? 0 : parseFloat(value));
   };
 
   const handleSeedRound = (event) => {
-    setSeedRound(event.target.value.trim() === '' ? 0 : parseFloat(event.target.value, 10));
+    let value = event.target.value.replace(/,/g, '');
+    setSeedRound(value.trim() === '' ? 0 : parseFloat(value));
   };
 
   const handleSeriesRound = (event) => {
-    setSeriesRound(event.target.value.trim() === '' ? 0 : parseFloat(event.target.value, 10));
+    let value = event.target.value.replace(/,/g, '');
+    setSeriesRound(value.trim() === '' ? 0 : parseFloat(value));
   };
 
   const investmentAmountSum = () => {
@@ -420,7 +427,7 @@ return sum;
     if (isNaN(total)) {
       return "";
     }
-    return "%" + total;
+    return "%" + parseInt(100*total);
   };
 
   const seedPercent = () => {
@@ -432,7 +439,7 @@ return sum;
     if (isNaN(total)) {
       return "";
     }
-    return "%" + total;
+    return "%" + parseInt(100*total);
   };
   
   const seriesRoundPercent = () => {
@@ -444,7 +451,7 @@ return sum;
     if (isNaN(total)) {
       return "";
     }
-    return "%" + total;
+    return "%" + parseInt(100*total);
   };
   
 
@@ -835,7 +842,11 @@ const percentOwnership = () => {
   console.log(JSON.stringify({ data, membersData, preRoundData, seedRoundData, 
     seriesRoundData ,shares, sharePrice, angelRound,preMoneyValuation,
     seedRound, preMoneyValuationSeed,seriesRound,preMoneyValuationSeriesRound})); 
-  
+  console.log(JSON.stringify({sharePrice}));
+  console.log("Data Type:", typeof sharePrice);
+  console.log(JSON.stringify({ value: data[0][3] }));
+  console.log("Data Type:", typeof data[0][3]);
+
 
 
   return (
@@ -862,7 +873,7 @@ const percentOwnership = () => {
               <input
               className='bg-yellow bg-opacity-50 w-full'
                 type="text"
-                value={shares}
+                value={numberFormatter(shares)} 
                 onChange={handleNumberOfShares}
               />
             </th>
@@ -883,10 +894,10 @@ const percentOwnership = () => {
           <tr className="text-white bg-grey border-black">
             <th>Founders</th>
             <th></th>
-            <th>{investmentAmountSum()}</th>
-            <th>{numberOfShares()}</th>
-            <th>{optionShares()}</th>
-            <th>{sharesOwnership()}</th>
+            <th>{numberFormatter(Math.round(investmentAmountSum()))}</th>
+            <th>{numberFormatter(numberOfShares())}</th>
+            <th>{numberFormatter(optionShares())}</th>
+            <th>{numberFormatter(sharesOwnership())}</th>
             <th>{100*percentOwnership()}% </th>
             <th>{100*dilutedOwnership()}%</th>
           </tr>
@@ -901,10 +912,11 @@ const percentOwnership = () => {
            type="text"
            value={
             (columnIndex === 6 || columnIndex === 7) ? `${parseFloat(cell*100).toFixed(2)}%` :
-            (columnIndex >= 2 && columnIndex <= 5) ? numberFormatter(cell) :
-            cell}           
+            (columnIndex === 2) ? Math.round(cell) :
+            (columnIndex >= 3 && columnIndex <= 5) ? numberFormatter(cell) :
+            cell}            
           onChange={(event) => handleInputChange(event, rowIndex, columnIndex)}
-           readOnly={columnIndex === 2 ||  columnIndex === 5 ||columnIndex === 6 || columnIndex ===  7} />
+           readOnly={columnIndex === 1 ||columnIndex === 2 ||  columnIndex === 5 ||columnIndex === 6 || columnIndex ===  7} />
         </td>
       ))}
       <td >
@@ -931,7 +943,7 @@ const percentOwnership = () => {
               <input
                className='bg-yellow bg-opacity-50 w-full'
                 type="text"
-                value={shares}
+                value={numberFormatter(shares)} 
                 onChange={handleNumberOfShares}
               />
             </th>
@@ -952,10 +964,10 @@ const percentOwnership = () => {
           <tr className="text-white bg-grey border-black">
             <th>Member</th>
             <th>Option/Purchase Price</th>
-            <th>{membersInvestmentAmountSum()}</th>
-            <th>{numberOfMemberShares()}</th>
-            <th>{MembersOptionShares()}</th>
-            <th>{MemberSharesOwnership()}</th>
+            <th>{numberFormatter(membersInvestmentAmountSum())}</th>
+            <th>{numberFormatter(numberOfMemberShares())}</th>
+            <th>{numberFormatter(MembersOptionShares())}</th>
+            <th>{numberFormatter(MemberSharesOwnership())}</th>
             <th>{100*percentOwnershipMembers()}%</th>
             <th>{100*dilutedOwnershipMembers()}%</th>
           </tr>
@@ -998,7 +1010,7 @@ const percentOwnership = () => {
               <input
                 className='bg-yellow bg-opacity-50 w-full'
                 type="text"
-                value={angelRound}
+                value={numberFormatter(angelRound)}
                 onChange={handleAngelRound}
               />
             </th>
@@ -1011,19 +1023,19 @@ const percentOwnership = () => {
               <input
                 className='bg-yellow bg-opacity-50 w-full'
                 type="text"
-                value={preMoneyValuation}
+                value={numberFormatter(preMoneyValuation)}
                 onChange={handlePreMoneyValuation}
               />
             </th>
-            
+            <th className="text-white bg-lightGrey border-black">Subtotal: </th>
+            <th>{numberFormatter(angelSubtotal())}</th>
           </tr>
           <tr>
             <th className="text-white bg-lightGrey border-black">Post-Money Valuation</th>
-            <th>{PostMoneyValuation()}</th>
+            <th>{numberFormatter(PostMoneyValuation())}</th>
             <th>{angelRound == preRoundInvestmentAmountSum() ? 'Check: True' : 'Check: False'}</th>
             
-            <th className="text-white bg-lightGrey border-black">Subtotal: </th>
-            <th>{angelSubtotal()}</th>
+            
           </tr>
           <tr>
             <th className="text-white bg-lightGrey border-black">Price per Share</th>
@@ -1032,10 +1044,10 @@ const percentOwnership = () => {
           <tr className="text-white bg-grey border-black">
             <th>PRE-SEED ROUND</th>
             <th></th>
-            <th>{preRoundInvestmentAmountSum()}</th>
-            <th>{numberOfPreRoundShares()}</th>
+            <th>{numberFormatter(preRoundInvestmentAmountSum())}</th>
+            <th>{numberFormatter(numberOfPreRoundShares())}</th>
             <th></th>
-            <th>{preRoundSharesOwnership()}</th>
+            <th>{numberFormatter(preRoundSharesOwnership())}</th>
             <th>{100*percentOwnershipPreRound()}%</th>
             <th>{100*dilutedOwnershipPreRound()}%</th>
           </tr>
@@ -1054,7 +1066,7 @@ const percentOwnership = () => {
               (columnIndex >= 2 && columnIndex <= 5) ? numberFormatter(cell) :
               cell}               
               onChange={(event) => handleInputChangePreRound(event, rowIndex, columnIndex)}
-            readOnly={columnIndex === 3 ||columnIndex === 4 ||columnIndex === 5 ||  columnIndex === 6 || columnIndex ===  7}
+            readOnly={columnIndex === 1 ||columnIndex === 3 ||columnIndex === 4 ||columnIndex === 5 ||  columnIndex === 6 || columnIndex ===  7}
           />
         </td>
       ))}
@@ -1081,7 +1093,7 @@ const percentOwnership = () => {
               <input
                 className='bg-yellow bg-opacity-50 w-full'
                 type="text"
-                value={seedRound}
+                value={numberFormatter(seedRound)}
                 onChange={handleSeedRound}
               />
             </th>
@@ -1093,16 +1105,16 @@ const percentOwnership = () => {
               <input
                 className='bg-yellow bg-opacity-50 w-full'
                 type="text"
-                value={preMoneyValuationSeed}
+                value={numberFormatter(preMoneyValuationSeed)}
                 onChange={handlePreMoneyValuationSeed}
               />
             </th>
             <th className="text-white bg-lightGrey border-black">Subtotal: </th>
-            <th>{seedSubtotal()}</th>
+            <th>{numberFormatter(seedSubtotal())}</th>
             </tr>
             <tr>
             <th className="text-white bg-lightGrey border-black">Post-Money Valuation</th>
-            <th>{PostMoneyValuationSeed()}</th>
+            <th>{numberFormatter(PostMoneyValuationSeed())}</th>
             <th>{seedRound == seedRoundInvestmentAmountSum() ? 'Check: True' : 'Check: False'}</th>
             </tr>
             <tr>
@@ -1112,10 +1124,10 @@ const percentOwnership = () => {
             <tr className="text-white bg-grey border-black">
               <th >SEED ROUND</th>
               <th></th>
-            <th>{seedRoundInvestmentAmountSum()}</th>
-            <th>{numberOfSeedRoundShares()}</th>
+            <th>{numberFormatter(seedRoundInvestmentAmountSum())}</th>
+            <th>{numberFormatter(numberOfSeedRoundShares())}</th>
             <th></th>
-            <th>{seedRoundSharesOwnership()}</th>
+            <th>{numberFormatter(seedRoundSharesOwnership())}</th>
             <th>{100*percentOwnershipSeedRound()}%</th>
             <th>{100*dilutedOwnershipSeedRound()}%</th>
           </tr>
@@ -1133,7 +1145,7 @@ const percentOwnership = () => {
               (columnIndex >= 2 && columnIndex <= 5) ? numberFormatter(cell) :
               cell}           
               onChange={(event) => handleInputChangeSeedRound(event, rowIndex, columnIndex)}
-            readOnly={columnIndex === 3 ||columnIndex === 4 ||columnIndex === 5 ||  columnIndex === 6 || columnIndex ===  7}
+            readOnly={columnIndex === 1 ||columnIndex === 3 ||columnIndex === 4 ||columnIndex === 5 ||  columnIndex === 6 || columnIndex ===  7}
           />
         </td>
       ))}
@@ -1158,7 +1170,7 @@ const percentOwnership = () => {
               <input
                 className='bg-yellow bg-opacity-50 w-full'
                 type="text"
-                value={seriesRound}
+                value={numberFormatter(seriesRound)}
                 onChange={handleSeriesRound}
               />
             </th>
@@ -1171,17 +1183,17 @@ const percentOwnership = () => {
               <input
                 className='bg-yellow bg-opacity-50 w-full'
                 type="text"
-                value={preMoneyValuationSeriesRound}
+                value={numberFormatter(preMoneyValuationSeriesRound)}
                 onChange={handlePreMoneyValuationSeriesRound}
               />
             </th>
             <th className="text-white bg-lightGrey border-black">Subtotal: </th>
-            <th>{seriesSubtotal()}</th>
+            <th>{numberFormatter(seriesSubtotal())}</th>
             
           </tr>
           <tr>
             <th className="text-white bg-lightGrey border-black">Post-Money Valuation</th>
-            <th>{PostMoneyValuationSeriesRound()}</th>
+            <th>{numberFormatter(PostMoneyValuationSeriesRound())}</th>
             <th>{seedRound == serieseRoundInvestmentAmountSum() ? 'Check: True' : 'Check: False'}</th>
             
           </tr>
@@ -1192,10 +1204,10 @@ const percentOwnership = () => {
           <tr className="text-white bg-grey border-black">
             <th>SERIES A ROUND</th>
             <th></th>
-            <th>{serieseRoundInvestmentAmountSum()}</th>
-            <th>{numberOfSeriesRoundShares()}</th>
+            <th>{numberFormatter(serieseRoundInvestmentAmountSum())}</th>
+            <th>{numberFormatter(numberOfSeriesRoundShares())}</th>
             <th></th>
-            <th>{seriesRoundSharesOwnership()}</th>
+            <th>{numberFormatter(seriesRoundSharesOwnership())}</th>
             <th>{100*percentOwnershipSeriesRound()}%</th>
             <th>{100*dilutedOwnershipSeriesRound()}%</th>
           </tr>
@@ -1213,7 +1225,7 @@ const percentOwnership = () => {
               (columnIndex >= 2 && columnIndex <= 5) ? numberFormatter(cell) :
               cell}           
               onChange={(event) => handleInputChangeSeriesRound(event, rowIndex, columnIndex)}
-            readOnly={columnIndex === 3 ||columnIndex === 4 ||columnIndex === 5 ||  columnIndex === 6 || columnIndex ===  7}
+            readOnly={columnIndex === 1 ||columnIndex === 3 ||columnIndex === 4 ||columnIndex === 5 ||  columnIndex === 6 || columnIndex ===  7}
           />
         </td>
       ))}
@@ -1240,6 +1252,7 @@ const percentOwnership = () => {
       <th className="border-black border-2 text-white bg-grey">{numberFormatter(handleSumAllShareOwnership())}</th>
       <th className="border-black border-2 text-white bg-grey">{sumOfOwnershipPercent()}%</th>
       <th className="border-black border-2 text-white bg-grey">{dilutedOwnershipSum()}%</th>
+      <th></th>
     </tr>
   </thead>
 </table>
