@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 import loginImg from '../assets/City.jpg';
 import Button from '../shared/components/FormElements/Button';
@@ -17,6 +17,7 @@ import {
 
 export default function Login() {
 	const auth = useContext(AuthContext);
+	const navigate = useNavigate();
 
 	const { isLoading, error, sendRequest, clearError } = useHttpClient();
 
@@ -56,6 +57,10 @@ export default function Login() {
 				responseData.expiresIn
 			);
 		} catch (err) {}
+	};
+
+	const handleLoginClick = () => {
+		navigate('/signup');
 	};
 
 	return (
@@ -106,6 +111,15 @@ export default function Login() {
 							<Link to="/forgot-password">Forgot Password? </Link>
 						</div>
 					</form>
+					<div className="text-white text-center mt-4">
+						<span>Don't have an account? </span>
+						<span
+							className="cursor-pointer text-blue-500"
+							onClick={handleLoginClick}
+						>
+							Signup
+						</span>
+					</div>
 				</div>
 			</div>
 		</React.Fragment>

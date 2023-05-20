@@ -19,6 +19,7 @@ import ResetPasswordPage from './auth/forgot-password';
 import CFOStartup from './routes/CFOStartup';
 import CaptableStartup from './routes/CaptableStartup';
 import CreateUpdates from './routes/CreateUpdates';
+import InvestorList from './routes/Investors';
 
 import { AuthContext } from './shared/context/auth-context';
 import { useAuth } from './shared/hooks/auth-hook';
@@ -38,17 +39,19 @@ function App() {
 	if (!token) {
 		routes = (
 			<Routes>
-				<Route path="/" element={<Home />} />
+				<Route path="/investors" element={<InvestorList />} />
+				{/* <Route path="/" element={<Home />} /> */}
 				<Route path="/login" element={<Login />} />
-				<Route path="/signup" element={<Signup />} />
+				{/* <Route path="/signup" element={<Signup />} />
 				<Route path="/forgot-password" element={<ResetPasswordPage />} />
-				<Route path="/reset-password" element={<UpdatePasswordPage />} />
+			<Route path="/reset-password" element={<UpdatePasswordPage />} /> */}
 			</Routes>
 		);
 	} else {
 		if (userRole === 'Startup') {
 			routes = (
 				<Routes>
+					<Route path="/investors" element={<InvestorList />} />
 					<Route path="/cfo-Startup" element={<CFOStartup />} />
 					<Route path="/captable-startup" element={<CaptableStartup />} />
 					<Route path="/create-updates" element={<CreateUpdates />} />
