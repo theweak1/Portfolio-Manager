@@ -1,5 +1,5 @@
 import { createInvestor } from '../../models/investors.model.mjs';
-import { createStartup } from '../../models/startups.model.mjs';
+import { createStartup, updateCodatId } from '../../models/startups.model.mjs';
 
 import {
 	createUser,
@@ -21,7 +21,7 @@ import {
 } from '../../services/auth.service.mjs';
 
 import { HttpError, handleErrorResponse } from '../../models/http-error.mjs';
-
+import { createCompany } from '../../services/codat.service.mjs';
 import { excludeFields, isValidUUID, titleCase } from '../../util/helpers.mjs';
 
 import {
@@ -222,12 +222,16 @@ async function httpSignupStartup(req, res, next) {
 			// 	error: startupResponse
 			// });
 		}
-		// TODO: Uncomment this line when doing full authentication test with admin area.
-		// await sendRequestStartupEmail(startupResponse.id,userInfo.email,startupInfo);
-		//TODO: Change isApproved to false
+		const codatResponse = await createCompany(startup.companyName);
+		await updateCodatId(
+			startupResponse.id,
+			codatResponse.id,
+			codatResponse.redirect
+		);
+
 		return res.status(200).json({
 			...startupResponse,
-			isApproved: true
+			...codatResponse
 		});
 	} catch (error) {
 		return handleErrorResponse('signup startup', error, res);

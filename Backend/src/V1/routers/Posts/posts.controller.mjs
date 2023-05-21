@@ -25,10 +25,6 @@ async function httpGetAllPost(req, res, next) {
 				400
 			);
 			return next(error);
-			// return handleBadRequestResponse(
-			// 	'This investor does not exist in the system.',
-			// 	res
-			// );
 		}
 
 		const startupsResponse = await StartupsWithPosts(investorResponse.id);

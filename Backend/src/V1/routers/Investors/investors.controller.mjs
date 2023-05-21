@@ -22,10 +22,6 @@ async function httpGetInvestorProfileByUserId(req, res, next) {
 				400
 			);
 			return next(error);
-			// return handleBadRequestResponse(
-			// 	'This investor does not exist in the system.',
-			// 	res
-			// );
 		}
 
 		return res.status(200).json(investor);

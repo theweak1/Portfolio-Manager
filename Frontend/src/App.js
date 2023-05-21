@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+	Navigate,
 	Route,
 	BrowserRouter as Router,
 	Routes,
@@ -16,11 +17,12 @@ import Navbar from './shared/components/Navigation/Navbar';
 
 import UpdatePasswordPage from './auth/ResetPassword';
 import ResetPasswordPage from './auth/forgot-password';
+
 import CFOStartup from './routes/CFOStartup';
 import CaptableStartup from './routes/CaptableStartup';
 import CreateUpdates from './routes/CreateUpdates';
 import InvestorList from './routes/Investors';
-
+import Startups from './routes/Startups';
 import { AuthContext } from './shared/context/auth-context';
 import { useAuth } from './shared/hooks/auth-hook';
 
@@ -40,11 +42,11 @@ function App() {
 		routes = (
 			<Routes>
 				<Route path="/investors" element={<InvestorList />} />
-				{/* <Route path="/" element={<Home />} /> */}
+				<Route path="/" element={<Home />} />
 				<Route path="/login" element={<Login />} />
-				{/* <Route path="/signup" element={<Signup />} />
+				<Route path="/signup" element={<Signup />} />
 				<Route path="/forgot-password" element={<ResetPasswordPage />} />
-			<Route path="/reset-password" element={<UpdatePasswordPage />} /> */}
+				<Route path="/reset-password" element={<UpdatePasswordPage />} />
 			</Routes>
 		);
 	} else {
@@ -63,6 +65,10 @@ function App() {
 					<Route path="/cfo" element={<CFO />} />
 					<Route path="/captable" element={<CapTable />} />
 					<Route path="/updates" element={<Updates />} />
+					<Route path="/startups" element={<Startups />} />
+
+					<Route path="/" element={<Home />} />
+					<Route path="*" element={<Navigate to="/cfo" />} />
 				</Routes>
 			);
 		}

@@ -3,7 +3,6 @@ import prisma from '../../database/index.mjs';
 import { excludeFields } from '../util/helpers.mjs';
 import { HttpError } from './http-error.mjs';
 
-import { getBalanceSheet } from '../services/codat.service.mjs';
 import { newUpdateNotification } from '../services/mail.service.mjs';
 
 async function createStartup(userId, email, startupInfo) {
@@ -75,24 +74,6 @@ async function findStartupByUserId(userId) {
 		}
 
 		return excludeFields(startup, ['userId', 'investorIds']);
-	} catch (error) {
-		throw error;
-	}
-}
-
-async function findUnApprovedStartups() {
-	try {
-		const startups = await prisma.startup.findMany({
-			where: {
-				user: {
-					isApproved: false
-				}
-			}
-		});
-
-		const filteredstartups = startups.map((s) => excludeFields(s, ['userId']));
-
-		return filteredstartups;
 	} catch (error) {
 		throw error;
 	}
@@ -172,8 +153,7 @@ async function investedStartupsbyInvestorId(investorId) {
 				id: true,
 				companyName: true,
 				email: true,
-				codatId: true,
-				blog: true
+				codatId: true
 			}
 		});
 
@@ -182,7 +162,7 @@ async function investedStartupsbyInvestorId(investorId) {
 		}
 
 		const filteredStartups = startups.map((s) =>
-			excludeFields(s, ['investorIds', 'userId'])
+			excludeFields(s, ['investorIds', 'userId', 'codatId', 'email'])
 		);
 		return filteredStartups;
 	} catch (error) {
@@ -347,7 +327,8 @@ async function updateCodatId(id, companyId, redirectLink) {
 				id: id
 			},
 			data: {
-				codatId: companyId
+				codatId: companyId,
+				RLink: redirectLink
 			}
 		});
 
@@ -371,6 +352,41 @@ async function getAllStartups() {
 			return null;
 		}
 		return startups;
+	} catch (error) {
+		throw error;
+	}
+}
+
+async function updateCaptable(startupId, captable) {
+	try {
+		const startup = await prisma.startup.update({
+			where: {
+				id: startupId
+			},
+			data: {
+				captable: captable
+			}
+		});
+
+		const filteredStartup = excludeFields(startup, ['id']);
+		return filteredStartup;
+	} catch (error) {
+		throw error;
+	}
+}
+
+async function getCaptable(startupId) {
+	try {
+		const captable = await prisma.startup.findUnique({
+			where: {
+				id: startupId
+			},
+			select: {
+				captable: true
+			}
+		});
+
+		return captable;
 	} catch (error) {
 		throw error;
 	}
@@ -403,7 +419,6 @@ async function NotifyInvestors(startupId) {
 export {
 	createStartup,
 	findStartupByUserId,
-	findUnApprovedStartups,
 	validateStartupExistsByUserId,
 	updateStartup,
 	findStartupById,
@@ -416,5 +431,7 @@ export {
 	NotifyInvestors,
 	deleteStartup,
 	updateCodatId,
-	getAllStartups
+	getAllStartups,
+	updateCaptable,
+	getCaptable
 };

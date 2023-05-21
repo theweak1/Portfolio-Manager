@@ -88,30 +88,10 @@ function getUserIdFromToken(token) {
 	return user.id;
 }
 
-async function validateUserAccess(req, res, next) {
-	const userId = req.userId;
-
-	const user = await findUserById(userId);
-	const role = user.role;
-	if (!role === 'Admin') {
-		const error = new HttpError(
-			'You are not allowed to perform this action',
-			400
-		);
-		return next(error);
-		// return handleBadRequestResponse(
-		// 	'You are not allowed to perform this action',
-		// 	res
-		// );
-	}
-	next();
-}
-
 export {
 	authenticateJsonWebToken,
 	generateAccessToken,
 	generateRefreshToken,
 	verifyRefreshToken,
-	getUserIdFromToken,
-	validateUserAccess
+	getUserIdFromToken
 };

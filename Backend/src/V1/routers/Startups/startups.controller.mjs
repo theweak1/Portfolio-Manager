@@ -1,9 +1,12 @@
 import {
 	addNewInvestor,
+	findStartupById,
 	findStartupByUserId,
+	getCaptable,
 	getInvestors,
 	getStartupByIdAndInvestorId,
 	investedStartupsbyInvestorId,
+	updateCaptable,
 	updateInvestorsList,
 	updateStartup,
 	validateStartupExistsByStartupId,
@@ -25,6 +28,11 @@ import { handleErrorResponse, HttpError } from '../../models/http-error.mjs';
 
 import { titleCase } from '../../util/helpers.mjs';
 
+import {
+	getBalanceSheet,
+	getProfitAndLoss
+} from '../../services/codat.service.mjs';
+
 import { sendInvestorInvitationEmail } from '../../services/mail.service.mjs';
 
 async function httpGetStartupProfileByUserId(req, res, next) {
@@ -37,10 +45,6 @@ async function httpGetStartupProfileByUserId(req, res, next) {
 				400
 			);
 			return next(error);
-			// return handleBadRequestResponse(
-			// 	'This startup does not exist in the system.',
-			// 	res
-			// );
 		}
 
 		return res.status(200).json(startupResponse);
@@ -64,9 +68,6 @@ async function httpUpdateStartupProfile(req, res, next) {
 		const validatedUserResponse = await validateProfileUpdate(userInfo);
 		if ('code' in validatedUserResponse) {
 			return next(validatedUserResponse);
-			// return res.status(validatedUserResponse.errorCode).json({
-			// 	error: validatedUserResponse,
-			// });
 		}
 
 		const validatedStartupResponse = await validateStartupExistsByUserId(
@@ -74,9 +75,6 @@ async function httpUpdateStartupProfile(req, res, next) {
 		);
 		if ('code' in validatedStartupResponse) {
 			return next(validatedStartupResponse);
-			// return res.status(validatedStartupResponse.errorCode).json({
-			// 	error: validatedStartupResponse,
-			// });
 		}
 
 		if (userInfo.email) {
@@ -110,10 +108,6 @@ async function httpGetStartupsByInvestorId(req, res, next) {
 				400
 			);
 			return next(error);
-			// return handleBadRequestResponse(
-			// 	'This investor does not exist in the system.',
-			// 	res
-			// );
 		}
 
 		const startups = await investedStartupsbyInvestorId(investorResponse.id);
@@ -123,13 +117,10 @@ async function httpGetStartupsByInvestorId(req, res, next) {
 				'You are not inveted to view any startups portfolio.',
 				404
 			);
-			// return handleNotFoundResponse(
-			// 	'You are not inveted to view any startups portfolio.',
-			// 	res
-			// );
+			return next(error);
 		}
 
-		return res.status(200).json(startups);
+		return res.status(200).json({ startups: startups });
 	} catch (error) {
 		return handleErrorResponse('get startups by investor id', error, res);
 	}
@@ -145,10 +136,6 @@ async function httpNewInvestors(req, res, next) {
 				400
 			);
 			return next(error);
-			// return handleBadRequestResponse(
-			// 	'This startup does not exist in the system.',
-			// 	res
-			// );
 		}
 		const newInvestors = req.body.investors;
 
@@ -180,10 +167,6 @@ async function httpUpdateInvestor(req, res, next) {
 				400
 			);
 			return next(error);
-			// return handleBadRequestResponse(
-			// 	'This startup does not exist in the system.',
-			// 	res
-			// );
 		}
 		const InvestorList = req.body.investors;
 
@@ -210,10 +193,6 @@ async function httpGetInvestors(req, res, next) {
 				400
 			);
 			return next(error);
-			// return handleBadRequestResponse(
-			// 	'This startup does not exist in the system.',
-			// 	res
-			// );
 		}
 
 		const investors = await getInvestors(startupResponse.id);
@@ -246,10 +225,6 @@ async function httpGetSpecificStartupProfile(req, res, next) {
 				400
 			);
 			return next(error);
-			// return handleBadRequestResponse(
-			// 	'This startup does not exist in the system.',
-			// 	res
-			// );
 		}
 
 		const startup = await getStartupByIdAndInvestorId(
@@ -263,10 +238,6 @@ async function httpGetSpecificStartupProfile(req, res, next) {
 				404
 			);
 			return next(error);
-			// return handleNotFoundResponse(
-			// 	'You are not invited to view this startup portfolio.',
-			// 	res
-			// );
 		}
 
 		res.status(200).json(startup);
@@ -279,6 +250,155 @@ async function httpGetSpecificStartupProfile(req, res, next) {
 	}
 }
 
+async function HttpPostCaptable(req, res, next) {
+	try {
+		const userId = req.userId;
+		const startupResponse = await findStartupByUserId(userId);
+		if (!startupResponse) {
+			const error = new HttpError(
+				'This startup does not exist in the system.',
+				400
+			);
+			return next(error);
+		}
+
+		const captable = req.body.data;
+
+		const captableResponse = await updateCaptable(startupResponse.id, captable);
+
+		return res.status(200).json(captableResponse);
+	} catch (error) {
+		return handleErrorResponse('Post captable', error, res);
+	}
+}
+
+async function httpGetPL(req, res, next) {
+	try {
+		const userId = req.userId;
+		const investorResponse = await findInvestorByUserId(userId);
+
+		if (!investorResponse) {
+			const error = new HttpError(
+				'An investor with this id does not exist in the system',
+				400
+			);
+			return next(error);
+		}
+
+		const startupId = req.body.startupId;
+
+		const startupResponse = await findStartupById(startupId);
+		if (!startupResponse) {
+			const error = new HttpError(
+				'A startup with this id does not exist in the system',
+				400
+			);
+			return next(error);
+		}
+
+		const codatResponse = await getProfitAndLoss(
+			startupResponse.codatId,
+			12,
+			1
+		);
+		const costOfGoodsSold = codatResponse.reports[0].costOfSales.value;
+		const OperatingExprenses = codatResponse.reports[0].expenses.value;
+		const revenue =
+			codatResponse.reports[0].income.value +
+			codatResponse.reports[0].otherIncome.value;
+		const allExpenses =
+			codatResponse.reports[0].expenses.value +
+			codatResponse.reports[0].otherExpenses.value;
+		res.status(200).json({
+			costOfGoodsSold: costOfGoodsSold,
+			OperatingExprenses: OperatingExprenses,
+			revenue: revenue,
+			allExpenses: allExpenses
+		});
+	} catch (error) {
+		return handleErrorResponse('Get PL', error, res);
+	}
+}
+
+async function httpGetBalanceSheet(req, res, next) {
+	try {
+		const userId = req.userId;
+		const investorResponse = await findInvestorByUserId(userId);
+
+		if (!investorResponse) {
+			const error = new HttpError(
+				'An investor with this id does not exist in the system',
+				400
+			);
+			return next(error);
+		}
+
+		const startupId = req.body.startupId;
+
+		const startupResponse = await findStartupById(startupId);
+		if (!startupResponse) {
+			const error = new HttpError(
+				'A startup with this id does not exist in the system',
+				400
+			);
+			return next(error);
+		}
+
+		const codatResponse = await getBalanceSheet(startupResponse.codatId, 12, 1);
+		const cashInBank = codatResponse.reports[0].assets.items[0].value;
+
+		res.status(200).json({
+			cashInBank: cashInBank
+		});
+	} catch (error) {
+		return handleErrorResponse('Get balance Sheet', error, res);
+	}
+}
+
+async function HttpGetCaptable(req, res, next) {
+	try {
+		const userId = req.userId;
+		const startupResponse = await findStartupByUserId(userId);
+
+		if (!startupResponse) {
+			const investorResponse = await findInvestorByUserId(userId);
+			if (!investorResponse) {
+				const error = new HttpError(
+					'An investor with this id does not exist in the system',
+					400
+				);
+				return next(error);
+			} else if (investorResponse) {
+				const startupId = req.body.startupId;
+				const startupResponse = await findStartupById(startupId, startupId);
+				if (!startupResponse) {
+					const error = new HttpError(
+						'This startup does not exist in the system.',
+						400
+					);
+					return next(error);
+				}
+
+				const captable = await getCaptable(startupResponse.id);
+
+				res.status(200).json({ data: captable });
+			} else {
+				const error = new HttpError(
+					'This startup does not exist in the system.',
+					400
+				);
+				return next(error);
+			}
+		} else {
+			const captable = await getCaptable(startupResponse.id);
+
+			res.status(200).json({ data: captable });
+		}
+	} catch (error) {
+		return handleErrorResponse('Get captable', error, res);
+	}
+}
+
 export {
 	httpGetStartupProfileByUserId,
 	httpUpdateStartupProfile,
@@ -286,5 +406,9 @@ export {
 	httpNewInvestors,
 	httpUpdateInvestor,
 	httpGetInvestors,
-	httpGetSpecificStartupProfile
+	httpGetSpecificStartupProfile,
+	HttpPostCaptable,
+	httpGetPL,
+	HttpGetCaptable,
+	httpGetBalanceSheet
 };

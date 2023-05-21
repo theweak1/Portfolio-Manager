@@ -16,6 +16,7 @@ async function StartupsWithPosts(investorId) {
 			include: {
 				blog: {
 					select: {
+						id: true,
 						lastModified: true,
 						title: true,
 						description: true
@@ -29,7 +30,16 @@ async function StartupsWithPosts(investorId) {
 		}
 
 		const filteredstartups = startups.map((s) =>
-			excludeFields(s, ['investorIds', 'userId', 'createdDate', 'lastModified'])
+			excludeFields(s, [
+				'investorIds',
+				'userId',
+				'createdDate',
+				'lastModified',
+				'email',
+				'codatId',
+				'redirectLink',
+				'captable'
+			])
 		);
 		return startups;
 	} catch (error) {

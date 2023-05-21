@@ -60,8 +60,8 @@ const Investors = () => {
 		dummyUsers.push(investor);
 
 		// Clear the form inputs
-		// inputHandler('name', '', false);
-		// inputHandler('email', '', false);
+		inputHandler('name', '', false);
+		inputHandler('email', '', false);
 	};
 
 	const handleFormSubmit = async (event) => {

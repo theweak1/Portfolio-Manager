@@ -15,7 +15,6 @@ model User {
   email        String    @unique
   password     String    @unique
   passwordSalt String    @unique
-  isApproved   Boolean   @default(false)
   role         String
   accessToken  String?
   refreshToken String?
@@ -49,6 +48,7 @@ model Startup {
   investors    Investor[] @relation(fields: [investorIds], references: [id])
 
   codatId      String?
+  RLink        String?
   redirectLink String?
   blog         Post[]
 

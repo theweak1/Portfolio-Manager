@@ -1,7 +1,6 @@
 //API Version
 const API_VERSION = 'v1';
 
-import cors from 'cors';
 import * as dotenv from 'dotenv';
 import express from 'express';
 
@@ -16,12 +15,6 @@ const { default: startupRouter } = await import(
 );
 const { default: postRouter } = await import(
 	`./${API_VERSION}/routers/Posts/posts.routes.mjs`
-);
-const { default: adminRouter } = await import(
-	`./${API_VERSION}/routers/Admin/admin.routes.mjs`
-);
-const { default: HttpError } = await import(
-	`./${API_VERSION}/models/http-error.mjs`
 );
 
 dotenv.config();
@@ -45,8 +38,7 @@ app.use((req, res, next) => {
 app.use(`/api/${API_VERSION}/auth`, authRouter);
 app.use(`/api/${API_VERSION}/investor`, investorRouter);
 app.use(`/api/${API_VERSION}/startup`, startupRouter);
-app.use(`/api/${API_VERSION}/post`, postRouter);
-app.use(`/api/${API_VERSION}/admin`, adminRouter);
+app.use(`/api/${API_VERSION}/posts`, postRouter);
 
 app.use((error, req, res, next) => {
 	if (res.headerSent) {
