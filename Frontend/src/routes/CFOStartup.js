@@ -8,9 +8,9 @@ function CFOStartup() {
     <div className="flex">
       <SidebarStartup />
       <div className="flex-1 p-6 ml-16"> {/* add left margin equal to sidebar width */}
-        <h1 className="text-3xl font-bold mb-6">Captable Report</h1>
+        <h1 className="text-3xl font-bold mb-6">CFO STARTUP</h1>
         <div>
-          <Table />
+          
         </div>
       </div>
     </div>

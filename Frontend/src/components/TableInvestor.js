@@ -874,6 +874,7 @@ const percentOwnership = () => {
                 type="text"
                 value={numberFormatter(shares)} 
                 onChange={handleNumberOfShares}
+                readOnly={true}
               />
             </th>
             <th>{shares == numberOfShares() ? 'Check: True' : 'Check: False'}</th>
@@ -886,6 +887,7 @@ const percentOwnership = () => {
                 type="number"
                 value={sharePrice}
                 onChange={handleSharePrice}
+                readOnly={true}
               />
             </th>
             <th></th>
@@ -915,19 +917,19 @@ const percentOwnership = () => {
             (columnIndex >= 3 && columnIndex <= 5) ? numberFormatter(cell) :
             cell}            
           onChange={(event) => handleInputChange(event, rowIndex, columnIndex)}
-           readOnly={columnIndex === 1 ||columnIndex === 2 ||  columnIndex === 5 ||columnIndex === 6 || columnIndex ===  7} />
+          readOnly={true} />
         </td>
       ))}
-      <td >
+      {/* <td >
         <button className='ml-12  py-1 px-4 bg-gray-500 hover:bg-red-600 text-white font-bold rounded-lg text-base  ' onClick={() => handleDeleteRowData(rowIndex)}>Delete</button>
-      </td>
+      </td> */}
     </tr>
   ))}
 </tbody>
       </table>
      
 
-      <button onClick={handleAddRow} className='w-full my-5 py-2 bg-yellow shadow-lg shadow-yellow-500/50 hover:shadow-yellow-500/40 text-black font-semibold rounded-lg'>Add Row</button>
+      <button  className='w-full my-5 py-2 bg-yellow shadow-lg shadow-yellow-500/50 hover:shadow-yellow-500/40 text-black font-semibold rounded-lg'></button>
     </div>
     {/* SECOND TABLE STARTS HERE */}
     <div>
@@ -944,6 +946,7 @@ const percentOwnership = () => {
                 type="text"
                 value={numberFormatter(shares)} 
                 onChange={handleNumberOfShares}
+                readOnly={true}
               />
             </th>
             <th></th>
@@ -956,6 +959,7 @@ const percentOwnership = () => {
                 type="number"
                 value={sharePrice}
                 onChange={handleSharePrice}
+                readOnly={true}
               />
             </th>
             <th></th>
@@ -984,20 +988,19 @@ const percentOwnership = () => {
               (columnIndex >= 1 && columnIndex <= 5) ? numberFormatter(cell) :
               cell}               
             onChange={(event) => handleInputChangeMembers(event, rowIndex, columnIndex)}
-            readOnly={columnIndex === 2 || columnIndex === 5 || columnIndex === 6 || columnIndex ===  7}
-          />
+            readOnly={true}          />
         </td>
       ))}
-      <td >
+      {/* <td >
         <button className='ml-12  py-1 px-4 bg-gray-500 hover:bg-red-600 text-white font-bold rounded-lg text-base  ' onClick={() => handleDeleteRowMembers(rowIndex)}>Delete</button>
-      </td>
+      </td> */}
     </tr>
   ))}
 </tbody>
       </table>
      
 
-      <button onClick={handleAddRowMembers} className='w-full my-5 py-2 bg-yellow shadow-lg shadow-yellow-500/50 hover:shadow-yellow-500/40 text-black font-semibold rounded-lg'>Add Row</button>
+      <button  className='w-full my-5 py-2 bg-yellow shadow-lg shadow-yellow-500/50 hover:shadow-yellow-500/40 text-black font-semibold rounded-lg'></button>
     </div>
     {/* //THIRD TABLE STARTS HERE */}
     <div>
@@ -1011,6 +1014,7 @@ const percentOwnership = () => {
                 type="text"
                 value={numberFormatter(angelRound)}
                 onChange={handleAngelRound}
+                readOnly={true}
               />
             </th>
             <th>{angelPercent()}</th>
@@ -1024,6 +1028,7 @@ const percentOwnership = () => {
                 type="text"
                 value={numberFormatter(preMoneyValuation)}
                 onChange={handlePreMoneyValuation}
+                readOnly={true}
               />
             </th>
             <th className="text-white bg-lightGrey border-black">Subtotal: </th>
@@ -1065,13 +1070,12 @@ const percentOwnership = () => {
               (columnIndex >= 2 && columnIndex <= 5) ? numberFormatter(cell) :
               cell}               
               onChange={(event) => handleInputChangePreRound(event, rowIndex, columnIndex)}
-            readOnly={columnIndex === 1 ||columnIndex === 3 ||columnIndex === 4 ||columnIndex === 5 ||  columnIndex === 6 || columnIndex ===  7}
-          />
+              readOnly={true}          />
         </td>
       ))}
-      <td >
+      {/* <td >
         <button className='ml-12  py-1 px-4 bg-gray-500 hover:bg-red-600 text-white font-bold rounded-lg text-base  ' onClick={() => handleDeleteRowPreRound(rowIndex)}>Delete</button>
-      </td>
+      </td> */}
     </tr>
   ))}
 </tbody>
@@ -1080,7 +1084,7 @@ const percentOwnership = () => {
       </table>
      
 
-      <button onClick={handleAddRowPreRound} className='w-full my-5 py-2 bg-yellow shadow-lg shadow-yellow-500/50 hover:shadow-yellow-500/40 text-black font-semibold rounded-lg'>Add Row</button>
+      <button  className='w-full my-5 py-2 bg-yellow shadow-lg shadow-yellow-500/50 hover:shadow-yellow-500/40 text-black font-semibold rounded-lg'></button>
     </div>
     {/* //TABLE 4 STARTS HERE SEEDROUND */}
     <div>
@@ -1094,6 +1098,7 @@ const percentOwnership = () => {
                 type="text"
                 value={numberFormatter(seedRound)}
                 onChange={handleSeedRound}
+                readOnly={true}
               />
             </th>
             <th>{seedPercent()}</th>
@@ -1106,6 +1111,7 @@ const percentOwnership = () => {
                 type="text"
                 value={numberFormatter(preMoneyValuationSeed)}
                 onChange={handlePreMoneyValuationSeed}
+                readOnly={true}
               />
             </th>
             <th className="text-white bg-lightGrey border-black">Subtotal: </th>
@@ -1144,20 +1150,19 @@ const percentOwnership = () => {
               (columnIndex >= 2 && columnIndex <= 5) ? numberFormatter(cell) :
               cell}           
               onChange={(event) => handleInputChangeSeedRound(event, rowIndex, columnIndex)}
-            readOnly={columnIndex === 1 ||columnIndex === 3 ||columnIndex === 4 ||columnIndex === 5 ||  columnIndex === 6 || columnIndex ===  7}
-          />
+              readOnly={true}          />
         </td>
       ))}
-      <td >
+      {/* <td >
         <button className='ml-12  py-1 px-4 bg-gray-500 hover:bg-red-600 text-white font-bold rounded-lg text-base  ' onClick={() => handleDeleteRowSeedRound(rowIndex)}>Delete</button>
-      </td>
+      </td> */}
     </tr>
   ))}
 </tbody>
       </table>
      
 
-      <button onClick={handleAddRowSeedRound} className='w-full my-5 py-2 bg-yellow shadow-lg shadow-yellow-500/50 hover:shadow-yellow-500/40 text-black font-semibold rounded-lg'>Add Row</button>
+      <button  className='w-full my-5 py-2 bg-yellow shadow-lg shadow-yellow-500/50 hover:shadow-yellow-500/40 text-black font-semibold rounded-lg'></button>
     </div>
     {/* //TABLE 5 STARTS HERE SERIES ROUND */}
     <div>
@@ -1171,6 +1176,7 @@ const percentOwnership = () => {
                 type="text"
                 value={numberFormatter(seriesRound)}
                 onChange={handleSeriesRound}
+                readOnly={true}
               />
             </th>
             <th>{seriesRoundPercent()}</th>
@@ -1184,6 +1190,7 @@ const percentOwnership = () => {
                 type="text"
                 value={numberFormatter(preMoneyValuationSeriesRound)}
                 onChange={handlePreMoneyValuationSeriesRound}
+                readOnly={true}
               />
             </th>
             <th className="text-white bg-lightGrey border-black">Subtotal: </th>
@@ -1224,20 +1231,19 @@ const percentOwnership = () => {
               (columnIndex >= 2 && columnIndex <= 5) ? numberFormatter(cell) :
               cell}           
               onChange={(event) => handleInputChangeSeriesRound(event, rowIndex, columnIndex)}
-            readOnly={columnIndex === 1 ||columnIndex === 3 ||columnIndex === 4 ||columnIndex === 5 ||  columnIndex === 6 || columnIndex ===  7}
-          />
+              readOnly={true}          />
         </td>
       ))}
-      <td >
-        <button className='ml-12  py-1 px-4 bg-gray-500 hover:bg-red-600 text-white font-bold rounded-lg text-base  ' onClick={() => handleDeleteRowSeriesRound(rowIndex)}>Delete</button>
-      </td>
+      {/* <td >
+        <button className='ml-12  py-1 px-4 bg-gray-500 hover:bg-red-600 text-white font-bold rounded-lg text-base  ' >Delete</button>
+      </td> */}
     </tr>
   ))}
 </tbody>
       </table>
      
 
-      <button onClick={handleAddRowSeriesRound} className='w-full my-5 py-2 bg-yellow shadow-lg shadow-yellow-500/50 hover:shadow-yellow-500/40 text-black font-semibold rounded-lg'>Add Row</button>
+      <button  className='w-full my-5 py-2 bg-yellow shadow-lg shadow-yellow-500/50 hover:shadow-yellow-500/40 text-black font-semibold rounded-lg'></button>
     </div>
     <div >
     <table className="w-full table-fixed">
@@ -1251,7 +1257,7 @@ const percentOwnership = () => {
       <th className="border-black border-2 text-white bg-grey">{numberFormatter(handleSumAllShareOwnership())}</th>
       <th className="border-black border-2 text-white bg-grey">{sumOfOwnershipPercent()}%</th>
       <th className="border-black border-2 text-white bg-grey">{dilutedOwnershipSum()}%</th>
-      <th></th>
+      {/* <th></th> */}
     </tr>
   </thead>
 </table>
@@ -1261,7 +1267,7 @@ const percentOwnership = () => {
       <thead>
         <tr>
           <th>
-          <button 
+          {/* <button 
           className='w-32 my-16 py-2 bg-yellow shadow-lg shadow-yellow-500/50 hover:shadow-yellow-500/40 text-black font-semibold rounded-lg absolute right-32'
           onClick={() => {
   console.log(JSON.stringify({data:{
@@ -1280,7 +1286,7 @@ const percentOwnership = () => {
     preMoneyValuationSeriesRound
   }
   }));
-}}>SAVE</button>
+}}>SAVE</button> */}
 
           </th>
         </tr>

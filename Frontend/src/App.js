@@ -21,8 +21,12 @@ import ResetPasswordPage from './auth/forgot-password';
 import CFOStartup from './routes/CFOStartup';
 import CaptableStartup from './routes/CaptableStartup';
 import CreateUpdates from './routes/CreateUpdates';
+<<<<<<< Updated upstream
 import InvestorList from './routes/Investors';
 import Startups from './routes/Startups';
+=======
+
+>>>>>>> Stashed changes
 import { AuthContext } from './shared/context/auth-context';
 import { useAuth } from './shared/hooks/auth-hook';
 
@@ -41,19 +45,28 @@ function App() {
 	if (!token) {
 		routes = (
 			<Routes>
+<<<<<<< Updated upstream
 				<Route path="/investors" element={<InvestorList />} />
+=======
+>>>>>>> Stashed changes
 				<Route path="/" element={<Home />} />
 				<Route path="/login" element={<Login />} />
 				<Route path="/signup" element={<Signup />} />
 				<Route path="/forgot-password" element={<ResetPasswordPage />} />
 				<Route path="/reset-password" element={<UpdatePasswordPage />} />
+<<<<<<< Updated upstream
+=======
+        <Route path="/cfo-Startup" element={<CFOStartup />} />
+        <Route path="/cfo" element={<CFO />} />
+        <Route path="/captable" element={<CapTable />} />
+        <Route path="/captable-startup" element={<CaptableStartup />} />
+>>>>>>> Stashed changes
 			</Routes>
 		);
 	} else {
 		if (userRole === 'Startup') {
 			routes = (
 				<Routes>
-					<Route path="/investors" element={<InvestorList />} />
 					<Route path="/cfo-Startup" element={<CFOStartup />} />
 					<Route path="/captable-startup" element={<CaptableStartup />} />
 					<Route path="/create-updates" element={<CreateUpdates />} />

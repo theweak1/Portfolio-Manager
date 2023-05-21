@@ -1,25 +1,32 @@
 import React, { useState, useEffect } from 'react';
+// import FinancialDataInput from './FinancialDataInput';
 
-const KpiDisplay = () => {
+const KpiDisplay = ({monthlyFinancials}) => {
   const [timeframe, setTimeframe] = useState('monthly');
     //When we add the json data we can change the array to something like; let monthlyFinancials = kpiData 
-  let monthlyFinancials = [
-    { revenue: 9000, costOfGoodsSold: 800, allExpenses: 1500, operatingExpenses: 1000, cashInBank: 20000 },
-    { revenue: 15000, costOfGoodsSold: 5000, allExpenses: 7000, operatingExpenses: 4000, cashInBank: 30000 },
-    { revenue: 25000, costOfGoodsSold: 3000, allExpenses: 4000, operatingExpenses: 5000, cashInBank: 60000 },
-    { revenue: 95000, costOfGoodsSold: 8000, allExpenses: 5000, operatingExpenses: 2000, cashInBank: 90000 },
-    { revenue: 15000, costOfGoodsSold: 6000, allExpenses: 2000, operatingExpenses: 9000, cashInBank: 20000 },
-    { revenue: 45000, costOfGoodsSold: 2000, allExpenses: 3000, operatingExpenses: 2000, cashInBank: 10000 },
-    { revenue: 35000, costOfGoodsSold: 7000, allExpenses: 3000, operatingExpenses: 4000, cashInBank: 20000 },
-    { revenue: 65000, costOfGoodsSold: 2000, allExpenses: 4000, operatingExpenses: 3000, cashInBank: 80000 },
-    { revenue: 55000, costOfGoodsSold: 2000, allExpenses: 4000, operatingExpenses: 2000, cashInBank: 10000 },
-    { revenue: 35000, costOfGoodsSold: 3000, allExpenses: 5000, operatingExpenses: 2000, cashInBank: 50000 },
-    { revenue: 15000, costOfGoodsSold: 5000, allExpenses: 7000, operatingExpenses: 4000, cashInBank: 30000 },
-    { revenue: 25000, costOfGoodsSold: 2000, allExpenses: 2000, operatingExpenses: 2000, cashInBank: 20000 },
-  ];
+    // const [monthlyFinancials, setMonthlyFinancials] = useState([{ revenue: 9000, costOfGoodsSold: 800, allExpenses: 1500, operatingExpenses: 1000, cashInBank: 20000 },
+    //   { revenue: 15000, costOfGoodsSold: 5000, allExpenses: 7000, operatingExpenses: 4000, cashInBank: 30000 },
+    //   { revenue: 25000, costOfGoodsSold: 3000, allExpenses: 4000, operatingExpenses: 5000, cashInBank: 60000 },
+    //   { revenue: 95000, costOfGoodsSold: 8000, allExpenses: 5000, operatingExpenses: 2000, cashInBank: 90000 },
+    //   { revenue: 15000, costOfGoodsSold: 6000, allExpenses: 2000, operatingExpenses: 9000, cashInBank: 20000 },
+    //   { revenue: 45000, costOfGoodsSold: 2000, allExpenses: 3000, operatingExpenses: 2000, cashInBank: 10000 },
+    //   { revenue: 35000, costOfGoodsSold: 7000, allExpenses: 3000, operatingExpenses: 4000, cashInBank: 20000 },
+    //   { revenue: 65000, costOfGoodsSold: 2000, allExpenses: 4000, operatingExpenses: 3000, cashInBank: 80000 },
+    //   { revenue: 55000, costOfGoodsSold: 2000, allExpenses: 4000, operatingExpenses: 2000, cashInBank: 10000 },
+    //   { revenue: 35000, costOfGoodsSold: 3000, allExpenses: 5000, operatingExpenses: 2000, cashInBank: 50000 },
+    //   { revenue: 15000, costOfGoodsSold: 5000, allExpenses: 7000, operatingExpenses: 4000, cashInBank: 30000 },
+    //   { revenue: 25000, costOfGoodsSold: 2000, allExpenses: 2000, operatingExpenses: 2000, cashInBank: 20000 },
+    //   // initial data here...
+    // ]);
 
   const [financials, setFinancials] = useState([monthlyFinancials[monthlyFinancials.length - 1]]);
   
+  // const replaceFinancialData = (newData) => {
+  //   setMonthlyFinancials(newData);
+  // }; 
+
+  
+
   useEffect(() => {
     const lastThreeMonths = monthlyFinancials.slice(-3);
     setFinancials(lastThreeMonths);
@@ -33,7 +40,7 @@ const KpiDisplay = () => {
         : monthlyFinancials.slice(-timeframeLength);
   
     setFinancials(newFinancials);
-  }, [timeframe]);
+  }, [timeframe, monthlyFinancials]);
 
   const calculateKpis = (financialsArray) => {
     const totalRevenue = financialsArray.reduce((total, month) => total + month.revenue, 0);
@@ -65,10 +72,11 @@ const KpiDisplay = () => {
 
   const kpis = calculateKpis(financials);
   console.log(JSON.stringify({ monthlyFinancials }));
+  console.log(monthlyFinancials);
 
   return (
-    <div className="p-6 max-w-lg mx-auto bg-white rounded-xl shadow-md space-y-6">
-      <h2 className="text-2xl font-semibold">KPIs</h2>
+    <div className="p-14 max-w-lg  mx-auto bg-white rounded-xl shadow-md space-y-6">
+      <h2 className="text-2xl font-semibold text-center">Key Performance Index</h2>
       <div className="flex space-x-4">
         <button
           className={`py-2 px-4 rounded ${timeframe === 'monthly' ? 'bg-yellow text-black font-bold' : 'bg-white text-black  border-2 border-yellow'}`}
@@ -97,6 +105,8 @@ const KpiDisplay = () => {
           </div>
         ))}
       </div>
+      {/* <FinancialDataInput onReplaceFinancialData={replaceFinancialData} /> */}
+        
     </div>
   );
 };
