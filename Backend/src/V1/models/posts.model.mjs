@@ -11,6 +11,9 @@ async function StartupsWithPosts(investorId) {
 					some: {
 						id: investorId
 					}
+				},
+				blog: {
+					some: {}
 				}
 			},
 			include: {
@@ -29,7 +32,7 @@ async function StartupsWithPosts(investorId) {
 			return null;
 		}
 
-		const filteredstartups = startups.map((s) =>
+		const filteredStartups = startups.map((s) =>
 			excludeFields(s, [
 				'investorIds',
 				'userId',
@@ -41,7 +44,7 @@ async function StartupsWithPosts(investorId) {
 				'captable'
 			])
 		);
-		return startups;
+		return filteredStartups;
 	} catch (error) {
 		throw error;
 	}

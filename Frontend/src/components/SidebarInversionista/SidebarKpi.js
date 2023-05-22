@@ -1,8 +1,6 @@
 import React, { useState,useContext, useEffect } from "react";
 import { Link,useLocation } from "react-router-dom";
 import '../../index.css';
-// import * as FaIcons from "react-icons/fa";//menu icon
-// import * as AiIcons from "react-icons/ai";//x icon
 
 import {FaBars} from 'react-icons/fa'
 import { AiOutlineClose} from 'react-icons/ai'
