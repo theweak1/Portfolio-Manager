@@ -16,17 +16,10 @@ const { default: startupRouter } = await import(
 const { default: postRouter } = await import(
 	`./${API_VERSION}/routers/Posts/posts.routes.mjs`
 );
-const { default: adminRouter } = await import(
-	`./${API_VERSION}/routers/Admin/admin.routes.mjs`
-);
 
 dotenv.config();
 
-const CLIENT_HOST = process.env.CLIENT_HOST;
-const CLIENT_PORT = process.env.CLIENT_PORT;
-
 const app = express();
-
 
 app.use(express.json());
 
@@ -45,7 +38,15 @@ app.use((req, res, next) => {
 app.use(`/api/${API_VERSION}/auth`, authRouter);
 app.use(`/api/${API_VERSION}/investor`, investorRouter);
 app.use(`/api/${API_VERSION}/startup`, startupRouter);
-app.use(`/api/${API_VERSION}/post`, postRouter);
-app.use(`/api/${API_VERSION}/admin`, adminRouter);
+app.use(`/api/${API_VERSION}/posts`, postRouter);
+
+app.use((error, req, res, next) => {
+	if (res.headerSent) {
+		return next(error);
+	}
+
+	res.status(error.code || 500);
+	res.json({ message: error.message || 'An unknown error occurred!' });
+});
 
 export default app;

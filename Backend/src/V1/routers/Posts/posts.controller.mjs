@@ -2,40 +2,43 @@ import {
 	CreatePost,
 	DeletePost,
 	StartupsWithPosts,
-	updatePost,
+	updatePost
 } from '../../models/posts.model.mjs';
 
 import { findInvestorByUserId } from '../../models/investors.model.mjs';
 
 import {
 	findStartupByUserId,
-	NotifyInvestors,
+	NotifyInvestors
 } from '../../models/startups.model.mjs';
-import {
-	handleBadRequestResponse,
-	handleErrorResponse,
-	handleNotFoundResponse,
-} from '../../util/helpers.mjs';
 
-async function httpGetAllPost(req, res) {
+import { handleErrorResponse, HttpError } from '../../models/http-error.mjs';
+
+async function httpGetAllPost(req, res, next) {
 	try {
 		const userId = req.userId;
 
 		const investorResponse = await findInvestorByUserId(userId);
 		if (!investorResponse) {
-			return handleBadRequestResponse(
+			const error = new HttpError(
 				'This investor does not exist in the system.',
-				res
+				400
 			);
+			return next(error);
 		}
 
 		const startupsResponse = await StartupsWithPosts(investorResponse.id);
 
 		if (!startupsResponse) {
-			return handleNotFoundResponse(
+			const error = new HttpError(
 				'You are not inveted to view any startups portfolio.',
-				res
+				404
 			);
+			return next(error);
+			// return handleNotFoundResponse(
+			// 	'You are not inveted to view any startups portfolio.',
+			// 	res
+			// );
 		}
 
 		return res.status(200).json(startupsResponse);
@@ -44,21 +47,26 @@ async function httpGetAllPost(req, res) {
 	}
 }
 
-async function httpCreatePost(req, res) {
+async function httpCreatePost(req, res, next) {
 	try {
 		const userId = req.userId;
 		const startupResponse = await findStartupByUserId(userId);
 
 		if (!startupResponse) {
-			return handleBadRequestResponse(
+			const error = new HttpError(
 				'This startup does not exist in the system.',
-				res
+				400
 			);
+			return next(error);
+			// return handleBadRequestResponse(
+			// 	'This startup does not exist in the system.',
+			// 	res
+			// );
 		}
 
 		const postInfo = {
 			title: req.body.title,
-			description: req.body.description,
+			description: req.body.description
 		};
 
 		const postResponse = await CreatePost(startupResponse.id, postInfo);
@@ -66,10 +74,15 @@ async function httpCreatePost(req, res) {
 		const notifyResponse = await NotifyInvestors(startupResponse.id);
 
 		if (!notifyResponse) {
-			return handleNotFoundResponse(
+			const error = new HttpError(
 				'There are no investors to notify of new post.',
-				res
+				404
 			);
+			return next(error);
+			// return handleNotFoundResponse(
+			// 	'There are no investors to notify of new post.',
+			// 	res
+			// );
 		}
 
 		res.status(200).json({ post: postResponse, investors: notifyResponse });
@@ -78,16 +91,18 @@ async function httpCreatePost(req, res) {
 	}
 }
 
-async function httpDeletePost(req, res) {
+async function httpDeletePost(req, res, next) {
 	try {
 		const userId = req.userId;
 		const startupResponse = await findStartupByUserId(userId);
 
 		if (!startupResponse) {
-			return handleBadRequestResponse(
-				'This startup does not exist in the system.',
-				res
-			);
+			const error = new HttpError('This startup does not exist in the system.');
+			return next(error);
+			// return handleBadRequestResponse(
+			// 	'This startup does not exist in the system.',
+			// 	res
+			// );
 		}
 
 		const postId = req.params.postId;
@@ -100,22 +115,27 @@ async function httpDeletePost(req, res) {
 	}
 }
 
-async function httpUpdatePost(req, res) {
+async function httpUpdatePost(req, res, next) {
 	try {
 		const userId = req.userId;
 		const startupResponse = await findStartupByUserId(userId);
 
 		if (!startupResponse) {
-			return handleBadRequestResponse(
+			const error = new HttpError(
 				'This startup does not exist in the system.',
-				res
+				400
 			);
+			return next(error);
+			// return handleBadRequestResponse(
+			// 	'This startup does not exist in the system.',
+			// 	res
+			// );
 		}
 
 		const postId = req.params.postId;
 		const postInfo = {
 			title: req.body.title,
-			description: req.body.description,
+			description: req.body.description
 		};
 		const postResponse = await updatePost(startupResponse.id, postId, postInfo);
 

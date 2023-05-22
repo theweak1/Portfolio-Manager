@@ -1,50 +1,93 @@
-import React from "react";
-import { BrowserRouter as Router, Routes, Route ,useLocation } from "react-router-dom";
-import CapTable from "./routes/CapTable";
-import CFO from "./routes/CFO";
-import Updates from "./routes/Updates";
-import Signup from "./auth/Signup";
-import Login from "./auth/Login";
-import Home from "./Home";
-import Navbar from "./shared/hooks/components/Navigation/Navbar";
+import React from 'react';
+import {
+	Navigate,
+	Route,
+	BrowserRouter as Router,
+	Routes,
+	useLocation
+} from 'react-router-dom';
+import Home from './Home';
+import Login from './auth/Login';
+import Signup from './auth/Signup';
 import './index.css';
+import CFO from './routes/CFO';
+import CapTable from './routes/CapTable';
+import Updates from './routes/Updates';
+import Navbar from './shared/components/Navigation/Navbar';
 
-import ResetPasswordPage from "./auth/forgot-password";
-import UpdatePasswordPage from "./auth/ResetPassword";
-import CFOStartup from "./routes/CFOStartup";
-import CreateUpdates from "./routes/CreateUpdates";
-import CaptableStartup from "./routes/CaptableStartup";
-
-
-function NavbarWithConditionalRendering() {
-  const location = useLocation();
-  const isHomePage = location.pathname === "/";
-
-  return isHomePage ? <Navbar /> : null;
-}
+import UpdatePasswordPage from './auth/ResetPassword';
+import ResetPasswordPage from './auth/forgot-password';
+import SidebarKpi from './components/SidebarInversionista/SidebarKpi';
+import CFOStartup from './routes/CFOStartup';
+import CaptableStartup from './routes/CaptableStartup';
+import CreateUpdates from './routes/CreateUpdates';
+import InvestorList from './routes/Investors';
+import Startups from './routes/Startups';
+import { AuthContext } from './shared/context/auth-context';
+import { useAuth } from './shared/hooks/auth-hook';
 
 function App() {
-  return (
-    <Router>
-      <div className="m-0 p-0 box-border font-serif">
-      <NavbarWithConditionalRendering />
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/cfo" element={<CFO />} />
-          <Route path="/cfo-Startup" element={<CFOStartup />} />
-          <Route path="/captable" element={<CapTable />} />
-          <Route path="/captable-startup" element={<CaptableStartup/>}/>
-          <Route path="/updates" element={<Updates />} />
-          <Route path="/create-updates" element={<CreateUpdates />} />
-          <Route path="/forgot-password" element={<ResetPasswordPage />} />
-          <Route path="/reset-password" element={<UpdatePasswordPage />} />
-        </Routes>
+	const { token, login, logout, userRole, expiration } = useAuth();
 
-      </div>
-    </Router>
-  );
+	let routes;
+
+	if (!token) {
+		routes = (
+			<Routes>
+				{/* <Route path="/investors" element={<InvestorList />} /> */}
+				<Route path="/" element={<Home />} />
+				<Route path="/login" element={<Login />} />
+				<Route path="/signup" element={<Signup />} />
+				<Route path="/forgot-password" element={<ResetPasswordPage />} />
+				<Route path="/reset-password" element={<UpdatePasswordPage />} />
+
+			</Routes>
+		);
+	} else {
+		if (userRole === 'Startup') {
+			routes = (
+				<Routes>
+					<Route path="/cfo-Startup" element={<CFOStartup />} />
+					<Route path="/captable-startup" element={<CaptableStartup />} />
+					<Route path="/create-updates" element={<CreateUpdates />} />
+
+				</Routes>
+			);
+		} else {
+			routes = (
+				<Routes>
+					<Route path="/cfo" element={<SidebarKpi />} />
+					<Route path="/cfo/:startupId" element={<SidebarKpi />} />
+					<Route path="/captable" element={<SidebarKpi />} />
+					<Route path="/captable/:startupId" exact element={<SidebarKpi />} />
+					<Route path="/updates" element={<Updates />} />
+
+				<Route path="*" element={<Navigate to="/cfo" />} />
+
+				</Routes>
+			);
+		}
+	}
+
+	return (
+		<AuthContext.Provider
+			value={{
+				isLoggedIn: !!token,
+				token: token,
+				userRole: userRole,
+				expiration: expiration,
+				login: login,
+				logout: logout
+			}}
+		>
+			<Router>
+				<div className="m-0 p-0 box-border font-serif">
+				<Navbar />
+					<main>{routes}</main>
+				</div>
+			</Router>
+		</AuthContext.Provider>
+	);
 }
 
 export default App;

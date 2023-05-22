@@ -1,5 +1,5 @@
 import { createInvestor } from '../../models/investors.model.mjs';
-import { createStartup } from '../../models/startups.model.mjs';
+import { createStartup, updateCodatId } from '../../models/startups.model.mjs';
 
 import {
 	createUser,
@@ -11,51 +11,49 @@ import {
 	updateUserEmail,
 	updateUserPassword,
 	updateUserTokens,
-	validateProfileUpdate,
+	validateProfileUpdate
 } from '../../models/users.model.mjs';
 
 import {
 	generateAccessToken,
 	generateRefreshToken,
-	verifyRefreshToken,
+	verifyRefreshToken
 } from '../../services/auth.service.mjs';
 
-import {
-	buildErrorObject,
-	excludeFields,
-	handleBadRequestResponse,
-	handleErrorResponse,
-	isValidUUID,
-	titleCase,
-} from '../../util/helpers.mjs';
+import { HttpError, handleErrorResponse } from '../../models/http-error.mjs';
+import { createCompany } from '../../services/codat.service.mjs';
+import { excludeFields, isValidUUID, titleCase } from '../../util/helpers.mjs';
 
 import {
 	sendRequestStartupEmail,
-	sendResetPasswordEmail,
+	sendResetPasswordEmail
 } from '../../services/mail.service.mjs';
 
-async function httpLogin(req, res) {
+async function httpLogin(req, res, next) {
 	try {
 		const userInfo = {
 			email: req.body.email,
-			password: req.body.password,
+			password: req.body.password
 		};
 
 		if (!userInfo.email || !userInfo.password) {
-			return handleBadRequestResponse(
+			const error = new HttpError(
 				'User requires email and password to login into the system.',
-				res
+				400
 			);
+			return next(error);
+			// return handleBadRequestResponse(
+			// 	'User requires email and password to login into the system.',
+			// 	res
+			// );
 		}
 
 		const userResponse = await isUserAuthorized(
 			userInfo.email,
 			userInfo.password
 		);
-		if ('errorCode' in userResponse) {
-			return res.status(userResponse.errorCode).json({
-				error: userResponse,
-			});
+		if ('code' in userResponse) {
+			return next(userResponse);
 		}
 
 		const accessToken = generateAccessToken(userResponse.id);
@@ -69,21 +67,23 @@ async function httpLogin(req, res) {
 			email: userResponse.email,
 			role: userResponse.role,
 			isApproved: userResponse.isApproved,
+			expiresIn: new Date(new Date().getTime() + 3600000 * '5h'.split('')[0]),
+			userId: userResponse.id
 		});
 	} catch (error) {
 		return handleErrorResponse('login', error, res);
 	}
 }
 
-async function httpSignupInvestor(req, res) {
+async function httpSignupInvestor(req, res, next) {
 	try {
 		const userInfo = {
 			email: req.body.email,
 			password: req.body.password,
-			role: titleCase(req.body.role),
+			role: titleCase(req.body.role)
 		};
 		const investorInfo = {
-			name: titleCase(req.body.name),
+			name: titleCase(req.body.name)
 		};
 
 		if (
@@ -92,19 +92,31 @@ async function httpSignupInvestor(req, res) {
 			!userInfo.role ||
 			!investorInfo.name
 		) {
-			return handleBadRequestResponse(
+			const error = new HttpError(
 				'Investor is missing required fields for creation.',
-				res
+				400
 			);
+			return next(error);
+			// return handleBadRequestResponse(
+			// 	'Investor is missing required fields for creation.',
+			// 	res
+			// );
 		}
 
 		if (userInfo.role !== 'Investor') {
-			return handleBadRequestResponse(
+			const error = new HttpError(
 				"Expected a role of 'Investor' but received " +
 					userInfo.role +
 					" instead. Please provide the 'Investor' role when creating a investor.",
-				res
+				400
 			);
+			return next(error);
+			// return handleBadRequestResponse(
+			// 	"Expected a role of 'Investor' but received " +
+			// 		userInfo.role +
+			// 		" instead. Please provide the 'Investor' role when creating a investor.",
+			// 	res
+			// );
 		}
 
 		const userResponse = await createUser(
@@ -113,10 +125,11 @@ async function httpSignupInvestor(req, res) {
 			userInfo.role,
 			true
 		);
-		if ('errorCode' in userResponse) {
-			return res.status(userResponse.errorCode).json({
-				error: userResponse,
-			});
+		if ('code' in userResponse) {
+			return next(userResponse);
+			// return res.status(userResponse.errorCode).json({
+			// 	error: userResponse
+			// });
 		}
 
 		const accessToken = generateAccessToken(userResponse.id);
@@ -133,7 +146,7 @@ async function httpSignupInvestor(req, res) {
 			accessToken,
 			refreshToken,
 			...investorResponse,
-			isApproved: true,
+			isApproved: true
 		});
 	} catch (error) {
 		return handleErrorResponse('signup investor', error, res);
@@ -141,15 +154,15 @@ async function httpSignupInvestor(req, res) {
 }
 
 // TODO: Create a Company Name verification function to avoid duplicate company names
-async function httpSignupStartup(req, res) {
+async function httpSignupStartup(req, res, next) {
 	try {
 		const userInfo = {
 			email: req.body.email,
 			password: req.body.password,
-			role: titleCase(req.body.role),
+			role: titleCase(req.body.role)
 		};
 		const startupInfo = {
-			companyName: titleCase(req.body.companyName),
+			companyName: titleCase(req.body.companyName)
 		};
 
 		if (
@@ -158,19 +171,31 @@ async function httpSignupStartup(req, res) {
 			!userInfo.role ||
 			!startupInfo.companyName
 		) {
-			return handleBadRequestResponse(
+			const error = new HttpError(
 				'Startup is missing required fields for creation.',
-				res
+				400
 			);
+			return next(error);
+			// return handleBadRequestResponse(
+			// 	'Startup is missing required fields for creation.',
+			// 	res
+			// );
 		}
 
 		if (userInfo.role !== 'Startup') {
-			return handleBadRequestResponse(
+			const error = new HttpError(
 				"Expected a role of 'startup' but received '" +
 					userInfo.role +
 					"' instead. Please provide the 'startup' role when creating a startup.",
-				res
+				400
 			);
+			return next(error);
+			// return handleBadRequestResponse(
+			// 	"Expected a role of 'startup' but received '" +
+			// 		userInfo.role +
+			// 		"' instead. Please provide the 'startup' role when creating a startup.",
+			// 	res
+			// );
 		}
 
 		const userResponse = await createUser(
@@ -179,10 +204,11 @@ async function httpSignupStartup(req, res) {
 			userInfo.role,
 			false
 		);
-		if ('errorCode' in userResponse) {
-			return res.status(userResponse.errorCode).json({
-				error: userResponse,
-			});
+		if ('code' in userResponse) {
+			return next(userResponse);
+			// return res.status(userResponse.errorCode).json({
+			// 	error: userResponse
+			// });
 		}
 
 		const startupResponse = await createStartup(
@@ -190,36 +216,46 @@ async function httpSignupStartup(req, res) {
 			userInfo.email,
 			startupInfo
 		);
-		if ('errorCode' in startupResponse) {
-			return res.status(startupResponse.errorCode).json({
-				error: startupResponse,
-			});
+		if ('code' in startupResponse) {
+			return next(startupResponse);
+			// return res.status(startupResponse.errorCode).json({
+			// 	error: startupResponse
+			// });
 		}
-		// TODO: Uncomment this line when doing full authentication test with admin area.
-		// await sendRequestStartupEmail(startupResponse.id,userInfo.email,startupInfo);
-		//TODO: Change isApproved to false
+		const codatResponse = await createCompany(startup.companyName);
+		await updateCodatId(
+			startupResponse.id,
+			codatResponse.id,
+			codatResponse.redirect
+		);
+
 		return res.status(200).json({
 			...startupResponse,
-			isApproved: true,
+			...codatResponse
 		});
 	} catch (error) {
 		return handleErrorResponse('signup startup', error, res);
 	}
 }
 
-async function httpSignupAdmin(req, res) {
+async function httpSignupAdmin(req, res, next) {
 	try {
 		const userInfo = {
 			email: req.body.email,
 			password: req.body.password,
-			role: 'Admin',
+			role: 'Admin'
 		};
 
 		if (!userInfo.email || !userInfo.password || !userInfo.role) {
-			return handleBadRequestResponse(
+			const error = new HttpError(
 				"The following fields need to be provided in order to signup: 'email' and 'password'.",
-				res
+				400
 			);
+			return next(error);
+			// return handleBadRequestResponse(
+			// 	"The following fields need to be provided in order to signup: 'email' and 'password'.",
+			// 	res
+			// );
 		}
 
 		const createdUser = await createUser(
@@ -228,10 +264,11 @@ async function httpSignupAdmin(req, res) {
 			userInfo.role,
 			true
 		);
-		if ('errorCode' in createdUser) {
-			return res.status(createdUser.errorCode).json({
-				error: createdUser,
-			});
+		if ('code' in createdUser) {
+			return createdUser;
+			// return res.status(createdUser.errorCode).json({
+			// 	error: createdUser
+			// });
 		}
 
 		const accessToken = generateAccessToken(createdUser.id);
@@ -248,15 +285,20 @@ async function httpSignupAdmin(req, res) {
 	}
 }
 
-async function httpGetAdminProfile(req, res) {
+async function httpGetAdminProfile(req, res, next) {
 	try {
 		const userId = req.userId;
 		const user = await findEmailById(userId);
 		if (!user) {
-			return handleNotFoundResponse(
+			const error = new HttpError(
 				"A user with this Id wasn't found.Please provide a valid Id.",
-				res
+				404
 			);
+			return next(error);
+			// return handleNotFoundResponse(
+			// 	"A user with this Id wasn't found.Please provide a valid Id.",
+			// 	res
+			// );
 		}
 
 		return res.status(200).json(user);
@@ -265,16 +307,21 @@ async function httpGetAdminProfile(req, res) {
 	}
 }
 
-async function httpUpdateAdmin(req, res) {
+async function httpUpdateAdmin(req, res, next) {
 	try {
 		const userId = req.userId;
 		const isValidId = isValidUUID(userId);
 
 		if (!isValidId) {
-			return handleBadRequestResponse(
+			const error = new HttpError(
 				'This Id passed in the URL parameter is not does not have a valid format.',
-				res
+				400
 			);
+			return next(error);
+			// return handleBadRequestResponse(
+			// 	'This Id passed in the URL parameter is not does not have a valid format.',
+			// 	res
+			// );
 		}
 
 		const userInfo = {
@@ -282,13 +329,14 @@ async function httpUpdateAdmin(req, res) {
 			email: req.body.email,
 			password: req.body.currentPassword,
 			newPassword: req.body.newPassword,
-			isApproved: true,
+			isApproved: true
 		};
 		const validatedUserResponse = await validateProfileUpdate(userInfo);
-		if ('errorCode' in validatedUserResponse) {
-			return res.status(validatedUserResponse.errorCode).json({
-				error: validatedUserResponse,
-			});
+		if ('code' in validatedUserResponse) {
+			return next(validatedUserResponse);
+			// return res.status(validatedUserResponse.errorCode).json({
+			// 	error: validatedUserResponse
+			// });
 		}
 
 		if (userInfo.email) {
@@ -301,16 +349,21 @@ async function httpUpdateAdmin(req, res) {
 
 		const updatedUser = await findUserById(userId);
 		if (!updatedUser) {
-			return handleBadRequestResponse(
+			const error = new HttpError(
 				"Couldn't find user in the system. Please provide valid Access Token",
-				res
+				400
 			);
+			return next(error);
+			// return handleBadRequestResponse(
+			// 	"Couldn't find user in the system. Please provide valid Access Token",
+			// 	res
+			// );
 		}
 
 		const userFiltered = excludeFields(updatedUser, [
 			'id',
 			'password',
-			'passwordSalt',
+			'passwordSalt'
 		]);
 
 		return res.status(200).json(userFiltered);
@@ -319,16 +372,21 @@ async function httpUpdateAdmin(req, res) {
 	}
 }
 
-async function httpLogout(req, res) {
+async function httpLogout(req, res, next) {
 	try {
 		const userId = req.userId;
 		const isValidId = isValidUUID(userId);
 
 		if (!isValidId) {
-			return handleBadRequestResponse(
+			const error = new HttpError(
 				'This Id passed in the URL parameter does not have a valid format.',
-				res
+				400
 			);
+			return next(error);
+			// return handleBadRequestResponse(
+			// 	'This Id passed in the URL parameter does not have a valid format.',
+			// 	res
+			// );
 		}
 
 		await updateUserTokens(userId, '', '');
@@ -338,25 +396,28 @@ async function httpLogout(req, res) {
 	}
 }
 
-async function httpRefreshToken(req, res) {
+async function httpRefreshToken(req, res, next) {
 	try {
 		const refreshToken = req.body.token;
 		if (!refreshToken) {
-			const error = buildErrorObject(401, 'Token was not provided.');
-			return res.status(error.errorCode).json({ error: error });
+			const error = new httpError('Token was not provided.', 401);
+			return next(error);
+			// return res.status(error.errorCode).json({ error: error });
 		}
 
 		const userRefreshToken = await getUserTokens(refreshToken);
 		if (!userRefreshToken || refreshToken !== userRefreshToken.refreshToken) {
-			const error = buildErrorObject(401, 'Token is not valid for this users.');
-			return res.status(error.errorCode).json({ error: error });
+			const error = new httpError('Token is not valid for this users.', 401);
+			return next(error);
+			// return res.status(error.errorCode).json({ error: error });
 		}
 
 		const verifyTokenResponse = verifyRefreshToken(refreshToken);
-		if ('errorCode' in verifyTokenResponse) {
-			return res.status(verifyTokenResponse.errorCode).json({
-				error: verifyTokenResponse,
-			});
+		if ('code' in verifyTokenResponse) {
+			return next(verifyTokenResponse);
+			// return res.status(verifyTokenResponse.errorCode).json({
+			// 	error: verifyTokenResponse
+			// });
 		}
 
 		const [accessToken, refreshedToken] = verifyTokenResponse;
@@ -370,23 +431,33 @@ async function httpRefreshToken(req, res) {
 	}
 }
 
-async function httpForgotPassword(req, res) {
+async function httpForgotPassword(req, res, next) {
 	try {
 		const email = req.body.email;
 
 		if (!email) {
-			return handleBadRequestResponse(
+			const error = new httpError(
 				"Can't reset password without providing an email address.",
-				res
+				400
 			);
+			return next(error);
+			// return handleBadRequestResponse(
+			// 	"Can't reset password without providing an email address.",
+			// 	res
+			// );
 		}
 
 		const user = await findUserByEmail(email);
 		if (!user) {
-			return handleBadRequestResponse(
+			const error = new httpError(
 				"Couldn't find user in the system. Please provide valid email address.",
-				res
+				400
 			);
+			return next(error);
+			// return handleBadRequestResponse(
+			// 	"Couldn't find user in the system. Please provide valid email address.",
+			// 	res
+			// );
 		}
 
 		const accessToken = generateAccessToken(user.id);
@@ -402,24 +473,34 @@ async function httpForgotPassword(req, res) {
 	}
 }
 
-async function httpResetPassword(req, res) {
+async function httpResetPassword(req, res, next) {
 	try {
 		const userId = req.userId;
 		const password = req.body.password;
 
 		if (!userId && !password) {
-			return handleBadRequestResponse(
+			const error = new httpError(
 				"Can't reset password without providing an email address.",
-				res
+				400
 			);
+			return next(error);
+			// return handleBadRequestResponse(
+			// 	"Can't reset password without providing an email address.",
+			// 	res
+			// );
 		}
 
 		const user = await findUserById(userId);
 		if (!user) {
-			return handleBadRequestResponse(
+			const error = new httpError(
 				"Couldn't find user in the system. Please provide valid Access Token",
-				res
+				400
 			);
+			return next(error);
+			// return handleBadRequestResponse(
+			// 	"Couldn't find user in the system. Please provide valid Access Token",
+			// 	res
+			// );
 		}
 
 		const updatePasswordResponse = await updateUserPassword(user, password);
@@ -439,5 +520,5 @@ export {
 	httpResetPassword,
 	httpSignupAdmin,
 	httpGetAdminProfile,
-	httpUpdateAdmin,
+	httpUpdateAdmin
 };

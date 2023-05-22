@@ -10,12 +10,16 @@ import ReadList from "../components/ReadList";
 /*Esta es la pagina que se muestra al seleccionar una opcion del menu principal*/
 function Updates() {
   return (
-    <div className="flex relative h-screen overflow-y-scroll bg-darkGrey">
-      <Sidebar/>
-     
-      <ReadList/>
+
+    
+      <div className="flex relative h-screen overflow-y-scroll bg-darkGrey">
+      <Sidebar />
+
+       <ReadList/>
+        </div>
+
       
-    </div>
+  
   );
 }
 

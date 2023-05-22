@@ -1,93 +1,127 @@
-import React from 'react'
-import loginImg from '../assets/City.jpg'
-import {useState} from 'react'
-import {useNavigate, Link} from 'react-router-dom'
+import React, { useContext } from 'react';
+
+import { Link, useNavigate } from 'react-router-dom';
+
+import loginImg from '../assets/City.jpg';
+import Button from '../shared/components/FormElements/Button';
+import Input from '../shared/components/FormElements/input';
+import ErrorModal from '../shared/components/UIElements/ErrorModal';
+import LoadingSpinner from '../shared/components/UIElements/LoadingSpinner';
+import { AuthContext } from '../shared/context/auth-context';
+import { useForm } from '../shared/hooks/form-hook';
 import { useHttpClient } from '../shared/hooks/http-hook';
+import {
+	VALIDATOR_EMAIL,
+	VALIDATOR_MINLENGTH
+} from '../shared/util/validators';
 
 export default function Login() {
+	const auth = useContext(AuthContext);
+	const navigate = useNavigate();
 
-    const [email, setEmail] = useState('')
-    const [password, setPassword] = useState('')
-    const navigate = useNavigate();
+	const { isLoading, error, sendRequest, clearError } = useHttpClient();
 
-	const { error, sendRequest } = useHttpClient();
-
-    const handleLogin = async (e) => {
-        console.log(`email: ${email}, password: ${password}`);
-        e.preventDefault()
-        // let result = await fetch(`${process.env.REACT_APP_BACKEND_URL}/auth/login`,{
-        // method:'post',
-        // body: JSON.stringify({email:email,password:password}),
-        // headers:{
-        //     'Content-Type': 'application/json'
-        // }
-        // });
-        
-        // result = await result.json();
-        // console.warn(result)
-        // if(result.email)
-        // {
-        //     localStorage.setItem("user", JSON.stringify(result));
-        //     navigate("/")
-        // }
-        // else{
-        //     alert("Please connection details")
-        // }
-
-		const responseData = await sendRequest(
-			`${process.env.REACT_APP_BACKEND_URL}/auth/login`,
-			'POST',
-			JSON.stringify({ email, password }),
-			{
-				'content-type': 'application/json',
+	const [formState, inputHandler] = useForm(
+		{
+			email: {
+				value: '',
+				isValid: false
+			},
+			password: {
+				value: '',
+				isValid: false
 			}
-		);
+		},
+		false
+	);
 
-		if (responseData.email) {
-			console.log(responseData);
-            localStorage.setItem("user", JSON.stringify(responseData))
-			navigate('/');
-		} else {
-			console.log(error);
-		}
-    }
-    
-  return (
-    <div className='grid grid-cols-1 sm:grid-cols-2 h-screen w-full'>
-        <div className='hidden sm:block'>
-            <img className='w-full h-full object-cover' src={loginImg} alt="" />
-        </div>
+	const handleSubmit = async (e) => {
+		e.preventDefault();
 
-        <div className='bg-darkGrey flex flex-col justify-center'>
-            <form className='max-w-[400px] w-full mx-auto rounded-lg bg-darkGrey p-8 px-8' onSubmit={handleLogin}>
-                <h2 className='text-4xl dark:text-white font-bold text-center'>Login</h2>
-                
-                <div className='flex flex-col text-white py-2'>
-                    <label>Email</label>
-                    <input className='rounded-lg bg-grey mt-2 p-2  focus:outline-none' 
-                    type="email" 
-                    onChange={(e) => setEmail(e.target.value)} 
-                    value={email} 
-                    />
-                </div>
+		try {
+			const responseData = await sendRequest(
+				`${process.env.REACT_APP_BACKEND_URL}/auth/login`,
+				'POST',
+				JSON.stringify({
+					email: formState.inputs.email.value,
+					password: formState.inputs.password.value
+				}),
+				{
+					'content-type': 'application/json'
+				}
+			);
 
-                <div className='flex flex-col text-white py-2'>
-                    <label>Password</label>
-                    <input className='p-2 rounded-lg bg-grey mt-2  focus:outline-none' 
-                    type="password" 
-                    onChange={(e) => setPassword(e.target.value)} 
-                    value={password} 
-                    />
-                </div>
-                <button className='w-full my-5 py-2 bg-yellow shadow-lg shadow-yellow-500/50 hover:shadow-yellow-500/40 text-black font-semibold rounded-lg'>Login</button>
-                <div className='flex justify-center py-2 text-lg  text-yellow '>
-                    <Link to='/forgot-password' >Forgot Password?  </Link>
-                </div>
-            </form>
-        </div>
-        
-    </div>
+			auth.login(
+				responseData.role,
+				responseData.accessToken,
+				responseData.expiresIn
+			);
+		} catch (err) {}
+	};
 
-    
-  )
+	const handleLoginClick = () => {
+		navigate('/signup');
+	};
+
+	return (
+		<React.Fragment>
+			<ErrorModal error={error} onClear={clearError} />
+			{isLoading && <LoadingSpinner asOverlay />}
+			<div className="grid grid-cols-1 sm:grid-cols-2 h-screen w-full">
+				<div className="hidden sm:block">
+					<img className="w-full h-full object-cover" src={loginImg} alt="" />
+				</div>
+
+				<div className="bg-darkGrey flex flex-col justify-center">
+					<form
+						className="max-w-[400px] w-full mx-auto rounded-lg bg-darkGrey p-8 px-8"
+						onSubmit={handleSubmit}
+					>
+						<h2 className="text-4xl dark:text-white font-bold text-center">
+							Login
+						</h2>
+
+						<div className="flex flex-col text-white py-2">
+							<Input
+								element="input"
+								id="email"
+								type="email"
+								label="E-Mail"
+								validators={[VALIDATOR_EMAIL()]}
+								errorText="Please enter a valid email address."
+								onInput={inputHandler}
+							/>
+						</div>
+
+						<div className="flex flex-col text-white py-2">
+							<Input
+								element="input"
+								id="password"
+								type="password"
+								label="Password"
+								validators={[VALIDATOR_MINLENGTH(4)]}
+								errorText="Please enter a valid password, at least 6 characters."
+								onInput={inputHandler}
+							/>
+						</div>
+						<Button type="submit" disabled={!formState.isValid}>
+							LOGIN
+						</Button>
+						<div className="flex justify-center py-2 text-lg  text-yellow ">
+							<Link to="/forgot-password">Forgot Password? </Link>
+						</div>
+					</form>
+					<div className="text-white text-center mt-4">
+						<span>Don't have an account? </span>
+						<span
+							className="cursor-pointer text-blue-500"
+							onClick={handleLoginClick}
+						>
+							Signup
+						</span>
+					</div>
+				</div>
+			</div>
+		</React.Fragment>
+	);
 }
