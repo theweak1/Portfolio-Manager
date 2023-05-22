@@ -10,11 +10,10 @@ export default function Sidebar() {
 
 	//const showSidebar = () => setSidebar(!sidebar);
 
-
 	return (
 		<>
 			{/*top bar where the menu icon is located*/}
-			<div className="fixed flex justify-center items-start top-0 left-0 h-full w-12 sm:w-14 md:w-16 bg-white border-b-yellow shadow-sm mt-20">
+			<div className="fixed flex justify-center items-start z-10 top-0 left-0 h-full w-12 sm:w-14 md:w-16 bg-white border-b-yellow shadow-sm mt-20">
 				{/*navbar*/}
 				<Link
 					to="#"
@@ -30,8 +29,8 @@ export default function Sidebar() {
 			<nav
 				className={
 					sidebar
-						? 'fixed flex justify-center w-44 sm:w-52 md:w-60 h-full top-0 left-0 transition-all duration-[700ms] ease-out  bg-white shadow-sm mt-20'
-						: 'fixed flex justify-center w-44 sm:w-52 md:w-60 h-full top-0 -left-full transition-all duration-[700ms] ease-in bg-white shadow-sm mt-20'
+						? 'fixed flex justify-center w-44 sm:w-52 md:w-60 h-full z-10 top-0 left-0 transition-all duration-[700ms] ease-out  bg-white shadow-sm mt-20'
+						: 'fixed flex justify-center w-44 sm:w-52 md:w-60 h-full z-10 top-0 -left-full transition-all duration-[700ms] ease-in bg-white shadow-sm mt-20'
 				}
 			>
 				{/*nav-menu shown(false) -left-full*/}

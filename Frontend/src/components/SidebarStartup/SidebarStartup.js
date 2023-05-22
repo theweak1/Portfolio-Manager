@@ -16,15 +16,15 @@ export default function SidebarStartup() {
         <> 
                
             {/*top bar where the menu icon is located*/}
-            <div className="fixed flex justify-center items-start top-0 left-0 h-full w-12 sm:w-14 md:w-16 bg-white border-b-yellow shadow-sm">{/*navbar*/}
+            <div className="fixed flex justify-center items-start z-10 top-0 left-0 h-full w-12 sm:w-14 md:w-16 bg-white border-b-yellow shadow-sm">{/*navbar*/}
                 <Link to="#" className=" p-4 text-xl sm:text-2xl md:text-3xl text-darkGrey ">{/*menu-bars*/}
                     <FaBars onClick={()=>setSidebar(!sidebar)} />{/*menu icon and action*/}
                 </Link>
             </div>
 
             {/*open and close the menu*/}         {/*nav-menu when hidden/active(true) left-0*/}
-            <nav className={sidebar ? "fixed flex justify-center w-44 sm:w-52 md:w-60 h-full top-0 left-0 transition-all duration-[250ms] ease-out  bg-white shadow-sm" 
-                                    : "fixed flex justify-center w-44 sm:w-52 md:w-60 h-full top-0 -left-full transition-all duration-[250ms] ease-in bg-white shadow-sm"}>{/*nav-menu shown(false) -left-full*/}                                                                      
+            <nav className={sidebar ? "fixed flex justify-center w-44 sm:w-52 md:w-60 h-full z-10 top-0 left-0 transition-all duration-[250ms] ease-out  bg-white shadow-sm" 
+                                    : "fixed flex justify-center w-44 sm:w-52 md:w-60 h-full z-10 top-0 -left-full transition-all duration-[250ms] ease-in bg-white shadow-sm"}>{/*nav-menu shown(false) -left-full*/}                                                                      
                 <ul className="w-full " onClick={()=>setSidebar(!sidebar)}> {/*nav-menu-items*/}  
                         
                     {/*where the close(X) icon is located*/}
