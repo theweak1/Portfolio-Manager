@@ -4,15 +4,7 @@ import React, { useState } from 'react';
 
 //where the form is located
 function ReadList(props) {
-  //hooks
-  const [posts, setPosts] = useState([]);
-  const [newPost, setNewPost] = useState({
-    id: 1,
-    title: '',
-    author: '',
-    text: '',
-    date: '',
-  });
+  
  
   const DummyData = [
 	{
@@ -103,8 +95,36 @@ function ReadList(props) {
 				"title": "This a new post",
 				"description": "The purpose of this post is to test the email notification service"
 			}
-		]
-	}
+		],
+},
+
+   {     "id": "6437de332b363fa9133d9371",
+		"companyName": "Theweak2 Consulting",
+		"blog": [
+			{
+				"id": "642cb3e3a33f2e40628fc6a3",
+				"lastModified": "2023-04-04T23:33:55.409Z",
+				"title": "This a test",
+				"description": "this is an example of what a post could look like."
+			},
+            {
+				"id": "6434c503d58988588ba4f285",
+				"lastModified": "2023-04-11T02:25:07.095Z",
+				"title": "This a new post",
+				"description": "The purpose of this post is to test the email notification service"
+			},
+        ]},
+        {     "id": "6437de337b363fa9133d9371",
+		"companyName": "Theweak3 Consulting",
+		"blog": [
+			{
+				"id": "642cb3e3a33f2e40628fc6a3",
+				"lastModified": "2023-04-04T23:33:55.409Z",
+				"title": "This a test",
+				"description": "this is an example of what a post could look like."
+			},
+        ]}
+	
 ]
 
   //variables that automaticly give the date and puts the start up as the author
@@ -114,34 +134,35 @@ function ReadList(props) {
 
   return (
     //everything in updates is contained in the first div
-      <div className=' relative top-[29rem] left-14 sm:left-20 md:left-20 grid min-grid-cols-1 md:grid-cols-2  gap-14 my-10 rounded-md shadow-md'>
+    <div className='absolute flex flex-col  top-20 left-20 sm:left-20 md:left-24 '>
         {/*This is where the posted form is located */}
         {DummyData.map((read) => (
-          <div key={read.id} className=" flex flex-col justify-between mx-auto border-2 w-[23rem] md:w-[27rem] lg:w-[36rem] p-2 max-h-96 h-72 md:h-80 mt-10 overflow-scroll bg-white rounded-md shadow-md">
-            <div className="flex flex-row items-center mb-2">
-              <div className="text-lg font-bold font-sans text-yellow-500 text-black">
-                {read.companyName}
-              </div>
+            <div key={read.id} className=" flex flex-col justify-between  w-[28rem] md:w-[40rem] lg:w-[74rem] p-2 h-72 md:h-[26rem] mt-10 overflow-scroll border-md border-2 bg-white shadow-md">
+                <div className="flex flex-row border-yellow border-b-2 items-center ">
+                    <div className="text-lg font-bold font-sans text-yellow-500 text-black">
+                        {read.companyName}
+                    </div>
+                </div>
+                    {read.blog.map((data) => (
+                        <div className=" text-lg font-bold font-sans text-yellow-500 mb-4 h-[35rem] border-grey border-b-2 text-black">
+                            <span className="text-sm text-grey mr-2">
+                                {data.lastModified} | 
+                            </span>
+                                {data.title}
+
+                            <div className="flex flex-col h-full">
+                                <textarea
+                                    value={data.description}
+                                    className=" text-justify text-sm h-80 p-2 w-[98%] text-black self-start resize-none"
+                                    readOnly
+                                />
+                            </div>
+                        </div>
+                    ))}
             </div>
-    
-            <div className=" text-lg font-bold font-sans text-yellow-500 mb-4 text-black">
-              <span className="text-sm text-gray-500 mr-2">
-                {read.lastModified} | 
-              </span>
-                {read.title}
-            </div> 
-            
-            <div className="flex flex-col h-full">
-              <textarea
-                  value={read.description}
-                  className=" text-justify text-sm h-24 md:h-32 p-2 w-[95%] text-black self-start resize-none"
-                  readOnly
-                />
-            </div>
-          </div>
         ))}
-      </div>
-      
+    </div>
+     
   );
 }
 
