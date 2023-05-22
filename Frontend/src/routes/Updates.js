@@ -12,7 +12,7 @@ function Updates() {
   return (
 
     
-      <div className="flex relative h-screen overflow-y-scroll bg-darkGrey">
+      <div className="flex relative h-screen  bg-darkGrey">
       <Sidebar />
 
        <ReadList/>

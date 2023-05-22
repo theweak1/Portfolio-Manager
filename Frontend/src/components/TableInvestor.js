@@ -67,7 +67,7 @@ useEffect(() => {
        setSeriesRound(responseData.data.captable.seriesRound)
        setPreMoneyValuationSeriesRound(responseData.data.captable.preMoneyValuationSeriesRound)
 
-      } catch (err) {console.log(err)}
+      } catch (err) {}
     }};
   fetchCapTable();
  },[sendRequest, auth.token, startupId])
