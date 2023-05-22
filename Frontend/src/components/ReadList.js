@@ -127,11 +127,6 @@ function ReadList(props) {
 	
 ]
 
-  //variables that automaticly give the date and puts the start up as the author
-  const boAuthor = "Franky";
-  const updateDate = new Date(Date.now()).toString();
-
-
   return (
     //everything in updates is contained in the first div
     <div className='absolute flex flex-col  top-20 left-20 sm:left-20 md:left-24 '>
@@ -140,9 +135,10 @@ function ReadList(props) {
             <div key={read.id} className=" flex flex-col justify-between  w-[28rem] md:w-[40rem] lg:w-[74rem] p-2 h-72 md:h-[26rem] mt-10 overflow-scroll border-md border-2 bg-white shadow-md">
                 <div className="flex flex-row border-yellow border-b-2 items-center ">
                     <div className="text-lg font-bold font-sans text-yellow-500 text-black">
-                        {read.companyName}
+                        {read.companyName} {/*This is where the Company Name is located */}
                     </div>
                 </div>
+                    {/*This is where the rest of the post is located is located */}
                     {read.blog.map((data) => (
                         <div className=" text-lg font-bold font-sans text-yellow-500 mb-4 h-[35rem] border-grey border-b-2 text-black">
                             <span className="text-sm text-grey mr-2">
