@@ -1,6 +1,5 @@
 import React from "react";
 import '../index.css';
-import SidebarKpi from "../components/SidebarInversionista/SidebarKpi";
 import Sidebar from "../components/SidebarInversionista/Sidebar";
 import PostList from "../components/PostList";
 import CatImg from "../assets/cat.jpg";
@@ -31,7 +30,7 @@ function Updates() {
     <div >
       <div className="flex h-screen items-center justify-center text-5xl bg-grey text-white">
       <Sidebar />
-      <SidebarKpi/>
+
       <div>
       <PostList posts={posts}/>
       </div>

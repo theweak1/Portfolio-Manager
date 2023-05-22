@@ -1,7 +1,50 @@
 import React, { useState,useEffect } from 'react';
 import Date from './Date';
+import { useHttpClient } from '../shared/hooks/http-hook';
+import { useContext } from 'react';
+import { AuthContext } from '../shared/context/auth-context';
+import ErrorModal from '../shared/components/UIElements/ErrorModal';
+import LoadingSpinner from '../shared/components/UIElements/LoadingSpinner';
 
 function Table() {
+const auth = useContext(AuthContext)
+const { isLoading, error, sendRequest, clearError } = useHttpClient();
+
+useEffect(() => {
+
+  const fetchCapTable = async () => {
+
+    if(!auth.token)
+    {}else{
+      try {
+     const responseData = await sendRequest(
+      `${process.env.REACT_APP_BACKEND_URL}/startup/captable`,
+      "GET",null,
+      {
+        Authorization: "Bearer " + auth.token
+      }
+     );
+
+       setData(responseData.data.captable.data)
+       setMembersData(responseData.data.captable.membersData)
+       setPreRoundData(responseData.data.captable.preRoundData)
+       setSeedRoundData(responseData.data.captable.seedRoundData)
+       setSeriesRoundData(responseData.data.captable.seriesRoundData)
+       setShares(responseData.data.captable.shares)
+       setSharePrice(responseData.data.captable.sharePrice)
+       setAngelRound(responseData.data.captable.angelRound)
+       setPreMoneyValuation(responseData.data.captable.preMoneyValuation)
+       setSeedRound(responseData.data.captable.seedRound)
+       setPreMoneyValuationSeed(responseData.data.captable.preMoneyValuationSeed)
+       setSeriesRound(responseData.data.captable.seriesRound)
+       setPreMoneyValuationSeriesRound(responseData.data.captable.preMoneyValuationSeriesRound)
+
+      } catch (err) {console.log(err)}
+    }};
+  fetchCapTable();
+ },[sendRequest,auth.token ])
+
+
   const [data, setData] = useState([
     ['', 0, 0, 0, 0, 0, 0, 0],
     ['', 0, 0, 0, 0, 0, 0, 0]
@@ -41,6 +84,41 @@ function Table() {
   const [angelPriceShareValue, setAngelPriceShareValue] = useState(0);
   const [seedPriceShareValue, setSeedPriceShareValue] = useState(0);
   const [seriesPriceShareValue, setSeriesPriceShareValue] = useState(0);
+
+
+
+const capTableSaveSubmitHandler = async () => {
+
+try {
+ await sendRequest(
+    `${process.env.REACT_APP_BACKEND_URL}/startup/captable`,
+  "POST",  
+    JSON.stringify({data:{
+      data,
+      membersData,
+      preRoundData,
+      seedRoundData,
+      seriesRoundData,
+      shares,
+      sharePrice,
+      angelRound,
+      preMoneyValuation,
+      seedRound,
+      preMoneyValuationSeed,
+      seriesRound,
+      preMoneyValuationSeriesRound
+    }
+    }),{
+      'Content-Type': 'application/json',
+      Authorization: 'Bearer ' + auth.token,
+    }
+ )
+
+} catch (err) {}
+
+
+}
+
 
   const handleAddRow = () => {
     setData([...data, ['', 0, 0, 0, 0, 0, 0, 0]]);
@@ -846,10 +924,19 @@ const percentOwnership = () => {
   //   seriesRoundData ,shares, sharePrice, angelRound,preMoneyValuation,
   //   seedRound, preMoneyValuationSeed,seriesRound,preMoneyValuationSeriesRound})); 
 
-
+if(isLoading){
+  return (
+    <div><LoadingSpinner /></div>
+    
+  )
+}
 
   return (
-    <div>
+    <React.Fragment>
+      <ErrorModal error={error} onClear={clearError} />
+      
+      {(!isLoading || data)  &&
+    (<div>
       <div>
       <table className="w-full table-fixed">
         <thead>
@@ -1264,22 +1351,7 @@ const percentOwnership = () => {
           <button 
           className='w-32 my-16 py-2 bg-yellow shadow-lg shadow-yellow-500/50 hover:shadow-yellow-500/40 text-black font-semibold rounded-lg absolute right-32'
           onClick={() => {
-  console.log(JSON.stringify({data:{
-    data,
-    membersData,
-    preRoundData,
-    seedRoundData,
-    seriesRoundData,
-    shares,
-    sharePrice,
-    angelRound,
-    preMoneyValuation,
-    seedRound,
-    preMoneyValuationSeed,
-    seriesRound,
-    preMoneyValuationSeriesRound
-  }
-  }));
+            capTableSaveSubmitHandler();
 }}>SAVE</button>
 
           </th>
@@ -1287,7 +1359,8 @@ const percentOwnership = () => {
       </thead>
     </table>
     </div>
-    
+    )}
+    </React.Fragment>
   );
 }
 

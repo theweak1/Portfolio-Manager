@@ -13,6 +13,7 @@ async function authenticateJsonWebToken(req, res, next) {
 		// return res.status(error.errorCode).json({ error: error });
 	}
 
+
 	const userTokens = await getUserTokens(token);
 	if (token !== userTokens?.accessToken || userTokens.isApproved == false) {
 		const error = new HttpError(

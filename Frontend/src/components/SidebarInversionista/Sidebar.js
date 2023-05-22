@@ -3,12 +3,13 @@ import { AiOutlineClose } from 'react-icons/ai';
 import { FaBars } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import '../../index.css';
-import { SidebarData } from './SidebarData';
+import  {SidebarData}  from './SidebarData';
 
 export default function Sidebar() {
 	const [sidebar, setSidebar] = useState(false);
 
 	//const showSidebar = () => setSidebar(!sidebar);
+
 
 	return (
 		<>

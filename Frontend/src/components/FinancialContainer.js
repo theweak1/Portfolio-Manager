@@ -57,9 +57,9 @@ const FinancialsContainer = () => {
       <ProfitAndLoss statementData={statementData} />
       <KpiDisplay monthlyFinancials={monthlyFinancials} />
       
-      <div>
+      {/* <div>
         <UpdateFinancialsButton onUpdate={updateFinancials} />
-      </div>
+      </div> */}
     </div>
   );
 };

@@ -1,7 +1,77 @@
-import React, { useState,useEffect } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
+import ErrorModal from '../shared/components/UIElements/ErrorModal';
+import LoadingSpinner from '../shared/components/UIElements/LoadingSpinner';
+import { AuthContext } from '../shared/context/auth-context';
+import { useHttpClient } from '../shared/hooks/http-hook';
 import Date from './Date';
 
-function Table() {
+
+function Table({startupId}) {
+
+const auth = useContext(AuthContext)
+const { isLoading, error, sendRequest, clearError } = useHttpClient();
+
+useEffect(() => {
+  setData([
+    ['', 0, 0, 0, 0, 0, 0, 0],
+    ['', 0, 0, 0, 0, 0, 0, 0]
+  ])
+  setMembersData([
+    ['', 0, 0, 0, 0, 0, 0, 0],
+    ['', 0, 0, 0, 0, 0, 0, 0]
+  ])
+  setPreRoundData([
+    ['', 0, 0, 0, 0, 0, 0, 0],
+    ['', 0, 0, 0, 0, 0, 0, 0]
+  ])
+  setSeedRoundData([
+    ['', 0, 0, 0, 0, 0, 0, 0],
+    ['', 0, 0, 0, 0, 0, 0, 0]
+  ])
+  setSeriesRoundData([
+    ['', 0, 0, 0, 0, 0, 0, 0],
+    ['', 0, 0, 0, 0, 0, 0, 0]
+  ])
+  setShares(0)
+  setSharePrice(0)
+  setAngelRound(0)
+  setPreMoneyValuation(0)
+  setSeedRound(0)
+  setPreMoneyValuationSeed(0)
+  setSeriesRound(0)
+  setPreMoneyValuationSeriesRound(0)
+  const fetchCapTable = async () => {
+
+    if(!auth.token || !startupId)
+    {}else{
+      try {
+     const responseData = await sendRequest(
+      `${process.env.REACT_APP_BACKEND_URL}/startup/captable/${startupId}`,
+      "GET",null,
+      {
+        Authorization: "Bearer " + auth.token
+      }
+     );
+
+       setData(responseData.data.captable.data)
+       setMembersData(responseData.data.captable.membersData)
+       setPreRoundData(responseData.data.captable.preRoundData)
+       setSeedRoundData(responseData.data.captable.seedRoundData)
+       setSeriesRoundData(responseData.data.captable.seriesRoundData)
+       setShares(responseData.data.captable.shares)
+       setSharePrice(responseData.data.captable.sharePrice)
+       setAngelRound(responseData.data.captable.angelRound)
+       setPreMoneyValuation(responseData.data.captable.preMoneyValuation)
+       setSeedRound(responseData.data.captable.seedRound)
+       setPreMoneyValuationSeed(responseData.data.captable.preMoneyValuationSeed)
+       setSeriesRound(responseData.data.captable.seriesRound)
+       setPreMoneyValuationSeriesRound(responseData.data.captable.preMoneyValuationSeriesRound)
+
+      } catch (err) {console.log(err)}
+    }};
+  fetchCapTable();
+ },[sendRequest, auth.token, startupId])
+
   const [data, setData] = useState([
     ['', 0, 0, 0, 0, 0, 0, 0],
     ['', 0, 0, 0, 0, 0, 0, 0]
@@ -846,9 +916,19 @@ const percentOwnership = () => {
   //   seriesRoundData ,shares, sharePrice, angelRound,preMoneyValuation,
   //   seedRound, preMoneyValuationSeed,seriesRound,preMoneyValuationSeriesRound})); 
 
+if(isLoading)
+{
+  return (
+    <div>
+       <LoadingSpinner asOverlay/>
+    </div>
 
+  )
+}
 
   return (
+    <React.Fragment>
+<ErrorModal error={error} onClear={clearError} />
     <div>
       <div>
       <table className="w-full table-fixed">
@@ -1293,7 +1373,7 @@ const percentOwnership = () => {
       </thead>
     </table>
     </div>
-    
+    </React.Fragment>
   );
 }
 

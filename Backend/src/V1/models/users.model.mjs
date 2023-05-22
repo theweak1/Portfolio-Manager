@@ -75,16 +75,7 @@ async function isUserAuthorized(email, password) {
 			// );
 		}
 
-		if (!user.isApproved) {
-			return new HttpError(
-				'User does not have approval to access the system.',
-				400
-			);
-			// return buildErrorObject(
-			// 	400,
-			// 	'User does not have approval to access the system.'
-			// );
-		}
+		
 
 		const userWithoutPassord = excludeFields(user, [
 			'password',

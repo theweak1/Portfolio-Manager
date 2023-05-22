@@ -17,25 +17,14 @@ import Navbar from './shared/components/Navigation/Navbar';
 
 import UpdatePasswordPage from './auth/ResetPassword';
 import ResetPasswordPage from './auth/forgot-password';
-
+import SidebarKpi from './components/SidebarInversionista/SidebarKpi';
 import CFOStartup from './routes/CFOStartup';
 import CaptableStartup from './routes/CaptableStartup';
 import CreateUpdates from './routes/CreateUpdates';
-<<<<<<< Updated upstream
 import InvestorList from './routes/Investors';
 import Startups from './routes/Startups';
-=======
-
->>>>>>> Stashed changes
 import { AuthContext } from './shared/context/auth-context';
 import { useAuth } from './shared/hooks/auth-hook';
-
-function NavbarWithConditionalRendering() {
-	const location = useLocation();
-	const isHomePage = location.pathname === '/';
-
-	return isHomePage ? <Navbar /> : null;
-}
 
 function App() {
 	const { token, login, logout, userRole, expiration } = useAuth();
@@ -45,22 +34,13 @@ function App() {
 	if (!token) {
 		routes = (
 			<Routes>
-<<<<<<< Updated upstream
-				<Route path="/investors" element={<InvestorList />} />
-=======
->>>>>>> Stashed changes
+				{/* <Route path="/investors" element={<InvestorList />} /> */}
 				<Route path="/" element={<Home />} />
 				<Route path="/login" element={<Login />} />
 				<Route path="/signup" element={<Signup />} />
 				<Route path="/forgot-password" element={<ResetPasswordPage />} />
 				<Route path="/reset-password" element={<UpdatePasswordPage />} />
-<<<<<<< Updated upstream
-=======
-        <Route path="/cfo-Startup" element={<CFOStartup />} />
-        <Route path="/cfo" element={<CFO />} />
-        <Route path="/captable" element={<CapTable />} />
-        <Route path="/captable-startup" element={<CaptableStartup />} />
->>>>>>> Stashed changes
+
 			</Routes>
 		);
 	} else {
@@ -70,18 +50,20 @@ function App() {
 					<Route path="/cfo-Startup" element={<CFOStartup />} />
 					<Route path="/captable-startup" element={<CaptableStartup />} />
 					<Route path="/create-updates" element={<CreateUpdates />} />
+
 				</Routes>
 			);
 		} else {
 			routes = (
 				<Routes>
-					<Route path="/cfo" element={<CFO />} />
-					<Route path="/captable" element={<CapTable />} />
+					<Route path="/cfo" element={<SidebarKpi />} />
+					<Route path="/cfo/:startupId" element={<SidebarKpi />} />
+					<Route path="/captable" element={<SidebarKpi />} />
+					<Route path="/captable/:startupId" exact element={<SidebarKpi />} />
 					<Route path="/updates" element={<Updates />} />
-					<Route path="/startups" element={<Startups />} />
 
-					<Route path="/" element={<Home />} />
-					<Route path="*" element={<Navigate to="/cfo" />} />
+				<Route path="*" element={<Navigate to="/cfo" />} />
+
 				</Routes>
 			);
 		}
@@ -100,7 +82,7 @@ function App() {
 		>
 			<Router>
 				<div className="m-0 p-0 box-border font-serif">
-					<NavbarWithConditionalRendering />
+				<Navbar />
 					<main>{routes}</main>
 				</div>
 			</Router>

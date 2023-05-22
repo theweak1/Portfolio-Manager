@@ -16,13 +16,13 @@ import {
 
 const router = express.Router();
 
-router.get('/', authenticateJsonWebToken, httpGetStartupsByInvestorId);
+router.get('/',  authenticateJsonWebToken, httpGetStartupsByInvestorId);
 
 router.get('/investors', authenticateJsonWebToken, httpGetInvestors);
 
 router.get('/profile', authenticateJsonWebToken, httpGetStartupProfileByUserId);
 
-router.get('/captable', authenticateJsonWebToken, HttpGetCaptable);
+router.get('/captable/:startupId', authenticateJsonWebToken, HttpGetCaptable);
 
 router.post('/captable', authenticateJsonWebToken, HttpPostCaptable);
 

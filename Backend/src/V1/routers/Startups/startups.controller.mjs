@@ -261,7 +261,6 @@ async function HttpPostCaptable(req, res, next) {
 			);
 			return next(error);
 		}
-
 		const captable = req.body.data;
 
 		const captableResponse = await updateCaptable(startupResponse.id, captable);
@@ -359,7 +358,6 @@ async function HttpGetCaptable(req, res, next) {
 	try {
 		const userId = req.userId;
 		const startupResponse = await findStartupByUserId(userId);
-
 		if (!startupResponse) {
 			const investorResponse = await findInvestorByUserId(userId);
 			if (!investorResponse) {
@@ -369,7 +367,7 @@ async function HttpGetCaptable(req, res, next) {
 				);
 				return next(error);
 			} else if (investorResponse) {
-				const startupId = req.body.startupId;
+				const startupId = req.params.startupId;
 				const startupResponse = await findStartupById(startupId, startupId);
 				if (!startupResponse) {
 					const error = new HttpError(

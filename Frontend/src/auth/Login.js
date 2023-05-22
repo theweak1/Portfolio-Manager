@@ -99,7 +99,7 @@ export default function Login() {
 								id="password"
 								type="password"
 								label="Password"
-								validators={[VALIDATOR_MINLENGTH(6)]}
+								validators={[VALIDATOR_MINLENGTH(4)]}
 								errorText="Please enter a valid password, at least 6 characters."
 								onInput={inputHandler}
 							/>
