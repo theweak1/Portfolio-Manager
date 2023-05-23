@@ -123,6 +123,39 @@ async function updatePost(startupId, postId, postInfo) {
 	}
 }
 
+async function getPosts(startupId) {
+	try {
+	  const posts = await prisma.post.findMany({
+		 where: {
+			creatorId: startupId,
+		 },
+		 select: {
+			id: true,
+			title: true,
+			description: true,
+			lastModified: true,
+			creator: {
+			  select: {
+				 companyName: true,
+			  },
+			},
+		 },
+	  });
+ 
+	  if (!posts.length) {
+		 return null;
+	  }
+ 
+	  ;
+		
+	  return posts;
+	} catch (error) {
+	  console.log(error);
+	  throw error;
+	}
+ }
+
+
 // --- Utilities Functions ---
 async function validatePostExistence(postId) {
 	const post = await prisma.post.findUnique({
@@ -136,4 +169,5 @@ async function validatePostExistence(postId) {
 	return post;
 }
 
-export { StartupsWithPosts, CreatePost, DeletePost, updatePost };
+export { StartupsWithPosts, CreatePost, DeletePost, updatePost,
+	getPosts };

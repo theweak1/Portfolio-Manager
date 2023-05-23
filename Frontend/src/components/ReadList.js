@@ -10,7 +10,7 @@ function ReadList() {
 	const auth = useContext(AuthContext)
 	const { isLoading, error, sendRequest, clearError } = useHttpClient();
 	const [LoadedPost, setLoadedPost] =useState([])
- 
+
 useEffect(()=> {
 	let ignored = false
 	const fetchPost = async () => {
@@ -30,6 +30,7 @@ if(!ignored){
 	fetchPost();
     ignored = true
 }
+
 },[auth.token, sendRequest])
 
 
@@ -40,7 +41,7 @@ return (
     //everything in updates is contained in the first div
     <React.Fragment>
 <ErrorModal error={error} onClear={clearError} />
-{isLoading && <LoadingSpinner />}
+{isLoading && <LoadingSpinner asOverlay/>}
     <div className='absolute flex flex-col  top-20 left-20 sm:left-20 md:left-24 '>
         {/*This is where the posted form is located */}
         {LoadedPost.map((read) => (

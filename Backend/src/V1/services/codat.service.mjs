@@ -1,73 +1,82 @@
 import axios from 'axios';
 
-var baseUrl = process.env.CODAT_BASE_URL;
-var authHeaderValue = process.env.CODAT_AUTHORIZATION_HEADER;
+const baseUrl = 'https://api.codat.io';
 
-var codatApiClient = axios.create({
-	baseURL: baseUrl,
-	headers: {
-		Authorization: authHeaderValue,
-		'Content-Type': 'application/json;charset=UTF-8'
-	}
-});
+const options = {
+  method: 'GET',
+  url: baseUrl,
+  headers: {
+    'Content-Type': 'application/json',
+    Authorization: process.env.CODAT_AUTHORIZATION_HEADER,
+  },
+};
 
 async function createCompany(companyName) {
-	try {
-		const response = await codatApiClient.post('/companies', {
-			name: companyName,
-			description: 'Any additional information about the company'
-		});
+  try {
+    const response = await axios.request({
+      ...options,
+      method: 'POST',
+      url: `${baseUrl}/companies`,
+      data: {
+        name: companyName,
+        description: 'Any additional information about the company',
+      },
+    });
 
-		return response.data;
-	} catch (error) {
-		throw error;
-	}
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
 }
 
 async function deleteCompany(companyId) {
-	try {
-		const response = await codatApiClient.delete(`/companies/${companyId}`);
+  try {
+    const response = await axios.request({
+      ...options,
+      method: 'DELETE',
+      url: `${baseUrl}/companies/${companyId}`,
+    });
 
-		return response.data;
-	} catch (error) {
-		throw error;
-	}
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
 }
 
-async function getBalanceSheet(companyId, periodLength, periodsToCompare) {
-	try {
-		const response = await codatApiClient.get(
-			`/companies/${companyId}/data/financials/balanceSheet`,
-			{
-				params: {
-					periodLength: periodLength,
-					periodsToCompare: periodsToCompare
-				}
-			}
-		);
+async function getBalanceSheet(companyId, periodLength, periodsToCompare,startMonth) {
+  try {
+    const response = await axios.request({
+      ...options,
+      url: `${baseUrl}/companies/${companyId}/data/financials/balanceSheet`,
+      params: {
+        periodLength,
+        periodsToCompare,
+        startMonth
+      },
+    });
 
-		return response.data;
-	} catch (error) {
-		throw error;
-	}
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
 }
 
-async function getProfitAndLoss(companyId, periodLength, periodsToCompare) {
-	try {
-		const response = await codatApiClient.get(
-			`/companies/${companyId}/data/financials/profitAndLoss`,
-			{
-				params: {
-					periodLength: periodLength,
-					periodsToCompare: periodsToCompare
-				}
-			}
-		);
+async function getProfitAndLoss(companyId, periodLength, periodsToCompare,startMonth) {
+  try {
+    const response = await axios.request({
+      ...options,
+      url: `${baseUrl}/companies/${companyId}/data/financials/profitAndLoss`,
+      params: {
+        periodLength,
+        periodsToCompare,
+        startMonth
+      },
+    });
 
-		return response.data;
-	} catch (error) {
-		throw error;
-	}
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
 }
 
 export { createCompany, deleteCompany, getBalanceSheet, getProfitAndLoss };

@@ -1,8 +1,51 @@
 import React, { useState, useEffect } from 'react';
 // import FinancialDataInput from './FinancialDataInput';
+import { useContext } from 'react';
+import { AuthContext } from '../shared/context/auth-context';
+import { useHttpClient } from '../shared/hooks/http-hook';
+import ErrorModal from '../shared/components/UIElements/ErrorModal';
+import LoadingSpinner from '../shared/components/UIElements/LoadingSpinner';
 
-const KpiDisplay = ({monthlyFinancials}) => {
+
+const KpiDisplay = ({monthlyFinancials, startupId}) => {
+  const auth = useContext(AuthContext)
+  const { isLoading, error, sendRequest, clearError } = useHttpClient();
+
   const [timeframe, setTimeframe] = useState('monthly');
+
+  const currentDate = new Date();
+  const previousMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1);
+  
+  const isoDate = previousMonth.toISOString();
+
+
+// useEffect(()=>{
+//   const fetchKPI = async() => {
+//   if(!auth.token || !startupId)
+//   {}else{
+//     try {
+//       const responseData = await sendRequest(`${
+//         process.env.REACT_APP_BACKEND_URL}/startup/pl/${startupId}`,"GET",
+//         JSON.stringify({
+//           periodLength: timeframe === 'monthly' ? 1 : timeframe === 'trimester' ? 3 : 12,
+//           periodToCompare: timeframe === 'monthly' ? 1 : timeframe === 'trimester' ? 3 : 12,
+//           startMonth:isoDate
+//         }),
+//         {
+//           Authorization: "Bearer " + auth.token
+//         }
+//         );
+
+//         setFinancials(responseData)
+//     } catch (err) {}
+//   }
+// };
+
+// fetchKPI()
+// },[auth.token, isoDate, sendRequest, startupId, timeframe])
+
+
+  
     //When we add the json data we can change the array to something like; let monthlyFinancials = kpiData 
     // const [monthlyFinancials, setMonthlyFinancials] = useState([{ revenue: 9000, costOfGoodsSold: 800, allExpenses: 1500, operatingExpenses: 1000, cashInBank: 20000 },
     //   { revenue: 15000, costOfGoodsSold: 5000, allExpenses: 7000, operatingExpenses: 4000, cashInBank: 30000 },
@@ -71,13 +114,15 @@ const KpiDisplay = ({monthlyFinancials}) => {
   
 
   const kpis = calculateKpis(financials);
-  console.log(JSON.stringify({ monthlyFinancials }));
-  console.log(monthlyFinancials);
+
 
   return (
-    <div className="p-14 max-w-lg  mx-auto bg-white rounded-xl shadow-md space-y-6">
-      <h2 className="text-2xl font-semibold text-center">Key Performance Index</h2>
-      <div className="flex space-x-4">
+    <React.Fragment> 
+    <ErrorModal error={error} onClear={clearError} />
+    {isLoading && <LoadingSpinner />}
+    <div className="p-14 bg-white rounded-xl shadow-md space-y-6">
+      <h2 className="text-3xl font-semibold text-center">Key Performance Index</h2>
+      <div className="flex space-x-4 justify-center">
         <button
           className={`py-2 px-4 rounded ${timeframe === 'monthly' ? 'bg-yellow text-black font-bold' : 'bg-white text-black  border-2 border-yellow'}`}
           onClick={() => setTimeframe('monthly')}
@@ -100,7 +145,7 @@ const KpiDisplay = ({monthlyFinancials}) => {
       <div className="grid grid-cols-2 gap-4">
         {Object.entries(kpis).map(([key, value]) => (
           <div key={key} className="p-4 bg-gray-100 rounded shadow">
-            <h3 className="font-semibold text-lg">{key.charAt(0).toUpperCase() + key.slice(1)}</h3>
+            <h3 className="font-semibold text-2xl">{key.charAt(0).toUpperCase() + key.slice(1)}</h3>
             <p className="text-gray-700">{value}</p>
           </div>
         ))}
@@ -108,6 +153,7 @@ const KpiDisplay = ({monthlyFinancials}) => {
       {/* <FinancialDataInput onReplaceFinancialData={replaceFinancialData} /> */}
         
     </div>
+    </React.Fragment>
   );
 };
 

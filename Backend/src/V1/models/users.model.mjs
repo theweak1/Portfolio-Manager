@@ -6,7 +6,7 @@ import { getUserIdFromToken } from '../services/auth.service.mjs';
 import { excludeFields } from '../util/helpers.mjs';
 import { HttpError } from './http-error.mjs';
 
-async function createUser(email, password, role, isApproved) {
+async function createUser(email, password, role) {
 	try {
 		const existingUser = await findUserByEmail(email);
 		if (existingUser) {
@@ -28,7 +28,6 @@ async function createUser(email, password, role, isApproved) {
 				password: hashedPassword,
 				passwordSalt: salt,
 				role: role,
-				isApproved: isApproved
 			}
 		});
 		return createdUser;
@@ -60,7 +59,6 @@ async function isUserAuthorized(email, password) {
 		const user = await findUserByEmail(email);
 		if (!user) {
 			return new HttpError("A user with this email doesn't exist.", 401);
-			// return buildErrorObject(401, "A user with this email doesn't exist.");
 		}
 
 		let hashedPasswordFromRequest = sha512(password, user.passwordSalt);
@@ -69,10 +67,7 @@ async function isUserAuthorized(email, password) {
 				'Provided password is incorrect for this user.',
 				401
 			);
-			// return buildErrorObject(
-			// 	401,
-			// 	'Provided password is incorrect for this user.'
-			// );
+
 		}
 
 		

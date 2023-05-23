@@ -3,7 +3,6 @@ import Date from './Date';
 import { useHttpClient } from '../shared/hooks/http-hook';
 import { useContext } from 'react';
 import { AuthContext } from '../shared/context/auth-context';
-import ErrorModal from '../shared/components/UIElements/ErrorModal';
 import LoadingSpinner from '../shared/components/UIElements/LoadingSpinner';
 
 function Table() {
@@ -39,7 +38,7 @@ useEffect(() => {
        setSeriesRound(responseData.data.captable.seriesRound)
        setPreMoneyValuationSeriesRound(responseData.data.captable.preMoneyValuationSeriesRound)
 
-      } catch (err) {console.log(err)}
+      } catch (err) {}
     }};
   fetchCapTable();
  },[sendRequest,auth.token ])
@@ -933,8 +932,7 @@ if(isLoading){
 
   return (
     <React.Fragment>
-      <ErrorModal error={error} onClear={clearError} />
-      
+     
       {(!isLoading || data)  &&
     (<div>
       <div>

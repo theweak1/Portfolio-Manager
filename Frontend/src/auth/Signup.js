@@ -36,10 +36,6 @@ export default function Signup() {
 				isValid: false
 			},
 
-			name: {
-				value: '',
-				isValid: false
-			},
 			password: {
 				value: '',
 				isValid: false
@@ -71,12 +67,8 @@ export default function Signup() {
 			);
 
 			if (responseData.email) {
-				console.log(responseData);
-
 				navigate('/cfo');
-			} else {
-				console.log(responseData);
-			}
+			} else {}
 		} else {
 			const responseData = await sendRequest(
 				`${process.env.REACT_APP_BACKEND_URL}/auth/signup/${role}`,
@@ -93,12 +85,8 @@ export default function Signup() {
 			);
 
 			if (responseData.email) {
-				console.log(responseData);
-
 				navigate('/updates');
-			} else {
-				console.log(responseData);
-			}
+			} else {}
 		}
 	};
 
@@ -136,7 +124,7 @@ export default function Signup() {
 								label="E-Mail"
 								validators={[VALIDATOR_EMAIL()]}
 								errorText="Please enter a valid email address."
-								onInput={handleSubmit}
+								onInput={inputHandler}
 							/>
 						</div>
 
@@ -157,7 +145,7 @@ export default function Signup() {
 						<div className="flex flex-col text-white py-2">
 							<Input
 								element="input"
-								id="name"
+								id="roleName"
 								type="text"
 								label={optionValue === '1' ? 'Company Name' : 'Name'}
 								validators={[VALIDATOR_REQUIRE()]}

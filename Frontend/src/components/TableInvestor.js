@@ -6,7 +6,7 @@ import { useHttpClient } from '../shared/hooks/http-hook';
 import Date from './Date';
 
 
-function Table({startupId}) {
+function TableInvestor({startupId}) {
 
 const auth = useContext(AuthContext)
 const { isLoading, error, sendRequest, clearError } = useHttpClient();
@@ -40,6 +40,7 @@ useEffect(() => {
   setPreMoneyValuationSeed(0)
   setSeriesRound(0)
   setPreMoneyValuationSeriesRound(0)
+  setCompanyName(null)
   const fetchCapTable = async () => {
 
     if(!auth.token || !startupId)
@@ -66,12 +67,14 @@ useEffect(() => {
        setPreMoneyValuationSeed(responseData.data.captable.preMoneyValuationSeed)
        setSeriesRound(responseData.data.captable.seriesRound)
        setPreMoneyValuationSeriesRound(responseData.data.captable.preMoneyValuationSeriesRound)
+       setCompanyName(responseData.data.companyName)
 
       } catch (err) {}
     }};
   fetchCapTable();
  },[sendRequest, auth.token, startupId])
 
+ const [companyName, setCompanyName] =useState(null)
   const [data, setData] = useState([
     ['', 0, 0, 0, 0, 0, 0, 0],
     ['', 0, 0, 0, 0, 0, 0, 0]
@@ -929,9 +932,10 @@ if(isLoading)
   return (
     <React.Fragment>
 <ErrorModal error={error} onClear={clearError} />
-    <div>
+    <div >
+    <h1 className="text-3xl font-bold mb-6">{`Captable Report ${companyName ? "for " + companyName : "" }`}</h1>
       <div>
-      <table className="w-full table-fixed">
+      <table className="w-full table-fixed ">
         <thead>
           <tr className="   text-white bg-darkGrey text-center">
             <th>Name</th>
@@ -1377,4 +1381,4 @@ if(isLoading)
   );
 }
 
-export default Table;
+export default TableInvestor;

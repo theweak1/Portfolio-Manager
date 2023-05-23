@@ -2,7 +2,8 @@ import {
 	CreatePost,
 	DeletePost,
 	StartupsWithPosts,
-	updatePost
+	updatePost,
+	getPosts
 } from '../../models/posts.model.mjs';
 
 import { findInvestorByUserId } from '../../models/investors.model.mjs';
@@ -31,14 +32,11 @@ async function httpGetAllPost(req, res, next) {
 
 		if (!startupsResponse) {
 			const error = new HttpError(
-				'You are not inveted to view any startups portfolio.',
+				'You are not invited to view any startups portfolio.',
 				404
 			);
 			return next(error);
-			// return handleNotFoundResponse(
-			// 	'You are not inveted to view any startups portfolio.',
-			// 	res
-			// );
+
 		}
 
 		return res.status(200).json(startupsResponse);
@@ -58,10 +56,6 @@ async function httpCreatePost(req, res, next) {
 				400
 			);
 			return next(error);
-			// return handleBadRequestResponse(
-			// 	'This startup does not exist in the system.',
-			// 	res
-			// );
 		}
 
 		const postInfo = {
@@ -91,6 +85,27 @@ async function httpCreatePost(req, res, next) {
 	}
 }
 
+async function httpGetMyPost(req,res,next) {try {
+	const userId = req.userId;
+
+	const startupResponse = await findStartupByUserId(userId);
+	if (!startupResponse) {
+		const error = new HttpError(
+			'This startup does not exist in the system.',
+			400
+		);
+		return next(error);
+	}
+
+	const postsResponse = await getPosts(startupResponse.id);
+
+	
+	return res.status(200).json(postsResponse);
+} catch (error) {
+	return handleErrorResponse('get all posts by investor id', error, res);
+}}
+
+
 async function httpDeletePost(req, res, next) {
 	try {
 		const userId = req.userId;
@@ -99,10 +114,6 @@ async function httpDeletePost(req, res, next) {
 		if (!startupResponse) {
 			const error = new HttpError('This startup does not exist in the system.');
 			return next(error);
-			// return handleBadRequestResponse(
-			// 	'This startup does not exist in the system.',
-			// 	res
-			// );
 		}
 
 		const postId = req.params.postId;
@@ -145,4 +156,4 @@ async function httpUpdatePost(req, res, next) {
 	}
 }
 
-export { httpGetAllPost, httpCreatePost, httpDeletePost, httpUpdatePost };
+export { httpGetAllPost, httpCreatePost, httpDeletePost, httpUpdatePost,httpGetMyPost };

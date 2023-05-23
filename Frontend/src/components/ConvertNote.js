@@ -71,215 +71,213 @@ export default function ConvertNote() {
 	};
 
 	return (
-		<>
-			<div className="fixed flex justify-start right-20 top-32 p-5 bg-white">
-				<table className=" table-auto text-2xl h-full">
-					<thead>
-						<th className=" text-3xl text-darkGrey">
-							<td>Convertible Note </td>
-						</th>
-					</thead>
-					<tbody className=" ">
-						<tr className="   text-white bg-darkGrey">
+        <div className='bg-lightGrey'>
+            <div className="flex justify-start right-20 top-32 p-5 bg-white">
+                <table className=" table-auto text-2xl h-full">
+                    <thead>
+                        <tr className=" text-3xl text-darkGrey">
+                            <td>Convertible Note </td>
+                        </tr>
+                    </thead>
+                    <tbody className=" ">
+                        <tr className="   text-white bg-darkGrey">
+                            <td>
+                                <label>Term </label>
+                            </td>
+                            <td>
+                                <label>Amount </label>
+                            </td>
+                        </tr>
+                        {/*row 1*/}
+                        <tr className="text-darkGrey">
+                            <td className="">
+                                <label>Capital Amount </label>
+                            </td>
+                            <td>
+                                <div className="bg-yellow bg-opacity-50">
+                                    <span>$</span>
+                                    <input
+                                        className=" bg-yellow bg-opacity-10 text-end"
+                                        type="string"
+                                        name="capital_Amount"
+                                        value={input.capital_Amount}
+                                        onChange={handleChange}
+                                    />
+                                </div>
+                            </td>
+                        </tr>
+                        {/*row 2*/}
+                        <tr className="text-darkGrey">
+                            <td className="">
+                                <label>Annual Interest Rate </label>
+                            </td>
+                            <td>
+                                <div className="bg-yellow bg-opacity-50">
+                                    <input
+                                        className=" bg-yellow bg-opacity-10 text-end"
+                                        type="string"
+                                        name="annual_Interest_Rate"
+                                        value={`${input.annual_Interest_Rate}`}
+                                        onChange={handleChange}
+                                    />
+                                    <span>%</span>
+                                </div>
+                            </td>
+                        </tr>
+                        {/*row 3*/}
+                        <tr className="text-darkGrey">
+                            <td className="">
+                                <label>Monthly Interest Rate</label>
+                            </td>
+                            <td>
+                                <div>
+                                    <input
+                                        className="bg-white text-end"
+                                        type="string"
+                                        name="monthly_Interest_Rate"
+                                        value={`${
+                                            input.monthly_Interest_Rate
+                                                ? input.monthly_Interest_Rate.toFixed(2)
+                                                : 0
+                                        }`}
+                                        readOnly
+                                    />
+                                    <span>%</span>
+                                </div>
+                            </td>
+                        </tr>
+                        {/*row 4*/}
+                        <tr className="text-darkGrey">
+                            <td className="">
+                                <label>
+                                    Term {'('}months to conversion{')'}
+                                </label>
+                            </td>
+                            <td className="bg-yellow bg-opacity-50">
+                                <input
+                                    className="bg-yellow bg-opacity-10 text-end"
+                                    type="string"
+                                    name="term"
+                                    value={input.term}
+                                    onChange={handleChange}
+                                />
+                            </td>
+                        </tr>
+                        {/*row 5*/}
+                        <tr className="text-darkGrey">
+                            <td className="">
+                                <label>Accrued Interest</label>
+                            </td>
+                            <td className="">
+                                <div>
+                                    <span className="bg-white">$</span>
+                                    <input
+                                        className="bg-white text-end"
+                                        type="string"
+                                        name="accrued_Interest"
+                                        value={input.accrued_Interest}
+                                        readOnly
+                                    />
+                                </div>
+                            </td>
+                        </tr>
+                        {/*row 6*/}
+                        <tr className="text-darkGrey">
+                            <td className="">
+                                <label>Discount Rate </label>
+                            </td>
+                            <td>
+                                <div className="bg-yellow bg-opacity-50">
+                                    <input
+                                        className="bg-yellow bg-opacity-10 text-end"
+                                        type="string"
+                                        name="discount_Rate"
+                                        value={`${input.discount_Rate}`}
+                                        onChange={handleChange}
+                                    />
+                                    <span>%</span>
+                                </div>
+                            </td>
+                        </tr>
+                        {/*row 7*/}
+                        <tr className="text-darkGrey">
+                            <td className="">
+                                <label>Valuation Cap </label>
+                            </td>
+                            <td>
+                                <div className="bg-yellow bg-opacity-50">
+                                    <span className="">$</span>
+                                    <input
+                                        className="bg-yellow bg-opacity-10 text-end"
+                                        type="string"
+                                        name="valuation_Cap"
+                                        value={input.valuation_Cap}
+                                        onChange={handleChange}
+                                    />
+                                </div>
+                            </td>
+                        </tr>
+                        {/*row 8*/}
+                        <tr className="text-darkGrey">
+                            <td className="">
+                                <label>Pre-money Valuation at Conversion </label>
+                            </td>
+                            <td>
+                                <div className="bg-yellow bg-opacity-50">
+                                    <span className="">$</span>
+                                    <input
+                                        className="bg-yellow bg-opacity-10 text-end"
+                                        type="string"
+                                        name="pre_Money_Valuation_at_Conversion"
+                                        value={input.pre_Money_Valuation_at_Conversion}
+                                        onChange={handleChange}
+                                    />
+                                </div>
+                            </td>
+                        </tr>
+                        {/*row 9*/}
+                        <tr className="text-darkGrey">
+                            <td className="">
+                                <label>Equity Conversion Excluding Interest</label>
+                            </td>
+                            <td className="">
+                                <div>
+                                    <input
+                                        className="bg-white text-end"
+                                        type="string"
+                                        name="equity_Conversion_Excluding_Interest"
+                                        value={`${input.equity_Conversion_Excluding_Interest}%`}
+                                        readOnly
+                                    />
+                                </div>
+                            </td>
+                        </tr>
+                        {/*row 10*/}
+                        <tr className="text-darkGrey">
+                            <td className="">
+                                <label>Equity Conversion Including Interest</label>
+                            </td>
+                            <td className="">
+                                <div>
+                                    <input
+                                        className="bg-white text-end"
+                                        type="string"
+                                        name="equity_Conversion_Including_Interest"
+                                        value={`${input.equity_Conversion_Including_Interest}%`}
+                                        readOnly
+                                    />
+                                </div>
+                            </td>
+                        </tr>
+						<tr>
 							<td>
-								<label>Term </label>
-							</td>
-							<td>
-								<label>Amount </label>
+							<button className="bg-darkGrey text-white px-6 py-2 m-4 text-2xl" onClick={calculator}>Calculate</button>
 							</td>
 						</tr>
-						{/*row 1*/}
-						<tr className="text-darkGrey">
-							<td className="">
-								<label>Capital Amount </label>
-							</td>
-							<td>
-								<div className="bg-yellow bg-opacity-50">
-									<span>$</span>
-									<input
-										className=" bg-yellow bg-opacity-10 text-end"
-										type="string"
-										name="capital_Amount"
-										value={input.capital_Amount}
-										onChange={handleChange}
-									/>
-								</div>
-							</td>
-						</tr>
-						{/*row 2*/}
-						<tr className="text-darkGrey">
-							<td className="">
-								<label>Annual Interest Rate </label>
-							</td>
-							<td>
-								<div className="bg-yellow bg-opacity-50">
-									<input
-										className=" bg-yellow bg-opacity-10 text-end"
-										type="string"
-										name="annual_Interest_Rate"
-										value={`${input.annual_Interest_Rate}`}
-										onChange={handleChange}
-									/>
-									<span>%</span>
-								</div>
-							</td>
-						</tr>
-						{/*row 3*/}
-						<tr className="text-darkGrey">
-							<td className="">
-								<label>Monthly Interest Rate</label>
-							</td>
-							<td>
-								<div>
-									<input
-										className="bg-white text-end"
-										type="string"
-										name="monthly_Interest_Rate"
-										value={`${
-											input.monthly_Interest_Rate
-												? input.monthly_Interest_Rate.toFixed(2)
-												: 0
-										}`}
-										readOnly
-									/>
-									<span>%</span>
-								</div>
-							</td>
-						</tr>
-						{/*row 4*/}
-						<tr className="text-darkGrey">
-							<td className="">
-								<label>
-									Term {'('}months to conversion{')'}
-								</label>
-							</td>
-							<td className="bg-yellow bg-opacity-50">
-								<input
-									className="bg-yellow bg-opacity-10 text-end"
-									type="string"
-									name="term"
-									value={input.term}
-									onChange={handleChange}
-								/>
-							</td>
-						</tr>
-						{/*row 5*/}
-						<tr className="text-darkGrey">
-							<td className="">
-								<label>Accrued Interest</label>
-							</td>
-							<td className="">
-								<div>
-									<span className="bg-white">$</span>
-									<input
-										className="bg-white text-end"
-										type="string"
-										name="accrued_Interest"
-										value={input.accrued_Interest}
-										readOnly
-									/>
-								</div>
-							</td>
-						</tr>
-						{/*row 6*/}
-						<tr className="text-darkGrey">
-							<td className="">
-								<label>Discount Rate </label>
-							</td>
-							<td>
-								<div className="bg-yellow bg-opacity-50">
-									<input
-										className="bg-yellow bg-opacity-10 text-end"
-										type="string"
-										name="discount_Rate"
-										value={`${input.discount_Rate}`}
-										onChange={handleChange}
-									/>
-									<span>%</span>
-								</div>
-							</td>
-						</tr>
-						{/*row 7*/}
-						<tr className="text-darkGrey">
-							<td className="">
-								<label>Valuation Cap </label>
-							</td>
-							<td>
-								<div className="bg-yellow bg-opacity-50">
-									<span className="">$</span>
-									<input
-										className="bg-yellow bg-opacity-10 text-end"
-										type="string"
-										name="valuation_Cap"
-										value={input.valuation_Cap}
-										onChange={handleChange}
-									/>
-								</div>
-							</td>
-						</tr>
-						{/*row 8*/}
-						<tr className="text-darkGrey">
-							<td className="">
-								<label>Pre-money Valuation at Conversion </label>
-							</td>
-							<td>
-								<div className="bg-yellow bg-opacity-50">
-									<span className="">$</span>
-									<input
-										className="bg-yellow bg-opacity-10 text-end"
-										type="string"
-										name="pre_Money_Valuation_at_Conversion"
-										value={input.pre_Money_Valuation_at_Conversion}
-										onChange={handleChange}
-									/>
-								</div>
-							</td>
-						</tr>
-						{/*row 9*/}
-						<tr className="text-darkGrey">
-							<td className=" pt-8">
-								<label>Equity Conversion Excluding Interest</label>
-							</td>
-							<td className=" pt-8">
-								<div>
-									<input
-										className="bg-white text-end"
-										type="string"
-										name="equity_Conversion_Excluding_Interest"
-										value={`${input.equity_Conversion_Excluding_Interest}`}
-										readOnly
-									/>
-									<span>%</span>
-								</div>
-							</td>
-						</tr>
-						{/*row 10*/}
-						<tr className="text-darkGrey">
-							<td className="">
-								<label>Equity Conversion Including Interest</label>
-							</td>
-							<td className="">
-								<div>
-									<input
-										className="bg-white text-end"
-										type="string"
-										name="equity_Conversion_Including_Interest"
-										value={`${input.equity_Conversion_Including_Interest}`}
-										readOnly
-									/>
-									<span>%</span>
-								</div>
-							</td>
-						</tr>
-					</tbody>
-					<button
-						onClick={calculator}
-						className="p-2 mt-4 text-white bg-darkGrey"
-					>
-						Calculate
-					</button>
-				</table>
-			</div>
-		</>
-	);
+                    </tbody>
+                </table>
+              
+            </div>
+        </div>
+    );
 }

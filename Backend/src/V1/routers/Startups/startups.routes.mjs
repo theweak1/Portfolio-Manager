@@ -3,24 +3,31 @@ import express from 'express';
 import { authenticateJsonWebToken } from '../../services/auth.service.mjs';
 
 import {
-	HttpGetCaptable,
-	HttpPostCaptable,
-	httpGetInvestors,
-	httpGetSpecificStartupProfile,
 	httpGetStartupProfileByUserId,
+	httpUpdateStartupProfile,
 	httpGetStartupsByInvestorId,
 	httpNewInvestors,
 	httpUpdateInvestor,
-	httpUpdateStartupProfile
+	httpGetInvestors,
+	httpGetSpecificStartupProfile,
+	HttpPostCaptable,
+	httpGetPL,
+	HttpGetCaptable,
+	httpGetKPI
 } from './startups.controller.mjs';
 
 const router = express.Router();
+
 
 router.get('/',  authenticateJsonWebToken, httpGetStartupsByInvestorId);
 
 router.get('/investors', authenticateJsonWebToken, httpGetInvestors);
 
 router.get('/profile', authenticateJsonWebToken, httpGetStartupProfileByUserId);
+
+router.get('/kpi/:startupId',authenticateJsonWebToken, httpGetKPI)
+
+router.get('/pl/:startupId',authenticateJsonWebToken, httpGetPL)
 
 router.get('/captable/:startupId', authenticateJsonWebToken, HttpGetCaptable);
 

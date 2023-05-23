@@ -13,6 +13,10 @@ export const SidebarDataStartup = [
       path: "/captable-Startup",
     },
     {
+      title: "Investors List",
+      path: "/investors-list",
+    },
+    {
       title: " Create Updates",
       path: "/create-updates",
     },

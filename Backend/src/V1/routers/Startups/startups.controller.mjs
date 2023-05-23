@@ -114,7 +114,7 @@ async function httpGetStartupsByInvestorId(req, res, next) {
 
 		if (!startups) {
 			const error = new HttpError(
-				'You are not inveted to view any startups portfolio.',
+				'You are not invited to view any startups portfolio.',
 				404
 			);
 			return next(error);
@@ -147,6 +147,7 @@ async function httpNewInvestors(req, res, next) {
 				// await sendInvestorInvitationEmail(startupResponse, investor.email);
 				console.log('Invitiation email sent');
 			} else {
+
 				await addNewInvestor(startupResponse.id, investor.id);
 			}
 		}
@@ -271,6 +272,70 @@ async function HttpPostCaptable(req, res, next) {
 	}
 }
 
+async function httpGetKPI(req, res, next) {
+	try {
+		const userId = req.userId;
+		const investorResponse = await findInvestorByUserId(userId);
+
+
+		if (!investorResponse) {
+			const error = new HttpError(
+				'An investor with this id does not exist in the system',
+				400
+			);
+			return next(error);
+		}
+
+		const startupId = req.params.startupId;
+const periodLength =req.body.periodLength;
+const periodToCompare = req.body.periodToCompare;
+const startMonth= req.body.startMonth
+
+		const startupResponse = await findStartupById(startupId);
+		if (!startupResponse) {
+			const error = new HttpError(
+				'A startup with this id does not exist in the system',
+				400
+			);
+			return next(error);
+		}
+
+		//Need to change static values of 12 and 1, to be variables based on request. 12 would be the period length in months to search data from, 1 would be the periods to compare. For more information https://docs.codat.io/accounting-api#/operations/get-profit-and-loss
+		let codatResponse;
+		codatResponse = await getProfitAndLoss(
+			startupResponse.codatId,
+			periodLength,
+			periodToCompare,startMonth
+			);
+console.log(codatResponse);
+		const costOfGoodsSold = codatResponse.reports[0].costOfSales.value;
+		const OperatingExprenses = codatResponse.reports[0].expenses.value;
+		const revenue =
+			codatResponse.reports[0].income.value +
+			codatResponse.reports[0].otherIncome.value;
+		const allExpenses =
+			codatResponse.reports[0].expenses.value +
+			codatResponse.reports[0].otherExpenses.value;
+
+//Need to change static values of 12 and 1, to be variables based on request. 12 would be the period length in months to search data from, 1 would be the periods to compare. For more information https://docs.codat.io/accounting-api#/operations/get-balance-sheet
+			codatResponse = await getBalanceSheet(startupResponse.codatId, periodLength, periodToCompare,startMonth);
+			const cashAndBank = codatResponse.reports[0].assets.items[0].value;
+
+
+
+			res.status(200).json({
+				costOfGoodsSold: costOfGoodsSold,
+				OperatingExprenses: OperatingExprenses,
+				revenue: revenue,
+				allExpenses: allExpenses,
+				cashAndBank: cashAndBank
+			});
+		} catch (error) {
+
+		return handleErrorResponse('Get KPI', error, res);
+	}
+}
+
 async function httpGetPL(req, res, next) {
 	try {
 		const userId = req.userId;
@@ -284,8 +349,10 @@ async function httpGetPL(req, res, next) {
 			return next(error);
 		}
 
-		const startupId = req.body.startupId;
-
+		const startupId = req.params.startupId;
+		const periodLength =req.body.periodLength;
+		const periodToCompare = req.body.periodToCompare;
+		const startMonth= req.body.startMonth
 		const startupResponse = await findStartupById(startupId);
 		if (!startupResponse) {
 			const error = new HttpError(
@@ -294,63 +361,44 @@ async function httpGetPL(req, res, next) {
 			);
 			return next(error);
 		}
-
-		const codatResponse = await getProfitAndLoss(
+		
+		//For more information https://dos.codat.io/accounting-api#/operations/get-profit-and-loss
+		let codatResponse;
+		 codatResponse = await getProfitAndLoss(
 			startupResponse.codatId,
-			12,
-			1
+			periodLength, periodToCompare,startMonth
 		);
-		const costOfGoodsSold = codatResponse.reports[0].costOfSales.value;
-		const OperatingExprenses = codatResponse.reports[0].expenses.value;
-		const revenue =
-			codatResponse.reports[0].income.value +
+		const income = codatResponse.reports[0].income.value;
+		const costOfSales = codatResponse.reports[0].costOfSales.value;
+		const expenses = codatResponse.reports[0].expenses.value;
+		const revenue = codatResponse.reports[0].income.value +
 			codatResponse.reports[0].otherIncome.value;
-		const allExpenses =
-			codatResponse.reports[0].expenses.value +
+			const allExpenses = codatResponse.reports[0].expenses.value +
 			codatResponse.reports[0].otherExpenses.value;
+		const grossProfit = (revenue -allExpenses) /revenue;
+
+
+		//For more information https://docs.codat.io/accounting-api#/operations/get-balance-sheet
+		 codatResponse = await getBalanceSheet(startupResponse.codatId, periodLength, periodToCompare,startMonth);
+		const cashAndBank = codatResponse.reports[0].assets.items[0].value;
+		const assets = codatResponse.reports[0].assets.value;
+		const liabilities = codatResponse.reports[0].liabilities.value;
+		const equity = codatResponse.reports[0].equity.value;
+
 		res.status(200).json({
-			costOfGoodsSold: costOfGoodsSold,
-			OperatingExprenses: OperatingExprenses,
-			revenue: revenue,
-			allExpenses: allExpenses
+			income : income,
+			costOfSales : costOfSales,
+			expenses : expenses,
+			revenue:revenue,
+			allExpenses : allExpenses,
+			grossProfit : grossProfit,
+			cashInBank: cashInBank,
+			assets : assets,
+			liabilities : liabilities,
+			equity : equity
 		});
 	} catch (error) {
 		return handleErrorResponse('Get PL', error, res);
-	}
-}
-
-async function httpGetBalanceSheet(req, res, next) {
-	try {
-		const userId = req.userId;
-		const investorResponse = await findInvestorByUserId(userId);
-
-		if (!investorResponse) {
-			const error = new HttpError(
-				'An investor with this id does not exist in the system',
-				400
-			);
-			return next(error);
-		}
-
-		const startupId = req.body.startupId;
-
-		const startupResponse = await findStartupById(startupId);
-		if (!startupResponse) {
-			const error = new HttpError(
-				'A startup with this id does not exist in the system',
-				400
-			);
-			return next(error);
-		}
-
-		const codatResponse = await getBalanceSheet(startupResponse.codatId, 12, 1);
-		const cashInBank = codatResponse.reports[0].assets.items[0].value;
-
-		res.status(200).json({
-			cashInBank: cashInBank
-		});
-	} catch (error) {
-		return handleErrorResponse('Get balance Sheet', error, res);
 	}
 }
 
@@ -408,5 +456,5 @@ export {
 	HttpPostCaptable,
 	httpGetPL,
 	HttpGetCaptable,
-	httpGetBalanceSheet
+	httpGetKPI
 };

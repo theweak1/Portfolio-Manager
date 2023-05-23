@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState ,useEffect} from 'react';
 import { useNavigate } from 'react-router-dom';
 import InvestorList from '../components/Investors/InvestorList';
 import Button from '../shared/components/FormElements/Button';
@@ -9,31 +9,15 @@ import { AuthContext } from '../shared/context/auth-context';
 import { useForm } from '../shared/hooks/form-hook';
 import { useHttpClient } from '../shared/hooks/http-hook';
 import { VALIDATOR_EMAIL, VALIDATOR_REQUIRE } from '../shared/util/validators';
+import SidebarStartup from '../components/SidebarStartup/SidebarStartup';
 
-const dummyUsers = [
-	{
-		id: 1,
-		name: 'John Doe',
-		email: 'john@example.com'
-	},
-	{
-		id: 2,
-		name: 'Jane Smith',
-		email: 'jane@example.com'
-	},
-	{
-		id: 3,
-		name: 'Alice Johnson',
-		email: 'alice@example.com'
-	}
-];
 
 const Investors = () => {
 	const auth = useContext(AuthContext);
 	const navigate = useNavigate();
 
 	const { isLoading, error, sendRequest, clearError } = useHttpClient();
-	const [investors, setInvestors] = useState([]);
+	const [loadedInvestors, setLoadedInvestors] = useState([]);
 	const [formState, inputHandler] = useForm(
 		{
 			name: {
@@ -48,31 +32,53 @@ const Investors = () => {
 		false
 	);
 
+	useEffect(() => {
+		const fetchInvestors = async() =>{ 
+			if(!auth.token)
+			{}else{
+				try{
+					const responseData = await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/startup/investors`,
+					"GET",
+					null,
+					{
+						Authorization: "Bearer " + auth.token
+					});
+					
+					setLoadedInvestors(responseData.investors);
+				}catch(err){}
+	 }
+		};
+		fetchInvestors();
+	},[sendRequest,auth.token])
+
 	const handleAddData = (event) => {
 		event.preventDefault();
 		const investor = {
 			name: formState.inputs.name.value,
 			email: formState.inputs.email.value,
-			id: dummyUsers.length + 1
+			id: loadedInvestors.length + 1 
 		};
+		
+		setLoadedInvestors((prevData) => [...prevData, investor]);
 
-		setInvestors((prevData) => [...prevData, investor]);
-		dummyUsers.push(investor);
 
-		// Clear the form inputs
-		inputHandler('name', '', false);
-		inputHandler('email', '', false);
 	};
+	
+	const handleDeleteInvestor =async (InvestorId) => {
+		setLoadedInvestors((prevState) => prevState.filter(investor => investor.id !==InvestorId));
+	
+	}
+
 
 	const handleFormSubmit = async (event) => {
-		event.preventDefault();
+		event.preventDefault(); 
 
 		try {
 			await sendRequest(
 				`${process.env.REACT_APP_BACKEND_URL}/startup/investors`,
 				'POST',
 				JSON.stringify({
-					investors: investors
+					investors: loadedInvestors
 				}),
 				{
 					'Content-Type': 'application/json',
@@ -87,8 +93,10 @@ const Investors = () => {
 		<React.Fragment>
 			<ErrorModal error={error} onClear={clearError} />
 			{isLoading && <LoadingSpinner asOverlay />}
-			<div>
-				<InvestorList investors={dummyUsers} />
+				<div className='flex'> 
+				<SidebarStartup />
+			<div className='flex-1 p-6 ml-16'>
+				{!isLoading && loadedInvestors && <InvestorList investors={loadedInvestors} />} 
 				<form onSubmit={handleFormSubmit}>
 					<Input
 						element="input"
@@ -121,8 +129,9 @@ const Investors = () => {
 					onClick={handleFormSubmit}
 					disabled={!formState.isValid}
 				>
-					Save Investors
+					Save Changes
 				</Button>
+			</div>
 			</div>
 		</React.Fragment>
 	);

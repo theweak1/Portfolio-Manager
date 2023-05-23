@@ -27,30 +27,30 @@ import { AuthContext } from './shared/context/auth-context';
 import { useAuth } from './shared/hooks/auth-hook';
 
 function App() {
-	const { token, login, logout, userRole, expiration } = useAuth();
+	const { token, login, logout, userRole, expiration, userId } = useAuth();
 
 	let routes;
 
 	if (!token) {
 		routes = (
 			<Routes>
-				{/* <Route path="/investors" element={<InvestorList />} /> */}
 				<Route path="/" element={<Home />} />
 				<Route path="/login" element={<Login />} />
 				<Route path="/signup" element={<Signup />} />
 				<Route path="/forgot-password" element={<ResetPasswordPage />} />
 				<Route path="/reset-password" element={<UpdatePasswordPage />} />
-
+				<Route path="*" element={<Navigate to="/" />} />
 			</Routes>
 		);
 	} else {
 		if (userRole === 'Startup') {
 			routes = (
 				<Routes>
-					<Route path="/cfo-Startup" element={<CFOStartup />} />
-					<Route path="/captable-startup" element={<CaptableStartup />} />
+					<Route path={`/cfo-Startup/${userId}`} element={<CFOStartup />} />
 					<Route path="/create-updates" element={<CreateUpdates />} />
-
+					<Route path={`/captable-startup`} element={<CaptableStartup />} />
+					<Route path={'/investors-list'} element={<InvestorList />} />
+					<Route path="*" element={<Navigate to={`/cfo-Startup/${userId}`} />} />
 				</Routes>
 			);
 		} else {

@@ -54,11 +54,11 @@ const Input = (props) => {
 				onChange={changeHandler}
 				onBlur={touchHandler}
 				value={inputState.value}
-				className={`w-full border ${
+				className={`w-full border  ${
 					!inputState.isValid && inputState.isTouched
 						? 'border-red-500'
 						: 'border-gray-300'
-				} p-2 rounded-lg bg-grey mt-2  focus:outline-none`}
+				} p-2 rounded-lg text-black mt-2  focus:outline-none`}
 			/>
 		) : (
 			<textarea

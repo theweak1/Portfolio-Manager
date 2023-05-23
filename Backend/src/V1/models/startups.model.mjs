@@ -17,7 +17,7 @@ async function createStartup(userId, email, startupInfo) {
 		});
 
 		const startupWithoutId = excludeFields(createdStartup, [
-			'id',
+			
 			'codatId',
 			'investorIds'
 		]);
@@ -75,6 +75,7 @@ async function findStartupByUserId(userId) {
 
 		return excludeFields(startup, ['userId', 'investorIds']);
 	} catch (error) {
+		console.log(error)
 		throw error;
 	}
 }
@@ -171,6 +172,7 @@ async function investedStartupsbyInvestorId(investorId) {
 }
 
 async function addNewInvestor(startupId, investorId) {
+
 	try {
 		const NewInvestor = await prisma.startup.update({
 			where: {
@@ -184,6 +186,7 @@ async function addNewInvestor(startupId, investorId) {
 				}
 			}
 		});
+		// console.log(NewInvestor);
 		return NewInvestor;
 	} catch (error) {
 		throw error;
@@ -250,12 +253,12 @@ async function getInvestors(startupId) {
 				investors: {
 					select: {
 						email: true,
-						name: true
+						name: true,
+						id:true
 					}
 				}
 			}
 		});
-
 		return startup;
 	} catch (error) {
 		throw error;
@@ -328,7 +331,7 @@ async function updateCodatId(id, companyId, redirectLink) {
 			},
 			data: {
 				codatId: companyId,
-				RLink: redirectLink
+				redirectLink: redirectLink
 			}
 		});
 
@@ -382,6 +385,7 @@ async function getCaptable(startupId) {
 				id: startupId
 			},
 			select: {
+				companyName: true,
 				captable: true
 			}
 		});

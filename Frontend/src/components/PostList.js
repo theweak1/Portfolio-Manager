@@ -1,50 +1,107 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+import { useNavigate  } from 'react-router-dom';
+import { AuthContext } from '../shared/context/auth-context';
+import { useHttpClient } from '../shared/hooks/http-hook';
+import ErrorModal from '../shared/components/UIElements/ErrorModal';
+import LoadingSpinner from '../shared/components/UIElements/LoadingSpinner';
+import Input from '../shared/components/FormElements/input';
+import { useForm } from '../shared/hooks/form-hook';
+import { VALIDATOR_REQUIRE, VALIDATOR_MINLENGTH } from '../shared/util/validators';
 
 
 //where the form is located
 function PostList(props) {
+
+  const auth = useContext(AuthContext)
+const { isLoading, error, sendRequest, clearError } = useHttpClient();
   //hooks
-  const [posts, setPosts] = useState([]);
-  const [newPost, setNewPost] = useState({
-    id: 1,
-    title: '',
-    author: '',
-    text: '',
-    date: '',
-  });
+  const [loadedPost, setloadedPost] = useState([]);
+const [creator, setCreator]=('')
+const navigate = useNavigate();
+
+const [formState, inputHandler, setFormData] = useForm(
+		{
+			title: {
+				value: '',
+				isValid: false,
+			},
+			description: {
+				value: '',
+				isValid: false,
+			},
+		},
+		false
+	);
+
  
-  //handle input change
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setNewPost((prevState) => ({ ...prevState, [name]: value }));
+  const [formSubmitted, setFormSubmitted] = useState(false);
+
+useEffect(()=>{
+  const fetchPosts = async() => {
+    if(!auth.token)
+    {}else{
+      try {
+        const responseData = await sendRequest(
+          `${process.env.REACT_APP_BACKEND_URL}/posts/startup`,"GET",null,
+          {
+            Authorization: "Bearer " + auth.token
+          }
+        );
+
+        setloadedPost(responseData);
+        setCreator(responseData.creator.companyName)
+      } catch (err) {}
+    }
   };
+  fetchPosts()
+
+
+  
+},[auth.token, sendRequest, formSubmitted])
 
   //handle when the form is submited
-  const handlePostSubmit = (e) => {
+  const handlePostSubmit = async (e) => {
     e.preventDefault();
-    setPosts((prevState) => [...prevState, newPost]);
 
-    setNewPost((prevState) => ({
-      ...prevState, id: prevState.id + 1,
-      title: '',
-      author: '',
-      text: '',
-      date: '',
-    }));
-  };
 
-  const handleDeletePost = (postId) => {
-    setPosts((prevState) => prevState.filter((post) => post.id !== postId));
-  };
+try {
+  await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/posts`,"POST",
+  JSON.stringify({
+    title: formState.inputs.title.value,
+					description: formState.inputs.description.value,
+  }),
+  {
+    'Content-Type': 'application/json',
+    Authorization: 'Bearer ' + auth.token,
+  }
+  );
+} catch (err) {}
+setFormSubmitted(true);
+navigate('/create-updates'); 
+};
+
+const handleDeletePost =  async (postId) => {
+  setloadedPost((prevState) => prevState.filter((post) => post.id !== postId));
+  
+  try{
+    await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/posts/${postId}`,"DELETE",null,
+    {
+      Authorization: 'Bearer ' + auth.token,
+    }
+    );
+  }catch (err) {}
+    
+};
+
+
 
   //variables that automaticly give the date and puts the start up as the author
-  const boAuthor = "Franky";
-  const updateDate = new Date(Date.now()).toString();
-
-
   return (
     //everything in updates is contained in the first div
+    <React.Fragment>
+      <ErrorModal error={error} onClear={clearError} />
+      {isLoading && <LoadingSpinner asOverlay/>}
     <div className=' '>
       {/*This is where the form to submit is located */}
       <form onSubmit={handlePostSubmit}
@@ -61,17 +118,20 @@ function PostList(props) {
           </thead>
 
           <tbody>
-                <p className='hidden'>
-                  {newPost.author = boAuthor}
-                </p>
-
-                <p  className='hidden'>
-                  {newPost.date = updateDate}
-                </p>
-            
             <tr>
               <td>
-                <input
+                <Input id="title"
+						element="input"
+						type="text"
+						label="Title"
+            validators={[VALIDATOR_REQUIRE()]}
+            onInput={inputHandler}
+            initialValue={''}
+            errorText="Please enter a valid title."
+            />
+
+
+                {/* <input
                   id="title"
                   type="text"
                   name="title"
@@ -80,13 +140,25 @@ function PostList(props) {
                   placeholder="Title"
                   className="rounded-sm w-3/5 m-2 font-bold"
                   required
-                />
+                /> */}
               </td>
             </tr>
 
             <tr>
               <td>
-                <textarea
+
+                <Input 
+                id="description"
+                element="textarea"
+                label="Description"
+                validators={[VALIDATOR_MINLENGTH(5)]}
+						errorText="Please enter a valid description (min. 5 characters)."
+            initialValue={''}
+						onInput={inputHandler}
+                />
+
+
+                {/* <textarea
                   id="text"
                   name="text"
                   value={newPost.text}
@@ -94,7 +166,7 @@ function PostList(props) {
                   placeholder="Text"
                   className="rounded-sm m-2 p-2 h-52 w-[97.5%] resize-none"
                   required
-                />
+                /> */}
               </td>
             </tr>
 
@@ -112,26 +184,28 @@ function PostList(props) {
         </table>
       </form>
 
-      <div className=' relative top-[29rem] left-14 sm:left-20 md:left-20 grid min-grid-cols-1 md:grid-cols-2  gap-14 my-10 rounded-md shadow-md'>
+      {!isLoading && loadedPost && (<div className=' relative top-[29rem] left-14 sm:left-20 md:left-20 grid min-grid-cols-1 md:grid-cols-2  gap-14 my-10 rounded-md shadow-md'>
         {/*This is where the posted form is located */}
-        {posts.map((post) => (
+        {loadedPost.map((post) =>
+ 
+         (
           <div key={post.id} className=" flex flex-col justify-between mx-auto border-2 w-[23rem] md:w-[27rem] lg:w-[36rem] p-2 max-h-96 h-72 md:h-80 mt-10 overflow-scroll bg-white rounded-md shadow-md">
             <div className="flex flex-row items-center mb-2">
               <div className="text-lg font-bold font-sans text-yellow-500 text-black">
-                {post.author}
+                {post.creator.companyName}
               </div>
             </div>
     
             <div className=" text-lg font-bold font-sans text-yellow-500 mb-4 text-black">
               <span className="text-sm text-gray-500 mr-2">
-                {post.date} | 
+                { new Date(post.lastModified).toLocaleDateString('en-us', { weekday:"long", year:"numeric", month:"short", day:"numeric"}) } | 
               </span>
                 {post.title}
             </div> 
             
             <div className="flex flex-col h-full">
               <textarea
-                  value={post.text}
+                  value={post.description}
                   className=" text-justify text-sm h-24 md:h-32 p-2 w-[95%] text-black self-start resize-none"
                   readOnly
                 />
@@ -144,8 +218,9 @@ function PostList(props) {
           </div>
         ))}
       </div>
-      
+      )}
     </div>
+    </React.Fragment>
   );
 }
 

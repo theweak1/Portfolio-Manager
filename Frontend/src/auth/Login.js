@@ -54,7 +54,8 @@ export default function Login() {
 			auth.login(
 				responseData.role,
 				responseData.accessToken,
-				responseData.expiresIn
+				responseData.expiresIn,
+				responseData.userId
 			);
 		} catch (err) {}
 	};

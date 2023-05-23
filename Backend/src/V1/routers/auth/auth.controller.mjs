@@ -42,10 +42,6 @@ async function httpLogin(req, res, next) {
 				400
 			);
 			return next(error);
-			// return handleBadRequestResponse(
-			// 	'User requires email and password to login into the system.',
-			// 	res
-			// );
 		}
 
 		const userResponse = await isUserAuthorized(
@@ -66,7 +62,6 @@ async function httpLogin(req, res, next) {
 			refreshToken,
 			email: userResponse.email,
 			role: userResponse.role,
-			isApproved: userResponse.isApproved,
 			expiresIn: new Date(new Date().getTime() + 3600000 * '5h'.split('')[0]),
 			userId: userResponse.id
 		});
@@ -153,7 +148,6 @@ async function httpSignupInvestor(req, res, next) {
 	}
 }
 
-// TODO: Create a Company Name verification function to avoid duplicate company names
 async function httpSignupStartup(req, res, next) {
 	try {
 		const userInfo = {
@@ -176,10 +170,7 @@ async function httpSignupStartup(req, res, next) {
 				400
 			);
 			return next(error);
-			// return handleBadRequestResponse(
-			// 	'Startup is missing required fields for creation.',
-			// 	res
-			// );
+
 		}
 
 		if (userInfo.role !== 'Startup') {
@@ -190,25 +181,18 @@ async function httpSignupStartup(req, res, next) {
 				400
 			);
 			return next(error);
-			// return handleBadRequestResponse(
-			// 	"Expected a role of 'startup' but received '" +
-			// 		userInfo.role +
-			// 		"' instead. Please provide the 'startup' role when creating a startup.",
-			// 	res
-			// );
+
 		}
 
 		const userResponse = await createUser(
 			userInfo.email,
 			userInfo.password,
-			userInfo.role,
-			false
+			userInfo.role
 		);
+
 		if ('code' in userResponse) {
 			return next(userResponse);
-			// return res.status(userResponse.errorCode).json({
-			// 	error: userResponse
-			// });
+
 		}
 
 		const startupResponse = await createStartup(
@@ -218,11 +202,9 @@ async function httpSignupStartup(req, res, next) {
 		);
 		if ('code' in startupResponse) {
 			return next(startupResponse);
-			// return res.status(startupResponse.errorCode).json({
-			// 	error: startupResponse
-			// });
+
 		}
-		const codatResponse = await createCompany(startup.companyName);
+		const codatResponse = await createCompany(startupInfo.companyName);
 		await updateCodatId(
 			startupResponse.id,
 			codatResponse.id,

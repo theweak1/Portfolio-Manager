@@ -4,7 +4,11 @@ import { findUserById, getUserTokens } from '../models/users.model.mjs';
 import { HttpError } from '../models/http-error.mjs';
 
 async function authenticateJsonWebToken(req, res, next) {
-	const authHeader = req.headers['authorization'];
+	if (req.method === 'OPTIONS') {
+		return next();
+	}
+	try {
+	{const authHeader = req.headers['authorization'];
 	const token = authHeader && authHeader.split(' ')[1];
 
 	if (!token) {
@@ -37,7 +41,10 @@ async function authenticateJsonWebToken(req, res, next) {
 		const userId = user;
 		req.userId = userId.id;
 		next();
-	});
+	});}}catch (err) {
+		const error = new HttpError('Authentication failed!', 403);
+		return next(error);
+	}
 }
 
 // TODO: Replace expiration time with 1200s after finish development

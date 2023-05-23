@@ -1,7 +1,7 @@
 import React from 'react';
 import Investor from './Investor';
 
-const InvestorList = ({ investors }) => {
+const InvestorList = ({ investors, onDelete }) => {
 	return (
 		<ul>
 			{investors.map((user) => (
