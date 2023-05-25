@@ -8,40 +8,42 @@ async function authenticateJsonWebToken(req, res, next) {
 		return next();
 	}
 	try {
-	{const authHeader = req.headers['authorization'];
-	const token = authHeader && authHeader.split(' ')[1];
+		{
+			const authHeader = req.headers['authorization'];
+			const token = authHeader && authHeader.split(' ')[1];
 
-	if (!token) {
-		const error = new HttpError('Your are not authenticated.', 401);
-		return next(error);
-		// return res.status(error.errorCode).json({ error: error });
-	}
+			if (!token) {
+				const error = new HttpError('Your are not authenticated.', 401);
+				return next(error);
+				// return res.status(error.errorCode).json({ error: error });
+			}
 
+			const userTokens = await getUserTokens(token);
+			if (token !== userTokens?.accessToken) {
+				const error = new HttpError(
+					'Your are not authorized to access these resources.',
+					403
+				);
+				return next(error);
+				// return res.status(error.errorCode).json({ error: error });
+			}
 
-	const userTokens = await getUserTokens(token);
-	if (token !== userTokens?.accessToken || userTokens.isApproved == false) {
-		const error = new HttpError(
-			'Your are not authorized to access these resources.',
-			403
-		);
-		return next(error);
-		// return res.status(error.errorCode).json({ error: error });
-	}
+			jwt.verify(token, process.env.ACCESS_TOKEN_SECRET || '', (err, user) => {
+				if (err) {
+					const error = new HttpError(
+						'Your are not authorized to access these resources.',
+						403
+					);
+					return next(error);
+					// return res.status(error.errorCode).json({ error: error });
+				}
 
-	jwt.verify(token, process.env.ACCESS_TOKEN_SECRET || '', (err, user) => {
-		if (err) {
-			const error = new HttpError(
-				'Your are not authorized to access these resources.',
-				403
-			);
-			return next(error);
-			// return res.status(error.errorCode).json({ error: error });
+				const userId = user;
+				req.userId = userId.id;
+				next();
+			});
 		}
-
-		const userId = user;
-		req.userId = userId.id;
-		next();
-	});}}catch (err) {
+	} catch (err) {
 		const error = new HttpError('Authentication failed!', 403);
 		return next(error);
 	}

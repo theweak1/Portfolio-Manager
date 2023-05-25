@@ -25,6 +25,9 @@ async function StartupsWithPosts(investorId) {
 						description: true
 					}
 				}
+			},
+			orderBy: {
+				lastModified: 'desc'
 			}
 		});
 
@@ -125,36 +128,36 @@ async function updatePost(startupId, postId, postInfo) {
 
 async function getPosts(startupId) {
 	try {
-	  const posts = await prisma.post.findMany({
-		 where: {
-			creatorId: startupId,
-		 },
-		 select: {
-			id: true,
-			title: true,
-			description: true,
-			lastModified: true,
-			creator: {
-			  select: {
-				 companyName: true,
-			  },
+		const posts = await prisma.post.findMany({
+			where: {
+				creatorId: startupId
 			},
-		 },
-	  });
- 
-	  if (!posts.length) {
-		 return null;
-	  }
- 
-	  ;
-		
-	  return posts;
-	} catch (error) {
-	  console.log(error);
-	  throw error;
-	}
- }
+			select: {
+				id: true,
+				title: true,
+				description: true,
+				lastModified: true,
+				creator: {
+					select: {
+						companyName: true
+					}
+				}
+			},
+			orderBy: {
+				lastModified: 'desc'
+			}
+		});
 
+		if (!posts.length) {
+			return null;
+		}
+
+		return posts;
+	} catch (error) {
+		console.log(error);
+		throw error;
+	}
+}
 
 // --- Utilities Functions ---
 async function validatePostExistence(postId) {
@@ -169,5 +172,4 @@ async function validatePostExistence(postId) {
 	return post;
 }
 
-export { StartupsWithPosts, CreatePost, DeletePost, updatePost,
-	getPosts };
+export { StartupsWithPosts, CreatePost, DeletePost, updatePost, getPosts };
