@@ -18,7 +18,7 @@ return (
       <div>
         <TableInvestor startupId={startupId}/>
       </div>
-      <div className="flex h-screen items-center justify-center text-5xl bg-lightGrey text-white">
+      <div className="flex h-screen items-center justify-center  bg-lightGrey text-white">
       <ConvertNote />
       </div>
     </div>

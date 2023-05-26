@@ -2,6 +2,7 @@ import React from "react";
 import '../index.css';
 import SidebarStartup from "../components/SidebarStartup/SidebarStartup";
 import Table from '../components/Table';
+import ConvertNote from "../components/ConvertNote";
 /*Esta es la pagina que se muestra al seleccionar una opcion del menu principal*/
 function CaptableStartup() {
   return (
@@ -12,6 +13,9 @@ function CaptableStartup() {
       <h1 className="text-3xl font-bold mb-6">Captable Report</h1>
       <div>
         <Table />
+      </div>
+      <div className="flex h-screen items-center justify-center  bg-lightGrey text-white">
+      <ConvertNote />
       </div>
     </div>
   </div>

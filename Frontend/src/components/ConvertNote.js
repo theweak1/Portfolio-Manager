@@ -73,9 +73,9 @@ export default function ConvertNote() {
 	return (
         <div className='bg-lightGrey'>
             <div className="flex justify-start right-20 top-32 p-5 bg-white">
-                <table className=" table-auto text-2xl h-full">
+                <table className=" table-auto text-4xl h-full">
                     <thead>
-                        <tr className=" text-3xl text-darkGrey">
+                        <tr className=" text-6xl font-bold text-darkGrey">
                             <td>Convertible Note </td>
                         </tr>
                     </thead>

@@ -42,7 +42,7 @@ return (
     <React.Fragment>
 <ErrorModal error={error} onClear={clearError} />
 {isLoading && <LoadingSpinner asOverlay/>}
-    <div className='absolute flex flex-col  top-20 left-20 sm:left-20 md:left-24 '>
+    <div className=' ml-96   '>
         {/*This is where the posted form is located */}
         {LoadedPost.map((read) => (
             <div key={read.id} className=" flex flex-col justify-between  w-[28rem] md:w-[40rem] lg:w-[74rem] p-2 h-72 md:h-[26rem] mt-10 overflow-scroll border-md border-2 bg-white shadow-md">
