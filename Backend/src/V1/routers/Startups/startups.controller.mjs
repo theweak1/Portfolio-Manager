@@ -4,20 +4,9 @@ import {
 	findStartupByUserId,
 	getCaptable,
 	getInvestors,
-	getStartupByIdAndInvestorId,
 	investedStartupsbyInvestorId,
-	updateCaptable,
-	updateInvestorsList,
-	updateStartup,
-	validateStartupExistsByStartupId,
-	validateStartupExistsByUserId
+	updateCaptable
 } from '../../models/startups.model.mjs';
-
-import {
-	updateUserEmail,
-	updateUserPassword,
-	validateProfileUpdate
-} from '../../models/users.model.mjs';
 
 import {
 	findInvestorByEmail,
@@ -26,14 +15,10 @@ import {
 
 import { handleErrorResponse, HttpError } from '../../models/http-error.mjs';
 
-import { titleCase } from '../../util/helpers.mjs';
-
 import {
 	getBalanceSheet,
 	getProfitAndLoss
 } from '../../services/codat.service.mjs';
-
-import { sendInvestorInvitationEmail } from '../../services/mail.service.mjs';
 
 async function httpGetStartupProfileByUserId(req, res, next) {
 	try {
@@ -52,51 +37,6 @@ async function httpGetStartupProfileByUserId(req, res, next) {
 		return handleErrorResponse('get startup by user id', error, res);
 	}
 }
-
-async function httpUpdateStartupProfile(req, res, next) {
-	try {
-		const userInfo = {
-			id: req.userId,
-			email: req.body.email,
-			password: req.body.currentPassword,
-			newPassword: req.body.newPassword
-		};
-		const startupInfo = {
-			companyName: titleCase(req.body.companyName)
-		};
-
-		const validatedUserResponse = await validateProfileUpdate(userInfo);
-		if ('code' in validatedUserResponse) {
-			return next(validatedUserResponse);
-		}
-
-		const validatedStartupResponse = await validateStartupExistsByUserId(
-			validatedUserResponse.id
-		);
-		if ('code' in validatedStartupResponse) {
-			return next(validatedStartupResponse);
-		}
-
-		if (userInfo.email) {
-			await updateUserEmail(validatedUserResponse, userInfo.email);
-		}
-
-		if (userInfo.newPassword) {
-			await updateUserPassword(validatedUserResponse, userInfo.newPassword);
-		}
-
-		const updateStartupResponse = await updateStartup(
-			validatedStartupResponse.id,
-			userInfo.email,
-			startupInfo
-		);
-
-		return res.status(200).json(updateStartupResponse);
-	} catch (error) {
-		return handleErrorResponse('update startup profile', error, res);
-	}
-}
-
 async function httpGetStartupsByInvestorId(req, res, next) {
 	try {
 		const userId = req.userId;
@@ -143,11 +83,7 @@ async function httpNewInvestors(req, res, next) {
 
 		for (const investor of investorsResponse) {
 			if (!Boolean(investor.id)) {
-				// TODO: uncomment below line to send invite email
-				// await sendInvestorInvitationEmail(startupResponse, investor.email);
-				console.log('Invitiation email sent');
 			} else {
-
 				await addNewInvestor(startupResponse.id, investor.id);
 			}
 		}
@@ -155,32 +91,6 @@ async function httpNewInvestors(req, res, next) {
 		return res.status(200).json(investorsResponse);
 	} catch (error) {
 		return handleErrorResponse('post new investors', error, res);
-	}
-}
-
-async function httpUpdateInvestor(req, res, next) {
-	try {
-		const userId = req.userId;
-		const startupResponse = await findStartupByUserId(userId);
-		if (!startupResponse) {
-			const error = new HttpError(
-				'This startup does not exist in the system.',
-				400
-			);
-			return next(error);
-		}
-		const InvestorList = req.body.investors;
-
-		const investorsResponse = await findInvestorByEmail(InvestorList);
-
-		const investorListUpdated = await updateInvestorsList(
-			startupResponse.id,
-			investorsResponse
-		);
-
-		return res.status(200).json(investorListUpdated);
-	} catch (error) {
-		return handleErrorResponse('update investors', error, res);
 	}
 }
 
@@ -201,53 +111,6 @@ async function httpGetInvestors(req, res, next) {
 		return res.status(200).json(investors);
 	} catch (error) {
 		return handleErrorResponse('get investors by startup id', error, res);
-	}
-}
-
-async function httpGetSpecificStartupProfile(req, res, next) {
-	try {
-		const userId = req.userId;
-		const investorResponse = await findInvestorByUserId(userId);
-
-		if (!investorResponse) {
-			const error = new HttpError(
-				'This investor does not exist in the system.',
-				400
-			);
-			return next(error);
-		}
-		const startupId = req.params.startupId;
-
-		const startupResponse = await validateStartupExistsByStartupId(startupId);
-
-		if (!startupResponse) {
-			const error = new HttpError(
-				'This startup does not exist in the system.',
-				400
-			);
-			return next(error);
-		}
-
-		const startup = await getStartupByIdAndInvestorId(
-			startupId,
-			investorResponse.id
-		);
-
-		if (!startup) {
-			const error = new HttpError(
-				'You are not invited to view this startup portfolio.',
-				404
-			);
-			return next(error);
-		}
-
-		res.status(200).json(startup);
-	} catch (error) {
-		return handleErrorResponse(
-			'get specific startup by startup id',
-			error,
-			res
-		);
 	}
 }
 
@@ -277,7 +140,6 @@ async function httpGetKPI(req, res, next) {
 		const userId = req.userId;
 		const investorResponse = await findInvestorByUserId(userId);
 
-
 		if (!investorResponse) {
 			const error = new HttpError(
 				'An investor with this id does not exist in the system',
@@ -287,9 +149,9 @@ async function httpGetKPI(req, res, next) {
 		}
 
 		const startupId = req.params.startupId;
-const periodLength =req.body.periodLength;
-const periodToCompare = req.body.periodToCompare;
-const startMonth= req.body.startMonth
+		const periodLength = req.body.periodLength;
+		const periodToCompare = req.body.periodToCompare;
+		const startMonth = req.body.startMonth;
 
 		const startupResponse = await findStartupById(startupId);
 		if (!startupResponse) {
@@ -300,14 +162,15 @@ const startMonth= req.body.startMonth
 			return next(error);
 		}
 
-		//Need to change static values of 12 and 1, to be variables based on request. 12 would be the period length in months to search data from, 1 would be the periods to compare. For more information https://docs.codat.io/accounting-api#/operations/get-profit-and-loss
+		// For more information https://docs.codat.io/accounting-api#/operations/get-profit-and-loss
 		let codatResponse;
 		codatResponse = await getProfitAndLoss(
 			startupResponse.codatId,
 			periodLength,
-			periodToCompare,startMonth
-			);
-console.log(codatResponse);
+			periodToCompare,
+			startMonth
+		);
+		console.log(codatResponse);
 		const costOfGoodsSold = codatResponse.reports[0].costOfSales.value;
 		const OperatingExprenses = codatResponse.reports[0].expenses.value;
 		const revenue =
@@ -317,21 +180,23 @@ console.log(codatResponse);
 			codatResponse.reports[0].expenses.value +
 			codatResponse.reports[0].otherExpenses.value;
 
-//Need to change static values of 12 and 1, to be variables based on request. 12 would be the period length in months to search data from, 1 would be the periods to compare. For more information https://docs.codat.io/accounting-api#/operations/get-balance-sheet
-			codatResponse = await getBalanceSheet(startupResponse.codatId, periodLength, periodToCompare,startMonth);
-			const cashAndBank = codatResponse.reports[0].assets.items[0].value;
+		// For more information https://docs.codat.io/accounting-api#/operations/get-balance-sheet
+		codatResponse = await getBalanceSheet(
+			startupResponse.codatId,
+			periodLength,
+			periodToCompare,
+			startMonth
+		);
+		const cashAndBank = codatResponse.reports[0].assets.items[0].value;
 
-
-
-			res.status(200).json({
-				costOfGoodsSold: costOfGoodsSold,
-				OperatingExprenses: OperatingExprenses,
-				revenue: revenue,
-				allExpenses: allExpenses,
-				cashAndBank: cashAndBank
-			});
-		} catch (error) {
-
+		res.status(200).json({
+			costOfGoodsSold: costOfGoodsSold,
+			OperatingExprenses: OperatingExprenses,
+			revenue: revenue,
+			allExpenses: allExpenses,
+			cashAndBank: cashAndBank
+		});
+	} catch (error) {
 		return handleErrorResponse('Get KPI', error, res);
 	}
 }
@@ -350,9 +215,9 @@ async function httpGetPL(req, res, next) {
 		}
 
 		const startupId = req.params.startupId;
-		const periodLength =req.body.periodLength;
+		const periodLength = req.body.periodLength;
 		const periodToCompare = req.body.periodToCompare;
-		const startMonth= req.body.startMonth
+		const startMonth = req.body.startMonth;
 		const startupResponse = await findStartupById(startupId);
 		if (!startupResponse) {
 			const error = new HttpError(
@@ -361,41 +226,49 @@ async function httpGetPL(req, res, next) {
 			);
 			return next(error);
 		}
-		
+
 		//For more information https://dos.codat.io/accounting-api#/operations/get-profit-and-loss
 		let codatResponse;
-		 codatResponse = await getProfitAndLoss(
+		codatResponse = await getProfitAndLoss(
 			startupResponse.codatId,
-			periodLength, periodToCompare,startMonth
+			periodLength,
+			periodToCompare,
+			startMonth
 		);
 		const income = codatResponse.reports[0].income.value;
 		const costOfSales = codatResponse.reports[0].costOfSales.value;
 		const expenses = codatResponse.reports[0].expenses.value;
-		const revenue = codatResponse.reports[0].income.value +
+		const revenue =
+			codatResponse.reports[0].income.value +
 			codatResponse.reports[0].otherIncome.value;
-			const allExpenses = codatResponse.reports[0].expenses.value +
+		const allExpenses =
+			codatResponse.reports[0].expenses.value +
 			codatResponse.reports[0].otherExpenses.value;
-		const grossProfit = (revenue -allExpenses) /revenue;
-
+		const grossProfit = (revenue - allExpenses) / revenue;
 
 		//For more information https://docs.codat.io/accounting-api#/operations/get-balance-sheet
-		 codatResponse = await getBalanceSheet(startupResponse.codatId, periodLength, periodToCompare,startMonth);
+		codatResponse = await getBalanceSheet(
+			startupResponse.codatId,
+			periodLength,
+			periodToCompare,
+			startMonth
+		);
 		const cashAndBank = codatResponse.reports[0].assets.items[0].value;
 		const assets = codatResponse.reports[0].assets.value;
 		const liabilities = codatResponse.reports[0].liabilities.value;
 		const equity = codatResponse.reports[0].equity.value;
 
 		res.status(200).json({
-			income : income,
-			costOfSales : costOfSales,
-			expenses : expenses,
-			revenue:revenue,
-			allExpenses : allExpenses,
-			grossProfit : grossProfit,
+			income: income,
+			costOfSales: costOfSales,
+			expenses: expenses,
+			revenue: revenue,
+			allExpenses: allExpenses,
+			grossProfit: grossProfit,
 			cashInBank: cashInBank,
-			assets : assets,
-			liabilities : liabilities,
-			equity : equity
+			assets: assets,
+			liabilities: liabilities,
+			equity: equity
 		});
 	} catch (error) {
 		return handleErrorResponse('Get PL', error, res);
@@ -447,12 +320,9 @@ async function HttpGetCaptable(req, res, next) {
 
 export {
 	httpGetStartupProfileByUserId,
-	httpUpdateStartupProfile,
 	httpGetStartupsByInvestorId,
 	httpNewInvestors,
-	httpUpdateInvestor,
 	httpGetInvestors,
-	httpGetSpecificStartupProfile,
 	HttpPostCaptable,
 	httpGetPL,
 	HttpGetCaptable,

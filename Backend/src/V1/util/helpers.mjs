@@ -1,5 +1,3 @@
-import { errorLogger } from './logger.mjs';
-
 function titleCase(str) {
 	if (!str) {
 		return '';

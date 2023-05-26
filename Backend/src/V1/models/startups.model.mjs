@@ -17,7 +17,6 @@ async function createStartup(userId, email, startupInfo) {
 		});
 
 		const startupWithoutId = excludeFields(createdStartup, [
-			
 			'codatId',
 			'investorIds'
 		]);
@@ -75,67 +74,7 @@ async function findStartupByUserId(userId) {
 
 		return excludeFields(startup, ['userId', 'investorIds']);
 	} catch (error) {
-		console.log(error)
-		throw error;
-	}
-}
-
-async function updateStartup(id, email, startupInfo) {
-	try {
-		const updatedStartup = await prisma.startup.update({
-			where: {
-				id: id
-			},
-			data: {
-				companyName: !!startupInfo.companyName
-					? startupInfo.companyName
-					: undefined,
-				email: !!email ? email : undefined,
-				lastModified: new Date()
-			}
-		});
-
-		const startupWithoutId = excludeFields(updatedStartup, ['id']);
-		return startupWithoutId;
-	} catch (error) {
-		throw error;
-	}
-}
-
-async function validateStartupExistsByUserId(userId) {
-	try {
-		const startup = await prisma.startup.findUnique({
-			where: {
-				userId: userId
-			}
-		});
-		if (!startup) {
-			return new HttpError('This startup does not exist in the system.', 401);
-			// return buildErrorObject(
-			// 	401,
-			// 	'This startup does not exist in the system.'
-			// );
-		}
-
-		return startup;
-	} catch (error) {
-		throw error;
-	}
-}
-
-async function validateStartupExistsByStartupId(startupId) {
-	try {
-		const startup = await prisma.startup.findUnique({
-			where: {
-				id: startupId
-			}
-		});
-		if (!startup) {
-			return null;
-		}
-
-		return startup;
-	} catch (error) {
+		console.log(error);
 		throw error;
 	}
 }
@@ -172,7 +111,6 @@ async function investedStartupsbyInvestorId(investorId) {
 }
 
 async function addNewInvestor(startupId, investorId) {
-
 	try {
 		const NewInvestor = await prisma.startup.update({
 			where: {
@@ -186,59 +124,8 @@ async function addNewInvestor(startupId, investorId) {
 				}
 			}
 		});
-		// console.log(NewInvestor);
+
 		return NewInvestor;
-	} catch (error) {
-		throw error;
-	}
-}
-
-async function updateInvestorsList(startupId, investorInfo) {
-	try {
-		// Fetch the current investors for the startup
-		const currentInvestors = await prisma.startup.findUnique({
-			where: { id: startupId },
-			select: { investors: { select: { id: true } } }
-		});
-
-		const currentInvestorIds = currentInvestors.investors.map(
-			(investor) => investor.id
-		);
-
-		// Find new investors to connect
-		const newInvestorIds = investorInfo
-			.filter((investor) => !currentInvestorIds.includes(investor.id))
-			.map((investor) => investor.id);
-
-		// Find existing investors to disconnect
-		const disconnectInvestorIds = currentInvestorIds.filter((investorId) => {
-			const investor = investorInfo.find((inv) => inv.id === investorId);
-			return !investor;
-		});
-
-		// Disconnect the filtered investors
-		const disconnectResult = await prisma.startup.update({
-			where: { id: startupId },
-			data: {
-				investors: { disconnect: disconnectInvestorIds.map((id) => ({ id })) }
-			}
-		});
-
-		// Connect new investors
-		const connectResult = await prisma.startup.update({
-			where: { id: startupId },
-			data: {
-				investors: {
-					connect: newInvestorIds.map((id) => ({ id }))
-				}
-			}
-		});
-
-		const investorList = await prisma.startup.findUnique({
-			where: { id: startupId }
-		});
-
-		return investorList;
 	} catch (error) {
 		throw error;
 	}
@@ -254,70 +141,12 @@ async function getInvestors(startupId) {
 					select: {
 						email: true,
 						name: true,
-						id:true
+						id: true
 					}
 				}
 			}
 		});
 		return startup;
-	} catch (error) {
-		throw error;
-	}
-}
-
-async function getStartupByIdAndInvestorId(startupId, investorId) {
-	try {
-		const startup = await prisma.startup.findUnique({
-			where: {
-				id: startupId
-			},
-			include: {
-				investors: {
-					where: {
-						id: investorId
-					}
-				},
-				blog: {
-					select: {
-						lastModified: true,
-						title: true,
-						description: true
-					}
-				}
-			}
-		});
-
-		if (!startup) {
-			return null;
-		}
-
-		const filteredStartup = excludeFields(startup, [
-			'investors',
-			'userId',
-			'investorIds'
-		]);
-		return filteredStartup;
-	} catch (error) {
-		throw error;
-	}
-}
-
-async function deleteStartup(startupId) {
-	try {
-		const startup = await validateStartupExistsByStartupId(startupId);
-
-		if (!startup) {
-			return new HttpError('Could not find startup for this id', 404);
-			// return handleNotFoundResponse('Could not find startup for this id', res);
-		}
-
-		const deletedStartup = await prisma.startup.delete({
-			where: {
-				id: startupId
-			}
-		});
-
-		return deletedStartup;
 	} catch (error) {
 		throw error;
 	}
@@ -337,24 +166,6 @@ async function updateCodatId(id, companyId, redirectLink) {
 
 		const startupWithoutId = excludeFields(updatedStartup, ['id']);
 		return startupWithoutId;
-	} catch (error) {
-		throw error;
-	}
-}
-
-async function getAllStartups() {
-	try {
-		const startups = await prisma.startup.findMany({
-			select: {
-				id: true,
-				companyName: true,
-				email: true
-			}
-		});
-		if (!startups.length) {
-			return null;
-		}
-		return startups;
 	} catch (error) {
 		throw error;
 	}
@@ -423,19 +234,12 @@ async function NotifyInvestors(startupId) {
 export {
 	createStartup,
 	findStartupByUserId,
-	validateStartupExistsByUserId,
-	updateStartup,
 	findStartupById,
 	investedStartupsbyInvestorId,
 	addNewInvestor,
-	updateInvestorsList,
 	getInvestors,
-	getStartupByIdAndInvestorId,
-	validateStartupExistsByStartupId,
 	NotifyInvestors,
-	deleteStartup,
 	updateCodatId,
-	getAllStartups,
 	updateCaptable,
 	getCaptable
 };

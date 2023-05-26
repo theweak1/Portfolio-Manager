@@ -97,35 +97,6 @@ async function DeletePost(startupId, postId) {
 	}
 }
 
-async function updatePost(startupId, postId, postInfo) {
-	try {
-		const postToUpdate = await validatePostExistence(postId);
-
-		if (!postToUpdate) {
-			return new HttpError('Could not find a post for this id', 404);
-		}
-
-		if (postToUpdate.creatorId !== startupId) {
-			return new HttpError('You are not authorized to update this post', 401);
-		}
-
-		const UpdatedPost = await prisma.post.update({
-			where: {
-				id: postId
-			},
-			data: {
-				title: postInfo.title,
-				description: postInfo.description,
-				lastModified: new Date()
-			}
-		});
-
-		return UpdatedPost;
-	} catch (error) {
-		throw error;
-	}
-}
-
 async function getPosts(startupId) {
 	try {
 		const posts = await prisma.post.findMany({
@@ -172,4 +143,4 @@ async function validatePostExistence(postId) {
 	return post;
 }
 
-export { StartupsWithPosts, CreatePost, DeletePost, updatePost, getPosts };
+export { StartupsWithPosts, CreatePost, DeletePost, getPosts };

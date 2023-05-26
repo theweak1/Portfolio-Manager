@@ -3,15 +3,12 @@ import { createStartup, updateCodatId } from '../../models/startups.model.mjs';
 
 import {
 	createUser,
-	findEmailById,
 	findUserByEmail,
 	findUserById,
 	getUserTokens,
 	isUserAuthorized,
-	updateUserEmail,
 	updateUserPassword,
-	updateUserTokens,
-	validateProfileUpdate
+	updateUserTokens
 } from '../../models/users.model.mjs';
 
 import {
@@ -22,12 +19,9 @@ import {
 
 import { HttpError, handleErrorResponse } from '../../models/http-error.mjs';
 import { createCompany } from '../../services/codat.service.mjs';
-import { excludeFields, isValidUUID, titleCase } from '../../util/helpers.mjs';
+import { isValidUUID, titleCase } from '../../util/helpers.mjs';
 
-import {
-	sendRequestStartupEmail,
-	sendResetPasswordEmail
-} from '../../services/mail.service.mjs';
+import { sendResetPasswordEmail } from '../../services/mail.service.mjs';
 
 async function httpLogin(req, res, next) {
 	try {
@@ -92,10 +86,6 @@ async function httpSignupInvestor(req, res, next) {
 				400
 			);
 			return next(error);
-			// return handleBadRequestResponse(
-			// 	'Investor is missing required fields for creation.',
-			// 	res
-			// );
 		}
 
 		if (userInfo.role !== 'Investor') {
@@ -106,12 +96,6 @@ async function httpSignupInvestor(req, res, next) {
 				400
 			);
 			return next(error);
-			// return handleBadRequestResponse(
-			// 	"Expected a role of 'Investor' but received " +
-			// 		userInfo.role +
-			// 		" instead. Please provide the 'Investor' role when creating a investor.",
-			// 	res
-			// );
 		}
 
 		const userResponse = await createUser(
@@ -122,9 +106,6 @@ async function httpSignupInvestor(req, res, next) {
 		);
 		if ('code' in userResponse) {
 			return next(userResponse);
-			// return res.status(userResponse.errorCode).json({
-			// 	error: userResponse
-			// });
 		}
 
 		const accessToken = generateAccessToken(userResponse.id);
@@ -170,7 +151,6 @@ async function httpSignupStartup(req, res, next) {
 				400
 			);
 			return next(error);
-
 		}
 
 		if (userInfo.role !== 'Startup') {
@@ -181,7 +161,6 @@ async function httpSignupStartup(req, res, next) {
 				400
 			);
 			return next(error);
-
 		}
 
 		const userResponse = await createUser(
@@ -192,7 +171,6 @@ async function httpSignupStartup(req, res, next) {
 
 		if ('code' in userResponse) {
 			return next(userResponse);
-
 		}
 
 		const startupResponse = await createStartup(
@@ -202,7 +180,6 @@ async function httpSignupStartup(req, res, next) {
 		);
 		if ('code' in startupResponse) {
 			return next(startupResponse);
-
 		}
 		const codatResponse = await createCompany(startupInfo.companyName);
 		await updateCodatId(
@@ -220,140 +197,6 @@ async function httpSignupStartup(req, res, next) {
 	}
 }
 
-async function httpSignupAdmin(req, res, next) {
-	try {
-		const userInfo = {
-			email: req.body.email,
-			password: req.body.password,
-			role: 'Admin'
-		};
-
-		if (!userInfo.email || !userInfo.password || !userInfo.role) {
-			const error = new HttpError(
-				"The following fields need to be provided in order to signup: 'email' and 'password'.",
-				400
-			);
-			return next(error);
-			// return handleBadRequestResponse(
-			// 	"The following fields need to be provided in order to signup: 'email' and 'password'.",
-			// 	res
-			// );
-		}
-
-		const createdUser = await createUser(
-			userInfo.email,
-			userInfo.password,
-			userInfo.role,
-			true
-		);
-		if ('code' in createdUser) {
-			return createdUser;
-			// return res.status(createdUser.errorCode).json({
-			// 	error: createdUser
-			// });
-		}
-
-		const accessToken = generateAccessToken(createdUser.id);
-		const refreshToken = generateRefreshToken(createdUser.id);
-		const updatedUser = await updateUserTokens(
-			createdUser.id,
-			accessToken,
-			refreshToken
-		);
-
-		return res.status(200).json(updatedUser);
-	} catch (error) {
-		return handleErrorResponse('signup admin', error, res);
-	}
-}
-
-async function httpGetAdminProfile(req, res, next) {
-	try {
-		const userId = req.userId;
-		const user = await findEmailById(userId);
-		if (!user) {
-			const error = new HttpError(
-				"A user with this Id wasn't found.Please provide a valid Id.",
-				404
-			);
-			return next(error);
-			// return handleNotFoundResponse(
-			// 	"A user with this Id wasn't found.Please provide a valid Id.",
-			// 	res
-			// );
-		}
-
-		return res.status(200).json(user);
-	} catch (error) {
-		return handleErrorResponse('get admin profile', error, res);
-	}
-}
-
-async function httpUpdateAdmin(req, res, next) {
-	try {
-		const userId = req.userId;
-		const isValidId = isValidUUID(userId);
-
-		if (!isValidId) {
-			const error = new HttpError(
-				'This Id passed in the URL parameter is not does not have a valid format.',
-				400
-			);
-			return next(error);
-			// return handleBadRequestResponse(
-			// 	'This Id passed in the URL parameter is not does not have a valid format.',
-			// 	res
-			// );
-		}
-
-		const userInfo = {
-			id: userId,
-			email: req.body.email,
-			password: req.body.currentPassword,
-			newPassword: req.body.newPassword,
-			isApproved: true
-		};
-		const validatedUserResponse = await validateProfileUpdate(userInfo);
-		if ('code' in validatedUserResponse) {
-			return next(validatedUserResponse);
-			// return res.status(validatedUserResponse.errorCode).json({
-			// 	error: validatedUserResponse
-			// });
-		}
-
-		if (userInfo.email) {
-			await updateUserEmail(validatedUserResponse, userInfo.email);
-		}
-
-		if (userInfo.newPassword) {
-			await updateUserPassword(validatedUserResponse, userInfo.newPassword);
-		}
-
-		const updatedUser = await findUserById(userId);
-		if (!updatedUser) {
-			const error = new HttpError(
-				"Couldn't find user in the system. Please provide valid Access Token",
-				400
-			);
-			return next(error);
-			// return handleBadRequestResponse(
-			// 	"Couldn't find user in the system. Please provide valid Access Token",
-			// 	res
-			// );
-		}
-
-		const userFiltered = excludeFields(updatedUser, [
-			'id',
-			'password',
-			'passwordSalt'
-		]);
-
-		return res.status(200).json(userFiltered);
-	} catch (error) {
-		return handleErrorResponse('update admin', error, res);
-	}
-}
-
 async function httpLogout(req, res, next) {
 	try {
 		const userId = req.userId;
@@ -365,10 +208,6 @@ async function httpLogout(req, res, next) {
 				400
 			);
 			return next(error);
-			// return handleBadRequestResponse(
-			// 	'This Id passed in the URL parameter does not have a valid format.',
-			// 	res
-			// );
 		}
 
 		await updateUserTokens(userId, '', '');
@@ -384,22 +223,17 @@ async function httpRefreshToken(req, res, next) {
 		if (!refreshToken) {
 			const error = new httpError('Token was not provided.', 401);
 			return next(error);
-			// return res.status(error.errorCode).json({ error: error });
 		}
 
 		const userRefreshToken = await getUserTokens(refreshToken);
 		if (!userRefreshToken || refreshToken !== userRefreshToken.refreshToken) {
 			const error = new httpError('Token is not valid for this users.', 401);
 			return next(error);
-			// return res.status(error.errorCode).json({ error: error });
 		}
 
 		const verifyTokenResponse = verifyRefreshToken(refreshToken);
 		if ('code' in verifyTokenResponse) {
 			return next(verifyTokenResponse);
-			// return res.status(verifyTokenResponse.errorCode).json({
-			// 	error: verifyTokenResponse
-			// });
 		}
 
 		const [accessToken, refreshedToken] = verifyTokenResponse;
@@ -423,10 +257,6 @@ async function httpForgotPassword(req, res, next) {
 				400
 			);
 			return next(error);
-			// return handleBadRequestResponse(
-			// 	"Can't reset password without providing an email address.",
-			// 	res
-			// );
 		}
 
 		const user = await findUserByEmail(email);
@@ -436,10 +266,6 @@ async function httpForgotPassword(req, res, next) {
 				400
 			);
 			return next(error);
-			// return handleBadRequestResponse(
-			// 	"Couldn't find user in the system. Please provide valid email address.",
-			// 	res
-			// );
 		}
 
 		const accessToken = generateAccessToken(user.id);
@@ -466,10 +292,6 @@ async function httpResetPassword(req, res, next) {
 				400
 			);
 			return next(error);
-			// return handleBadRequestResponse(
-			// 	"Can't reset password without providing an email address.",
-			// 	res
-			// );
 		}
 
 		const user = await findUserById(userId);
@@ -479,10 +301,6 @@ async function httpResetPassword(req, res, next) {
 				400
 			);
 			return next(error);
-			// return handleBadRequestResponse(
-			// 	"Couldn't find user in the system. Please provide valid Access Token",
-			// 	res
-			// );
 		}
 
 		const updatePasswordResponse = await updateUserPassword(user, password);
@@ -499,8 +317,5 @@ export {
 	httpLogout,
 	httpRefreshToken,
 	httpForgotPassword,
-	httpResetPassword,
-	httpSignupAdmin,
-	httpGetAdminProfile,
-	httpUpdateAdmin
+	httpResetPassword
 };

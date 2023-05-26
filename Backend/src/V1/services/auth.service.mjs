@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import { findUserById, getUserTokens } from '../models/users.model.mjs';
+import { getUserTokens } from '../models/users.model.mjs';
 
 import { HttpError } from '../models/http-error.mjs';
 

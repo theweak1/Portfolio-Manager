@@ -11,157 +11,34 @@ async function sendResetPasswordEmail(toEmail, accessToken) {
 		const _email = {
 			from: {
 				email: FROM_ADDRESS,
-				name: 'Portfolio Manager',
+				name: 'Portfolio Manager'
 			},
 			template_id: RESET_PASSWORD_TEMPLATE_ID,
 			personalizations: [
 				{
 					to: [
 						{
-							email: toEmail,
-						},
+							email: toEmail
+						}
 					],
 					dynamic_template_data: {
-						accessToken: accessToken,
-					},
-				},
+						accessToken: accessToken
+					}
+				}
 			],
 			reply_to: {
 				email: FROM_ADDRESS,
-				name: 'Reply',
-			},
+				name: 'Reply'
+			}
 		};
 
 		return axios({
 			method: 'post',
 			url: EMAIL_SEND_URL,
 			headers: {
-				Authorization: `Bearer ${SENGRID_API_KEY}`,
+				Authorization: `Bearer ${SENGRID_API_KEY}`
 			},
-			data: _email,
-		});
-	} catch (error) {
-		throw error;
-	}
-}
-
-async function sendRequestStartupEmail(startupId, email, startup) {
-	try {
-		const REQUEST_STARTUP_ACCESS_TEMPLATE_ID =
-			process.env.REQUEST_STARTUP_ACCESS_TEMPLATE_ID ?? '';
-		const _email = {
-			from: {
-				email: FROM_ADDRESS,
-				name: 'Portfolio Manager',
-			},
-			template_id: REQUEST_STARTUP_ACCESS_TEMPLATE_ID,
-			personalizations: [
-				{
-					to: [
-						{
-							email: 'lenier543@gmail.com',
-						},
-					],
-					dynamic_template_data: {
-						startupId: startupId,
-						companyName: startup.companyName,
-						email: email,
-					},
-				},
-			],
-			reply_to: {
-				email: FROM_ADDRESS,
-				name: 'Reply',
-			},
-		};
-
-		return axios({
-			method: 'post',
-			url: EMAIL_SEND_URL,
-			headers: {
-				Authorization: `Bearer ${SENGRID_API_KEY}`,
-			},
-			data: _email,
-		});
-	} catch (error) {
-		throw error;
-	}
-}
-
-async function sendApprovedStartupAccessEmail(toEmail) {
-	try {
-		const APPROVED_STARTUP_ACCESS_TEMPLATE_ID =
-			process.env.APPROVED_STARTUP_ACCESS_TEMPLATE_ID ?? '';
-		const _email = {
-			from: {
-				email: FROM_ADDRESS,
-				name: 'Portfolio Manager',
-			},
-			template_id: APPROVED_STARTUP_ACCESS_TEMPLATE_ID,
-			personalizations: [
-				{
-					to: [
-						{
-							email: toEmail,
-						},
-					],
-					dynamic_template_data: {},
-				},
-			],
-			reply_to: {
-				email: FROM_ADDRESS,
-				name: 'Reply',
-			},
-		};
-
-		return axios({
-			method: 'post',
-			url: EMAIL_SEND_URL,
-			headers: {
-				Authorization: `Bearer ${SENGRID_API_KEY}`,
-			},
-			data: _email,
-		});
-	} catch (error) {
-		throw error;
-	}
-}
-
-async function sendInvestorInvitationEmail(startupInfo, email) {
-	try {
-		const INVITE_EMAIL_TEMPLATE_ID = process.env.INVITE_EMAIL_TEMPLATE_ID ?? '';
-		const _email = {
-			from: {
-				email: FROM_ADDRESS,
-				name: 'Portfolio Manager',
-			},
-			template_id: INVITE_EMAIL_TEMPLATE_ID,
-			personalizations: [
-				{
-					to: [
-						{
-							email: email,
-						},
-					],
-					dynamic_template_data: {
-						startupId: startupInfo.id,
-						companyName: startupInfo.companyName,
-					},
-				},
-			],
-			reply_to: {
-				email: FROM_ADDRESS,
-				name: 'Reply',
-			},
-		};
-
-		return axios({
-			method: 'post',
-			url: EMAIL_SEND_URL,
-			headers: {
-				Authorization: `Bearer ${SENGRID_API_KEY}`,
-			},
-			data: _email,
+			data: _email
 		});
 	} catch (error) {
 		throw error;
@@ -175,7 +52,7 @@ async function newUpdateNotification(startupName, name, email) {
 		const _email = {
 			from: {
 				email: FROM_ADDRESS,
-				name: 'Portfolio Manager',
+				name: 'Portfolio Manager'
 			},
 			template_id: NEW_POST_NOTIFICATION_TEMPLATE_ID,
 			personalizations: [
@@ -183,37 +60,31 @@ async function newUpdateNotification(startupName, name, email) {
 					to: [
 						{
 							name: name,
-							email: email,
-						},
+							email: email
+						}
 					],
 					dynamic_template_data: {
-						companyName: startupName,
-					},
-				},
+						companyName: startupName
+					}
+				}
 			],
 			reply_to: {
 				email: FROM_ADDRESS,
-				name: 'Reply',
-			},
+				name: 'Reply'
+			}
 		};
 
 		return axios({
 			method: 'post',
 			url: EMAIL_SEND_URL,
 			headers: {
-				Authorization: `Bearer ${SENGRID_API_KEY}`,
+				Authorization: `Bearer ${SENGRID_API_KEY}`
 			},
-			data: _email,
+			data: _email
 		});
 	} catch (error) {
 		throw error;
 	}
 }
 
-export {
-	sendResetPasswordEmail,
-	sendRequestStartupEmail,
-	sendApprovedStartupAccessEmail,
-	sendInvestorInvitationEmail,
-	newUpdateNotification,
-};
+export { sendResetPasswordEmail, newUpdateNotification };

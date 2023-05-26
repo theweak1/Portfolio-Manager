@@ -7,9 +7,6 @@ import express from 'express';
 const { default: authRouter } = await import(
 	`./${API_VERSION}/routers/auth/auth.routes.mjs`
 );
-const { default: investorRouter } = await import(
-	`./${API_VERSION}/routers/Investors/investors.routes.mjs`
-);
 const { default: startupRouter } = await import(
 	`./${API_VERSION}/routers/Startups/startups.routes.mjs`
 );
@@ -36,7 +33,6 @@ app.use((req, res, next) => {
 
 //Routes
 app.use(`/api/${API_VERSION}/auth`, authRouter);
-app.use(`/api/${API_VERSION}/investor`, investorRouter);
 app.use(`/api/${API_VERSION}/startup`, startupRouter);
 app.use(`/api/${API_VERSION}/posts`, postRouter);
 

@@ -1,9 +1,8 @@
 import {
 	CreatePost,
 	DeletePost,
-	StartupsWithPosts,
-	updatePost,
-	getPosts
+	getPosts,
+	StartupsWithPosts
 } from '../../models/posts.model.mjs';
 
 import { findInvestorByUserId } from '../../models/investors.model.mjs';
@@ -36,7 +35,6 @@ async function httpGetAllPost(req, res, next) {
 				404
 			);
 			return next(error);
-
 		}
 
 		return res.status(200).json(startupsResponse);
@@ -73,10 +71,6 @@ async function httpCreatePost(req, res, next) {
 				404
 			);
 			return next(error);
-			// return handleNotFoundResponse(
-			// 	'There are no investors to notify of new post.',
-			// 	res
-			// );
 		}
 
 		res.status(200).json({ post: postResponse, investors: notifyResponse });
@@ -85,26 +79,26 @@ async function httpCreatePost(req, res, next) {
 	}
 }
 
-async function httpGetMyPost(req,res,next) {try {
-	const userId = req.userId;
+async function httpGetMyPost(req, res, next) {
+	try {
+		const userId = req.userId;
 
-	const startupResponse = await findStartupByUserId(userId);
-	if (!startupResponse) {
-		const error = new HttpError(
-			'This startup does not exist in the system.',
-			400
-		);
-		return next(error);
+		const startupResponse = await findStartupByUserId(userId);
+		if (!startupResponse) {
+			const error = new HttpError(
+				'This startup does not exist in the system.',
+				400
+			);
+			return next(error);
+		}
+
+		const postsResponse = await getPosts(startupResponse.id);
+
+		return res.status(200).json(postsResponse);
+	} catch (error) {
+		return handleErrorResponse('get all posts by investor id', error, res);
 	}
-
-	const postsResponse = await getPosts(startupResponse.id);
-
-	
-	return res.status(200).json(postsResponse);
-} catch (error) {
-	return handleErrorResponse('get all posts by investor id', error, res);
-}}
-
+}
 
 async function httpDeletePost(req, res, next) {
 	try {
@@ -126,34 +120,4 @@ async function httpDeletePost(req, res, next) {
 	}
 }
 
-async function httpUpdatePost(req, res, next) {
-	try {
-		const userId = req.userId;
-		const startupResponse = await findStartupByUserId(userId);
-
-		if (!startupResponse) {
-			const error = new HttpError(
-				'This startup does not exist in the system.',
-				400
-			);
-			return next(error);
-			// return handleBadRequestResponse(
-			// 	'This startup does not exist in the system.',
-			// 	res
-			// );
-		}
-
-		const postId = req.params.postId;
-		const postInfo = {
-			title: req.body.title,
-			description: req.body.description
-		};
-		const postResponse = await updatePost(startupResponse.id, postId, postInfo);
-
-		res.status(200).json(postResponse);
-	} catch (error) {
-		return handleErrorResponse('update specific post', error, res);
-	}
-}
-
-export { httpGetAllPost, httpCreatePost, httpDeletePost, httpUpdatePost,httpGetMyPost };
+export { httpGetAllPost, httpCreatePost, httpDeletePost, httpGetMyPost };

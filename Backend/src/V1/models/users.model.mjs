@@ -14,10 +14,6 @@ async function createUser(email, password, role) {
 				'Email is already taken, please provide another email address.',
 				400
 			);
-			// return buildErrorObject(
-			// 	400,
-			// 	'Email is already taken, please provide another email address.'
-			// );
 		}
 		let salt = generateSalt(32);
 		let hashedPassword = sha512(password.toString(), salt);
@@ -27,28 +23,10 @@ async function createUser(email, password, role) {
 				email: email,
 				password: hashedPassword,
 				passwordSalt: salt,
-				role: role,
+				role: role
 			}
 		});
 		return createdUser;
-	} catch (error) {
-		throw error;
-	}
-}
-
-async function updateUserEmail(user, email) {
-	try {
-		const updatedUser = await prisma.user.update({
-			where: {
-				id: user.id
-			},
-			data: {
-				email: email,
-				lastModified: new Date()
-			}
-		});
-
-		return updatedUser;
 	} catch (error) {
 		throw error;
 	}
@@ -67,10 +45,7 @@ async function isUserAuthorized(email, password) {
 				'Provided password is incorrect for this user.',
 				401
 			);
-
 		}
-
-		
 
 		const userWithoutPassord = excludeFields(user, [
 			'password',
@@ -91,30 +66,6 @@ async function findUserById(userId) {
 		});
 
 		return user;
-	} catch (error) {
-		throw error;
-	}
-}
-
-async function findEmailById(userId) {
-	try {
-		const user = await prisma.user.findUnique({
-			where: {
-				id: userId
-			}
-		});
-
-		if (!user) {
-			return null;
-		}
-
-		return excludeFields(user, [
-			'id',
-			'accessToken',
-			'refreshToken',
-			'password',
-			'passwordSalt'
-		]);
 	} catch (error) {
 		throw error;
 	}
@@ -203,78 +154,7 @@ async function updateUserTokens(userId, accessToken, refreshToken) {
 	}
 }
 
-async function updateUserApproval(userId, approval) {
-	try {
-		const user = await prisma.user.update({
-			where: {
-				id: userId
-			},
-			data: {
-				isApproved: approval,
-				lastModified: new Date()
-			}
-		});
-
-		const userFiltered = excludeFields(user, [
-			'id',
-			'password',
-			'passwordSalt',
-			'accessToken',
-			'refreshToken'
-		]);
-		return userFiltered;
-	} catch (error) {
-		throw error;
-	}
-}
-
 // --- Utilities Functions ---
-async function validateProfileUpdate(userInfo) {
-	try {
-		// Validate that User Exists
-		const user = await prisma.user.findUnique({
-			where: {
-				id: userInfo.id
-			}
-		});
-		if (!user) {
-			return new HttpError('This user does not exist in the system.', 401);
-			// return buildErrorObject(401, 'This user does not exist in the system.');
-		}
-
-		// Validate if Email Already Exists
-		if (userInfo.email !== user.email && !!userInfo.email) {
-			const userWithEmailExists = await findUserByEmail(userInfo.email);
-			if (userWithEmailExists) {
-				return new HttpError('A user with this email already exists.', 400);
-				// return buildErrorObject(400, 'A user with this email already exists.');
-			}
-		}
-
-		// Validate Passwords Match
-		if (
-			userInfo.password &&
-			userInfo.newPassword &&
-			userInfo.password !== userInfo.newPassword
-		) {
-			let hashedPasswordFromRequest = sha512(
-				userInfo.password,
-				user.passwordSalt
-			);
-			if (hashedPasswordFromRequest !== user.password) {
-				return new HttpError('Current password is incorrect for this user,401');
-				// return buildErrorObject(
-				// 	401,
-				// 	'Current password is incorrect for this user.'
-				// );
-			}
-		}
-
-		return user;
-	} catch (error) {
-		throw error;
-	}
-}
 
 function generateSalt(length) {
 	return crypto
@@ -292,14 +172,10 @@ function sha512(password, salt) {
 
 export {
 	createUser,
-	findEmailById,
 	findUserByEmail,
 	findUserById,
-	updateUserEmail,
 	updateUserPassword,
 	isUserAuthorized,
 	getUserTokens,
-	updateUserApproval,
-	updateUserTokens,
-	validateProfileUpdate
+	updateUserTokens
 };

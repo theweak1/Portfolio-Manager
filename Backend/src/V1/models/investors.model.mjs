@@ -1,7 +1,6 @@
 import prisma from '../../database/index.mjs';
 
 import { excludeFields } from '../util/helpers.mjs';
-import { HttpError } from './http-error.mjs';
 
 async function createInvestor(userId, email, investorInfo) {
 	try {
@@ -46,43 +45,6 @@ async function findInvestorByUserId(userId) {
 	}
 }
 
-async function validateInvestorExists(userId) {
-	try {
-		const investor = await prisma.investor.findUnique({
-			where: {
-				userId: userId
-			}
-		});
-		if (!investor) {
-			return new HttpError('This investor does not exist in the system.', 401);
-		}
-
-		return investor;
-	} catch (error) {
-		throw error;
-	}
-}
-
-async function updateInvestor(id, email, investorInfo) {
-	try {
-		const updatedInvestor = await prisma.investor.update({
-			where: {
-				id: id
-			},
-			data: {
-				name: !!investorInfo.name ? investorInfo.name : undefined,
-				email: !!email ? email : undefined,
-				lastModified: new Date()
-			}
-		});
-
-		const investorWithoutId = excludeFields(updatedInvestor, ['id']);
-		return investorWithoutId;
-	} catch (error) {
-		throw error;
-	}
-}
-
 async function findInvestorByEmail(newInvestors) {
 	try {
 		const investors = [];
@@ -105,10 +67,4 @@ async function findInvestorByEmail(newInvestors) {
 	}
 }
 
-export {
-	createInvestor,
-	findInvestorByUserId,
-	validateInvestorExists,
-	updateInvestor,
-	findInvestorByEmail
-};
+export { createInvestor, findInvestorByUserId, findInvestorByEmail };
