@@ -31,7 +31,7 @@ async function httpGetAllPost(req, res, next) {
 
 		if (!startupsResponse) {
 			const error = new HttpError(
-				'You are not invited to view any startups portfolio.',
+				'There are no posts to view at the time.',
 				404
 			);
 			return next(error);
