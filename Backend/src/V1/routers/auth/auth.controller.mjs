@@ -53,7 +53,6 @@ async function httpLogin(req, res, next) {
 
 		const expirationTime = parseInt('20m', 10) * 60 * 1000; // Parse the string as an integer
 
-		console.log(expirationTime);
 		return res.status(200).json({
 			accessToken,
 			refreshToken,
