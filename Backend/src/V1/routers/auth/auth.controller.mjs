@@ -51,12 +51,15 @@ async function httpLogin(req, res, next) {
 
 		await updateUserTokens(userResponse.id, accessToken, refreshToken);
 
+		const expirationTime = parseInt('20m', 10) * 60 * 1000; // Parse the string as an integer
+
+		console.log(expirationTime);
 		return res.status(200).json({
 			accessToken,
 			refreshToken,
 			email: userResponse.email,
 			role: userResponse.role,
-			expiresIn: new Date(new Date().getTime() + 3600000 * '5h'.split('')[0]),
+			expiresIn: new Date(new Date().getTime() + expirationTime),
 			userId: userResponse.id
 		});
 	} catch (error) {

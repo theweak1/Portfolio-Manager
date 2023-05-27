@@ -130,7 +130,7 @@ async function getPosts(startupId) {
 	}
 }
 
-// --- Utilities Functions ---
+// ---------- Utility Functions ----------
 async function validatePostExistence(postId) {
 	const post = await prisma.post.findUnique({
 		where: {

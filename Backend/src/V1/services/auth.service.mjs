@@ -15,7 +15,6 @@ async function authenticateJsonWebToken(req, res, next) {
 			if (!token) {
 				const error = new HttpError('Your are not authenticated.', 401);
 				return next(error);
-				// return res.status(error.errorCode).json({ error: error });
 			}
 
 			const userTokens = await getUserTokens(token);
@@ -25,7 +24,6 @@ async function authenticateJsonWebToken(req, res, next) {
 					403
 				);
 				return next(error);
-				// return res.status(error.errorCode).json({ error: error });
 			}
 
 			jwt.verify(token, process.env.ACCESS_TOKEN_SECRET || '', (err, user) => {
@@ -35,7 +33,6 @@ async function authenticateJsonWebToken(req, res, next) {
 						403
 					);
 					return next(error);
-					// return res.status(error.errorCode).json({ error: error });
 				}
 
 				const userId = user;
@@ -49,11 +46,10 @@ async function authenticateJsonWebToken(req, res, next) {
 	}
 }
 
-// TODO: Replace expiration time with 1200s after finish development
 function generateAccessToken(id) {
 	const user = { id };
 	return jwt.sign(user, process.env.ACCESS_TOKEN_SECRET || '', {
-		expiresIn: '5h'
+		expiresIn: '20m'
 	});
 }
 
@@ -75,7 +71,6 @@ function verifyRefreshToken(refreshToken, next) {
 			if (err) {
 				const error = new HttpError('Token has expired.', 403);
 				return next(error);
-				// return buildErrorObject(403, 'Token has expired.');
 			}
 
 			const userId = user;

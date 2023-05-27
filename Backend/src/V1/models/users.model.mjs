@@ -154,7 +154,7 @@ async function updateUserTokens(userId, accessToken, refreshToken) {
 	}
 }
 
-// --- Utilities Functions ---
+// ---------- Utility Functions ----------
 
 function generateSalt(length) {
 	return crypto

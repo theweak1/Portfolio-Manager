@@ -1,11 +1,9 @@
 import React, { useContext, useEffect, useState } from 'react';
+import { AiOutlineClose } from 'react-icons/ai';
+import { FaBars } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import '../../index.css';
 import { SidebarDataStartup } from './SidebarDataStartup';
-// import * as FaIcons from "react-icons/fa";//menu icon
-// import * as AiIcons from "react-icons/ai";//x icon
-import { AiOutlineClose } from 'react-icons/ai';
-import { FaBars } from 'react-icons/fa';
 
 import { AuthContext } from '../../shared/context/auth-context';
 import { useHttpClient } from '../../shared/hooks/http-hook';
